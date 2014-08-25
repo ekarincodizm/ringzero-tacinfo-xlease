@@ -1,0 +1,135 @@
+@charset "utf-8";
+body {
+	margin: 0px;
+	padding: 0px;
+	height: 100%;
+	width: 100%;
+}
+ul {
+	margin: 0px;
+	padding: 0px;
+}
+
+#footercontrainer {
+	height: 180px;
+	width: 100%;
+	background-image: url(../images/footer-bg.png);
+	background-repeat: repeat-x;
+	margin-top: 2px;
+}
+#divgroupbothmenu {
+	width: 800px;
+}
+
+#divbothmenu {
+	position: relative;
+	height: 120px;
+	width: 800px;
+	background-image: url(../images/footer-sub-bg.png);
+	top: 5px;
+	border-radius:5px;
+	opacity: 0.8;
+	filter: alpha(opacity=80, style=0);
+	-moz-opacity: 80%;
+	text-align: left;
+	margin: 0px;
+	padding: 0px;
+}
+
+
+.diveachbothmenu {
+	width: 160px;
+	padding: 0px;
+	position: relative;
+	top: 0px;
+	float: left;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	margin-left: 25px;
+}
+#diveachbothmenu1 {
+	position: relative;
+	left: 25px;
+	top: 5px;
+}
+#diveachbothmenu2 {
+	position: relative;
+	left: 25px;
+	top: 5px;
+}
+#diveachbothmenu3 {
+	position: relative;
+	left: 25px;
+	top: 5px;
+}
+#diveachbothmenu4 {
+	left: 25px;
+	top: 5px;
+	position: relative;
+}
+#uleachbothmenu li {
+	line-height: 15px;
+	font-weight: normal;
+	text-align: left;
+	height: 12px;
+	font-family: Tahoma, Geneva, sans-serif;
+	color: #fff;
+	text-decoration: none;
+	padding: 0px;
+	margin-top: 2px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	margin-left: 0px;
+	list-style-type: none;
+}
+.subbothmenueng a{
+	color: #fff;
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 10px;
+	font-weight: normal;
+	text-decoration: none;
+	text-align: left;
+	line-height: 15px;
+}
+.subbothmenuthai a{
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 12px;
+	font-weight: normal;
+	color: #fff;
+	text-decoration: none;
+	line-height: 15px;
+	text-align: left;
+}
+#divfooter {
+	height: 45px;
+	width: 800px;
+	position: relative;
+	background-image: url(../images/footer-sub-bg.png);
+	top: 10px;
+	border-radius:5px;
+	opacity: 0.8;
+	filter: alpha(opacity=80, style=0);
+	-moz-opacity: 80%;
+}
+#spanauthor  {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 12px;
+	font-weight: normal;
+	line-height: 45px;
+	color: #fff;
+	text-decoration: none;
+	text-align: left;
+	margin-left: 10px;
+	float: left;
+}
+#copyright {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 11px;
+	font-weight: normal;
+	color: #fff;
+	text-decoration: none;
+	line-height: 45px;
+	float: right;
+	margin-right: 10px;
+}

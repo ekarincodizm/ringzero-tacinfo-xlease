@@ -1,0 +1,37 @@
+<?php
+include("../config/config.php");
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+<head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="txt/html; charset=utf-8" />
+    <link type="text/css" rel="stylesheet" href="act.css"></link>
+    <link type="text/css" rel="stylesheet" href="../dhtmlgoodies_calendar/dhtmlgoodies_calendar/dhtmlgoodies_calendar.css?random=20051112" media="screen"></LINK>
+    <script type="text/javascript" src="../dhtmlgoodies_calendar/dhtmlgoodies_calendar/dhtmlgoodies_calendar.js?random=20060118"></script> 
+    <script type="text/javascript" src="autocomplete.js"></script>  
+    <link rel="stylesheet" href="autocomplete.css"  type="text/css"/>  
+
+</head>
+<body>
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top:1px" align="left">
+    <tr>
+        <td>
+        
+<div class="header"><h1>โอนสิทธิ์ เช่าซื้อ</h1></div>
+<div class="wrapper">
+
+<div align="center">
+ทำการโอนสิทธิ์เรียบร้อยแล้ว
+<br><br>
+<input type="button" value="  Back  " onclick="location.href='frm_tranfer.php'">
+</div>
+
+</div>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

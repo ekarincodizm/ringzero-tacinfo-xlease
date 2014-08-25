@@ -1,0 +1,1243 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<?php
+session_start();
+include("../../config/config.php");
+
+
+$check = $_POST['check'];
+$check1 = $_GET['Check'];
+$datelog = nowDateTime(); //ดึงข้อมูลวันเวลาจาก server
+$user_id = $_SESSION["av_iduser"];
+
+$status = 0;
+$status1 = 0;
+if($check1==""){
+	if(isset($_POST["appv"])){ 
+		$check1='agree';
+	}
+}
+
+if($check1 == 'agree'){
+
+	/*$appsecurID = $_GET['appsecurID'];
+	$securdeID = $_GET['securdeID'];*/
+	$appsecurID = $_POST["appsecurID"];
+	$securdeID = $_POST["securdeID"];
+
+	pg_query('BEGIN');			
+		$strSQL = "update \"approve_securities_detail\" SET \"status\" = '1' where \"appsecurID\" = '$appsecurID' ";
+		$objQuery = pg_query($strSQL);
+	
+		
+		if($objQuery){
+		}else{
+			$status++;
+		}
+			if($status == 0){
+				$strSQL1 = "select * from \"temp_securities_detail\" where \"securdeID\" = '$securdeID' ";				
+				$objQuery1 = pg_query($strSQL1);
+				$re = pg_fetch_array($objQuery1);
+				
+			$feature=$re['feature'];
+			$feature_other=$re['feature_other'];
+			$height=$re['height'];
+			$size_build=$re['size_build'];
+			$size_area=$re['size_area'];
+			$struncture_build =$re['structure_build'];
+			$wall_brick=$re['wall_brick'];
+			$wall_wood_brick=$re['wall_wood_brick'];
+			$wall_wood=$re['wall_wood'];
+			$wall_other=$re['wall_other'];
+			$wall_other_detail=$re['wall_other_detail'];
+			$ground_top_con =$re['ground_top_con'];
+			$ground_top_wood=$re['ground_top_wood'];
+			$ground_top_parquet=$re['ground_top_parquet'];
+			$ground_top_ceramic=$re['ground_top_ceramic'];
+			$ground_top_other=$re['ground_top_other'];
+			$ground_top_other_detail=$re['ground_top_other_detail'];
+			$ground_bot_con=$re['ground_bot_con'];
+			$ground_bot_wood=$re['ground_bot_wood'];
+			$ground_bot_parquet=$re['ground_bot_parquet'];
+			$ground_bot_ceramic=$re['ground_bot_ceramic'];
+			$ground_bot_other=$re['ground_bot_other'];
+			$ground_bot_other_detail=$re['ground_bot_other_detail'];
+			$roof_frame_iron=$re['roof_frame_iron'];
+			$roof_frame_con=$re['roof_frame_con'];
+			$roof_frame_wood=$re['roof_frame_wood'];
+			$roof_frame_unknow=$re['roof_frame_unknow'];
+			$roof_frame_other=$re['roof_frame_other'];
+			$roof_frame_other_detail=$re['roof_frame_other_detail'];
+			$roof_zine=$re['roof_zine'];
+			$roof_deck=$re['roof_deck'];
+			$roof_tile_duo=$re['roof_tile_duo'];
+			$roof_tile_monern=$re['roof_tile_monern'];
+			$roof_other=$re['roof_other'];
+			$roof_other_detail=$re['roof_other_detail'];
+			$ceiling_gypsum=$re['ceiling_gypsum'];
+			$ceiling_tile=$re['ceiling_tile'];
+			$ceiling_structure=$re['ceiling_structure'];
+			$ceiling_nothing=$re['ceiling_nothing'];
+			$ceiling_other=$re['ceiling_other'];
+			$ceiling_other_detail=$re['ceiling_other_detail'];
+			$door_wood=$re['door_wood'];
+			$door_glass=$re['door_glass'];
+			$door_plywood=$re['door_plywood'];
+			$door_iron=$re['door_iron'];
+			$door_other=$re['door_other'];
+			$door_other_detail=$re['door_other_detail'];
+			$window_open_glass=$re['window_open_glass'];
+			$window_silde_glass=$re['window_slide_glass'];
+			$window_scale_glass=$re['window_scale_glass'];
+			$window_wood=$re['window_wood'];
+			$window_other=$re['window_other'];
+			$window_other_detail=$re['window_other_detail'];
+			$rest_wc=$re['rest_wc'];
+			$rest_basin=$re['rest_basin'];
+			$rest_tub=$re['rest_tub'];
+			$rest_other=$re['rest_other'];
+			$rest_other_detail=$re['rest_other_detail'];
+			$quan_cave=$re['quan_cave'];
+			$quan_units=$re['quan_unit'];
+			$quan_room=$re['quan_room'];
+			$floor_number=$re['floor_number'];
+			$fire=$re['fire'];
+			$room_height=$re['room_height'];
+			$build_inside_area=$re['build_inside_area'];
+			$roof_interval=$re['roof_interval'];
+			$deed_quantity=$re['Deed_quantity'];
+			$cost_near=$re['cost_near'];
+			$cost_checker=$re['cost_checker'];
+			$typedocument=$re['typedocument'];
+			$typebuild=$re['typebuild'];
+			$typebuild_floor=$re['typebuild_floor'];
+			$size_build_width=$re['size_build_width'];
+			$size_build_long=$re['size_build_long'];
+			$deed_owner=$re['deed_owner'];
+			$deed_owner_area=$re['deed_owner_area'];
+			$deed_owner_area_size1=$re['deed_owner_area_size1'];
+			$deed_owner_area_size2=$re['deed_owner_area_size2'];
+			$address=$re['address'];
+			$position_address_right_map=$re['position_add_right_map'];
+			$position_address_fail_map=$re['position_add_fail_map'];
+			$position_address_success=$re['position_add_success'];
+			$position_address_fail=$re['position_add_fail'];
+			$position_address_navigation=$re['position_add_navigation'];
+			$position_address_navigation_name=$re['position_add_navigation_name'];
+			$land_shape_rectangle=$re['land_shape_rectangle'];
+			$land_shape_square=$re['land_shape_square'];
+			$land_shape_trapezuid=$re['land_shape_trapqzuid'];
+			$land_shape_triangle=$re['land_shape_triangle'];
+			$land_shape_polygon=$re['land_shape_polygon'];
+			$land_state_coverall=$re['land_state_coverall'];
+			$land_state_cover=$re['land_state_cover'];
+			$land_state_cover_about=$re['land_state_cover_about'];
+			$land_state_hole=$re['land_state_hole'];
+			$land_state_hole_about1=$re['land_state_hole_about1'];
+			$land_state_hole_about2=$re['land_state_hole_about2'];
+			$land_level_match=$re['land_level_match'];
+			$land_level_height=$re['land_level_height'];
+			$land_level_height_about=$re['land_level_height_about'];
+			$land_level_low=$re['land_level_low'];
+			$land_level_low_about=$re['land_level_low_about'];
+			$communication=$re['communication'];
+			$road_type=$re['road_type'];
+			$road_state=$re['road_state'];
+			$road_state_detail=$re['road_state_detail'];
+			$roadtobuild=$re['road_to_build'];
+			$road_status=$re['road_status'];
+			$road_vehicles=$re['road_vehicles'];
+			$useful_home=$re['useful_home'];
+			$useful_commerce=$re['useful_commerce'];
+			$useful_rent=$re['useful_rent'];
+			$useful_stored=$re['useful_stored'];
+			$useful_industry=$re['useful_industry'];
+			$useful_agriculture=$re['useful_agriculture'];
+			$useful_other=$re['useful_other'];
+			$useful_other_detail=$re['useful_other_detail'];
+			$utilities=$re['utilities'];
+			$utilities_electricity=$re['utilities_electricity'];
+			$utilities_plumbing=$re['utilities_plumbing'];
+			$utilities_phone=$re['utilities_phone'];
+			$utilities_drain=$re['utilities_drain'];
+			$utilities_groundwater=$re['utilities_groundwater'];
+			$utilities_electricroad=$re['utilities_electri_road'];
+			$environment=$re['environment'];
+			$environment_trade=$re['environment_trade'];
+			$environment_home=$re['environment_home'];
+			$environment_factory=$re['environment_factory'];
+			$environment_slum=$re['environment_slum'];
+			$environment_military=$re['environment_military'];
+			$environment_tomb=$re['environment_tomb'];
+			$environment_shrine=$re['environment_shrine'];
+			$environment_temple=$re['environment_temple'];
+			$environment_highvoltage=$re['environment_highvoltage'];
+			$environment_dirt=$re['environment_dirt'];
+			$environment_closeplace=$re['environment_closeplace'];
+			$bind_rent=$re['bind_rent'];
+			$bind_rent_about=$re['bind_rent_about'];
+			$bind_pawn=$re['bind_pawn'];
+			$bind_pawn_about=$re['bind_pawn_about'];
+			$bind_all=$re['bind_all'];
+			$bind_rentbuy=$re['bind_rentbuy'];
+			$bind_nothing=$re['bind_nothing'];
+			$expropriate=$re['expropriate'];
+			$advancementnow=$re['advancementnow'];
+			$advancementcontinue=$re['advancementcontinue'];
+			$advancement=$re['advancement'];
+			$generality=$re['generality'];
+			$generality_detail=$re['generality_detail'];
+			$nearhome_status=$re['nearhome_status'];
+			$nearhomesize=$re['nearhomesize'];
+			$nearhometel=$re['nearhometel'];
+			$nearhomeprice=$re['nearhomeprice'];
+			$landoffice=$re['landoffice'];
+			$landoffice_branch=$re['landoffice_branch'];
+			$file=$re['file'];
+			$date=$re['date'];
+			$marketvalue=$re['marketvalue'];
+			$salevalue=$re['salevalue'];
+			$feel_checker=$re['feel_checker'];
+			$securID=$re['securID'];
+			$CusID=$re['CusID'];
+			$id_user=$re['id_user'];
+			$auditorID=$re['id_auditor'];
+			
+			
+			if($feature==""){
+				$feature="0";
+			}else{
+				$feature = "'".$feature."'";
+			}
+			if($feature_other=="")
+			{
+				$feature_other="null";
+			}else{
+				$feature_other= "'".$feature_other."'";
+			}
+			if($height==""){
+				$height="null";
+			}else{
+				$height="'".$height."'";
+			}if($size_build==""){
+				$size_build="null";
+			}else{
+				$size_build="'".$size_build."'";
+			}if($size_area==""){
+				$size_area="null";
+			}else{
+				$size_area="'".$size_area."'";
+			}if($struncture_build==""){
+				$struncture_build="null";
+			}else{
+				$struncture_build="'".$struncture_build."'";
+			}if($wall_brick==""){
+				$wall_brick="0";
+			}else{
+				$wall_brick="'".$wall_brick."'";
+			}if($wall_wood_brick==""){
+				$wall_wood_brick="0";
+			}else{
+				$wall_wood_brick="'".$wall_wood_brick."'";
+			}if($wall_wood==""){
+				$wall_wood="0";
+			}else{
+				$wall_wood="'".$wall_wood."'";
+			}if($wall_other==""){
+				$wall_other="0";
+			}else{
+				$wall_other="'".$wall_other."'";
+			}if($wall_other_detail==""){
+				$wall_other_detail="null";
+			}else{
+				$wall_other_detail="'".$wall_other_detail."'";
+			}if($ground_top_con==""){
+				$ground_top_con="0";
+			}else{
+				$ground_top_con="'".$ground_top_con."'";
+			}if($ground_top_wood==""){
+				$ground_top_wood="0";
+			}else{
+				$ground_top_wood="'".$ground_top_wood."'";
+			}if($ground_top_parquet==""){
+				$ground_top_parquet="0";
+			}else{
+				$ground_top_parquet="'".$ground_top_parquet."'";
+			}if($ground_top_ceramic==""){
+				$ground_top_ceramic="0";
+			}else{
+				$ground_top_ceramic="'".$ground_top_ceramic."'";
+			}if($ground_top_other==""){
+				$ground_top_other="0";
+			}else{
+				$ground_top_other="'".$ground_top_other."'";
+			}if($ground_top_other_detail==""){
+				$ground_top_other_detail="null";
+			}else{
+				$ground_top_other_detail="'".$ground_top_other_detail."'";
+			}if($ground_bot_con==""){
+				$ground_bot_con="0";
+			}else{
+				$ground_bot_con="'".$ground_bot_con."'";
+			}if($ground_bot_wood==""){
+				$ground_bot_wood="0";
+			}else{
+				$ground_bot_wood="'".$ground_bot_wood."'";
+			}if($ground_bot_parquet==""){
+				$ground_bot_parquet="0";
+			}else{
+				$ground_bot_parquet="'".$ground_bot_parquet."'";
+			}if($ground_bot_ceramic==""){
+				$ground_bot_ceramic="0";
+			}else{
+				$ground_bot_ceramic="'".$ground_bot_ceramic."'";
+			}if($ground_bot_other==""){
+				$ground_bot_other="0";
+			}else{
+				$ground_bot_other="'".$ground_bot_other."'";
+			}if($ground_bot_other_detail==""){
+				$ground_bot_other_detail="null";
+			}else{
+				$ground_bot_other_detail="'".$ground_bot_other_detail."'";
+			}if($roof_frame_iron==""){
+				$roof_frame_iron="0";
+			}else{
+				$roof_frame_iron="'".$roof_frame_iron."'";
+			}if($roof_frame_con==""){
+				$roof_frame_con="0";
+			}else{
+				$roof_frame_con="'".$roof_frame_con."'";
+			}if($roof_frame_wood==""){
+				$roof_frame_wood="0";
+			}else{
+				$roof_frame_wood="'".$roof_frame_wood."'";
+			}if($roof_frame_unknow==""){
+				$roof_frame_unknow="0";
+			}else{
+				$roof_frame_unknow="'".$roof_frame_unknow."'";
+			}if($roof_frame_other==""){
+				$roof_frame_other="0";
+			}else{
+				$roof_frame_other="'".$roof_frame_other."'";
+			}if($roof_frame_other_detail==""){
+				$roof_frame_other_detail="null";
+			}else{
+				$roof_frame_other_detail="'".$roof_frame_other_detail."'";
+			}if($roof_zine==""){
+				$roof_zine="0";
+			}else{
+				$roof_zine="'".$roof_zine."'";
+			}if($roof_deck==""){
+				$roof_deck="0";
+			}else{
+				$roof_deck="'".$roof_deck."'";
+			}if($roof_tile_duo==""){
+				$roof_tile_duo="0";
+			}else{
+				$roof_tile_duo="'".$roof_tile_duo."'";
+			}if($roof_tile_monern==""){
+				$roof_tile_monern="0";
+			}else{
+				$roof_tile_monern="'".$roof_tile_monern."'";
+			}if($roof_other==""){
+				$roof_other="0";
+			}else{
+				$roof_other="'".$roof_other."'";
+			}if($roof_other_detail==""){
+				$roof_other_detail="null";
+			}else{
+				$roof_other_detail="'".$roof_other_detail."'";
+			}if($ceiling_gypsum==""){
+				$ceiling_gypsum="0";
+			}else{
+				$ceiling_gypsum="'".$ceiling_gypsum."'";
+			}if($ceiling_tile==""){
+				$ceiling_tile="0";
+			}else{
+				$ceiling_tile="'".$ceiling_tile."'";
+			}if($ceiling_structure==""){
+				$ceiling_structure="0";
+			}else{
+				$ceiling_structure="'".$ceiling_structure."'";
+			}if($ceiling_nothing==""){
+				$ceiling_nothing="0";
+			}else{
+				$ceiling_nothing="'".$ceiling_nothing."'";
+			}if($ceiling_other==""){
+				$ceiling_other="0";
+			}else{
+				$ceiling_other="'".$ceiling_other."'";
+			}if($ceiling_other_detail==""){
+				$ceiling_other_detail="null";
+			}else{
+				$ceiling_other_detail="'".$ceiling_other_detail."'";
+			}if($door_wood==""){
+				$door_wood="0";
+			}else{
+				$door_wood="'".$door_wood."'";
+			}if($door_glass==""){
+				$door_glass="0";
+			}else{
+				$door_glass="'".$door_glass."'";
+			}if($door_plywood==""){
+				$door_plywood="0";
+			}else{
+				$door_plywood="'".$door_plywood."'";
+			}if($door_iron==""){
+				$door_iron="0";
+			}else{
+				$door_iron="'".$door_iron."'";
+			}if($door_other==""){
+				$door_other="0";
+			}else{
+				$door_other="'".$door_other."'";
+			}if($door_other_detail==""){
+				$door_other_detail="null";
+			}else{
+				$door_other_detail="'".$door_other_detail."'";
+			}if($window_open_glass==""){
+				$window_open_glass="0";
+			}else{
+				$window_open_glass="'".$window_open_glass."'";
+			}if($window_silde_glass==""){
+				$window_silde_glass="0";
+			}else{
+				$window_silde_glass="'".$window_silde_glass."'";
+			}if($window_scale_glass==""){
+				$window_scale_glass="0";
+			}else{
+				$window_scale_glass="'".$window_scale_glass."'";
+			}if($window_wood==""){
+				$window_wood="0";
+			}else{
+				$window_wood="'".$window_wood."'";
+			}if($window_other==""){
+				$window_other="0";
+			}else{
+				$window_other="'".$window_other."'";
+			}if($window_other_detail==""){
+				$window_other_detail="null";
+			}else{
+				$window_other_detail="'".$window_other_detail."'";
+			}if($rest_wc==""){
+				$rest_wc="0";
+			}else{
+				$rest_wc="'".$rest_wc."'";
+			}if($rest_basin==""){
+				$rest_basin="0";
+			}else{
+				$rest_basin="'".$rest_basin."'";
+			}if($rest_tub==""){
+				$rest_tub="0";
+			}else{
+				$rest_tub="'".$rest_tub."'";
+			}if($rest_other==""){
+				$rest_other="0";
+			}else{
+				$rest_other="'".$rest_other."'";
+			}if($rest_other_detail==""){
+				$rest_other_detail="null";
+			}else{
+				$rest_other_detail="'".$rest_other_detail."'";
+			}if($quan_cave==""){
+				$quan_cave="null";
+			}else{
+				$quan_cave="'".$quan_cave."'";
+			}if($quan_units==""){
+				$quan_units="null";
+			}else{
+				$quan_units="'".$quan_units."'";
+			}if($quan_room==""){
+				$quan_room="null";
+			}else{
+				$quan_room="'".$quan_room."'";
+			}if($floor_number==""){
+				$floor_number="null";
+			}else{
+				$floor_number="'".$floor_number."'";
+			}if($fire==""){
+				$fire="null";
+			}else{
+				$fire="'".$fire."'";
+			}if($room_height==""){
+				$room_height="null";
+			}else{
+				$room_height="'".$room_height."'";
+			}if($build_inside_area==""){
+				$build_inside_area="null";
+			}else{
+				$build_inside_area="'".$build_inside_area."'";
+			}if($roof_interval==""){
+				$roof_interval="null";
+			}else{
+				$roof_interval="'".$roof_interval."'";
+			}if($deed_quantity==""){
+				$deed_quantity="null";
+			}else{
+				$deed_quantity="'".$deed_quantity."'";
+			}if($cost_near==""){
+				$cost_near="null";
+			}else{
+				$cost_near="'".$cost_near."'";
+			}if($cost_checker==""){
+				$cost_checker="null";
+			}else{
+				$cost_checker="'".$cost_checker."'";
+			}if($typedocument==""){	
+				$typedocument="null";
+			}else{
+				$typedocument="'".$typedocument."'";
+			}if($typebuild==""){
+				$typebuild="null";
+			}else{
+				$typebuild="'".$typebuild."'";
+			}if($typebuild_floor==""){
+				$typebuild_floor="null";
+			}else{
+				$typebuild_floor="'".$typebuild_floor."'";
+			}if($size_build_width==""){
+				$size_build_width="null";
+			}else{
+				$size_build_width="'".$size_build_width."'";
+			}if($size_build_long==""){
+				$size_build_long="null";
+			}else{
+				$size_build_long="'".$size_build_long."'";
+			}if($deed_owner==""){
+				$deed_owner="null";
+			}else{
+				$deed_owner="'".$deed_owner."'";
+			}if($deed_owner_area==""){
+				$deed_owner_area="null";
+			}else{
+				$deed_owner_area="'".$deed_owner_area."'";
+			}if($deed_owner_area_size1==""){
+				$deed_owner_area_size1="null";
+			}else{
+				$deed_owner_area_size1="'".$deed_owner_area_size1."'";
+			}if($deed_owner_area_size2==""){
+				$deed_owner_area_size2="null";
+			}else{
+				$deed_owner_area_size2="'".$deed_owner_area_size2."'";
+			}if($address==""){
+				$address="null";
+			}else{
+				$address="'".$address."'";
+			}if($position_address_right_map==""){
+				$position_address_right_map="0";
+			}else{
+				$position_address_right_map="'".$position_address_right_map."'";
+			}if($position_address_fail_map==""){
+				$position_address_fail_map="0";
+			}else{
+				$position_address_fail_map="'".$position_address_fail_map."'";
+			}if($position_address_success==""){
+				$position_address_success="0";
+			}else{
+				$position_address_success="'".$position_address_success."'";
+			}if($position_address_fail==""){
+				$position_address_fail="0";
+			}else{
+				$position_address_fail="'".$position_address_fail."'";
+			}if($position_address_navigation==""){
+				$position_address_navigation="0";
+			}else{
+				$position_address_navigation="'".$position_address_navigation."'";
+			}if($position_address_navigation_name==""){
+				$position_address_navigation_name="null";
+			}else{
+				$position_address_navigation_name="'".$position_address_navigation_name."'";
+			}if($land_shape_rectangle==""){
+				$land_shape_rectangle="0";
+			}else{
+				$land_shape_rectangle="'".$land_shape_rectangle."'";
+			}if($land_shape_square==""){
+				$land_shape_square="0";
+			}else{
+				$land_shape_square="'".$land_shape_square."'";
+			}if($land_shape_trapezuid==""){
+				$land_shape_trapezuid="0";
+			}else{
+				$land_shape_trapezuid="'".$land_shape_trapezuid."'";
+			}if($land_shape_triangle==""){
+				$land_shape_triangle="0";
+			}else{
+				$land_shape_triangle="'".$land_shape_triangle."'";
+			}if($land_shape_polygon==""){
+				$land_shape_polygon="0";
+			}else{
+				$land_shape_polygon="'".$land_shape_polygon."'";
+			}if($land_state_coverall==""){
+				$land_state_coverall="0";
+			}else{
+				$land_state_coverall="'".$land_state_coverall."'";
+			}if($land_state_cover==""){
+				$land_state_cover="0";
+			}else{
+				$land_state_cover="'".$land_state_cover."'";
+			}if($land_state_cover_about=="" || $land_state_cover_about=='/'){
+				$land_state_cover_about="null";
+			}else{
+				$land_state_cover_about="'".$land_state_cover_about."'";
+			}if($land_state_hole==""){
+				$land_state_hole="0";
+			}else{
+				$land_state_hole="'".$land_state_hole."'";
+			}if($land_state_hole_about1==""){
+				$land_state_hole_about1="null";
+			}else{
+				$land_state_hole_about1="'".$land_state_hole_about1."'";
+			}if($land_state_hole_about2==""){
+				$land_state_hole_about2="null";
+			}else{
+				$land_state_hole_about2="'".$land_state_hole_about2."'";
+			}if($land_level_match==""){
+				$land_level_match="0";
+			}else{
+				$land_level_match="'".$land_level_match."'";
+			}if($land_level_height==""){
+				$land_level_height="0";
+			}else{
+				$land_level_height="'".$land_level_height."'";
+			}if($land_level_height_about==""){
+				$land_level_height_about="null";
+			}else{
+				$land_level_height_about="'".$land_level_height_about."'";
+			}if($land_level_low==""){
+				$land_level_low="0";
+			}else{
+				$land_level_low="'".$land_level_low."'";
+			}if($land_level_low_about==""){
+				$land_level_low_about="null";
+			}else{
+				$land_level_low_about="'".$land_level_low_about."'";
+			}if($communication==""){
+				$communication="null";
+			}else{
+				$communication="'".$communication."'";
+			}if($road_type==""){
+				$road_type="null";
+			}else{
+				$road_type="'".$road_type."'";
+			}if($road_state==""){
+				$road_state="null";
+			}else{
+				$road_state="'".$road_state."'";
+			}if($road_state_detail==""){
+				$road_state_detail="null";
+			}else{
+				$road_state_detail="'".$road_state_detail."'";
+			}if($roadtobuild==""){
+				$roadtobuild="null";
+			}else{
+				$roadtobuild="'".$roadtobuild."'";
+			}if($road_status==""){
+				$road_status="null";
+			}else{
+				$road_status="'".$road_status."'";
+			}if($road_vehicles==""){
+				$road_vehicles="null";
+			}else{
+				$road_vehicles="'".$road_vehicles."'";
+			}if($useful_home==""){
+				$useful_home="0";
+			}else{
+				$useful_home="'".$useful_home."'";
+			}if($useful_commerce==""){
+				$useful_commerce="0";
+			}else{
+				$useful_commerce="'".$useful_commerce."'";
+			}if($useful_rent==""){
+				$useful_rent="0";
+			}else{
+				$useful_rent="'".$useful_rent."'";
+			}if($useful_stored==""){
+				$useful_stored="0";
+			}else{
+				$useful_stored="'".$useful_stored."'";
+			}if($useful_industry==""){
+				$useful_industry="0";
+			}else{
+				$useful_industry="'".$useful_industry."'";
+			}if($useful_agriculture==""){
+				$useful_agriculture="0";
+			}else{
+				$useful_agriculture="'".$useful_agriculture."'";
+			}if($useful_other==""){
+				$useful_other="0";
+			}else{
+				$useful_other="'".$useful_other."'";
+			}if($useful_other_detail==""){
+				$useful_other_detail="null";
+			}else{
+				$useful_other_detail="'".$useful_other_detail."'";
+			}if($utilities==""){
+				$utilities="null";
+			}else{
+				$utilities="'".$utilities."'";
+			}if($utilities_electricity==""){
+				$utilities_electricity="0";
+			}else{
+				$utilities_electricity="'".$utilities_electricity."'";
+			}if($utilities_plumbing==""){
+				$utilities_plumbing="0";
+			}else{
+				$utilities_plumbing="'".$utilities_plumbing."'";
+			}if($utilities_phone==""){
+				$utilities_phone="0";
+			}else{
+				$utilities_phone="'".$utilities_phone."'";
+			}if($utilities_drain==""){
+				$utilities_drain="0";
+			}else{
+				$utilities_drain="'".$utilities_drain."'";
+			}if($utilities_groundwater==""){
+				$utilities_groundwater="0";
+			}else{
+				$utilities_groundwater="'".$utilities_groundwater."'";
+			}if($utilities_electricroad==""){
+				$utilities_electricroad="0";
+			}else{
+				$utilities_electricroad="'".$utilities_electricroad."'";
+			}if($environment==""){
+				$environment="null";
+			}else{
+				$environment="'".$environment."'";
+			}if($environment_trade==""){
+				$environment_trade="0";
+			}else{
+				$environment_trade="'".$environment_trade."'";
+			}if($environment_home==""){
+				$environment_home="0";
+			}else{
+				$environment_home="'".$environment_home."'";
+			}if($environment_factory==""){
+				$environment_factory="0";
+			}else{
+				$environment_factory="'".$environment_factory."'";
+			}if($environment_slum==""){
+				$environment_slum="0";
+			}else{
+				$environment_slum="'".$environment_slum."'";
+			}if($environment_military==""){
+				$environment_military="0";
+			}else{
+				$environment_military="'".$environment_military."'";
+			}if($environment_tomb==""){
+				$environment_tomb="0";
+			}else{
+				$environment_tomb="'".$environment_tomb."'";
+			}if($environment_shrine==""){
+				$environment_shrine="0";
+			}else{
+				$environment_shrine="'".$environment_shrine."'";
+			}if($environment_temple==""){
+				$environment_temple="0";
+			}else{
+				$environment_temple="'".$environment_temple."'";
+			}if($environment_highvoltage==""){
+				$environment_highvoltage="0";
+			}else{
+				$environment_highvoltage="'".$environment_highvoltage."'";
+			}if($environment_dirt==""){
+				$environment_dirt="0";
+			}else{
+				$environment_dirt="'".$environment_dirt."'";
+			}if($environment_closeplace==""){
+				$environment_closeplace="null";
+			}else{
+				$environment_closeplace="'".$environment_closeplace."'";
+			}if($bind_rent==""){
+				$bind_rent="0";
+			}else{
+				$bind_rent="'".$bind_rent."'";
+			}if($bind_rent_about==""){
+				$bind_rent_about="null";
+			}else{
+				$bind_rent_about="'".$bind_rent_about."'";
+			}if($bind_pawn==""){
+				$bind_pawn="0";
+			}else{
+				$bind_pawn="'".$bind_pawn."'";
+			}if($bind_pawn_about==""){
+				$bind_pawn_about="null";
+			}else{
+				$bind_pawn_about="'".$bind_pawn_about."'";
+			}if($bind_all==""){
+				$bind_all="0";
+			}else{
+				$bind_all="'".$bind_all."'";
+			}if($bind_rentbuy==""){
+				$bind_rentbuy="0";
+			}else{
+				$bind_rentbuy="'".$bind_rentbuy."'";
+			}if($bind_nothing==""){
+				$bind_nothing="0";
+			}else{
+				$bind_nothing="'".$bind_nothing."'";
+			}if($expropriate==""){
+				$expropriate="null";
+			}else{
+				$expropriate="'".$expropriate."'";
+			}if($advancementnow==""){
+				$advancementnow="null";
+			}else{
+				$advancementnow="'".$advancementnow."'";
+			}if($advancementcontinue==""){
+				$advancementcontinue="null";
+			}else{
+				$advancementcontinue="'".$advancementcontinue."'";
+			}if($advancement==""){
+				$advancement="null";
+			}else{
+				$advancement="'".$advancement."'";
+			}if($generality==""){
+				$generality="null";
+			}else{
+				$generality="'".$generality."'";
+			}if($generality_detail==""){
+				$generality_detail="null";
+			}else{
+				$generality_detail="'".$generality_detail."'";
+			}if($nearhome_status==""){
+				$nearhome_status="null";
+			}else{
+				$nearhome_status="'".$nearhome_status."'";
+			}if($nearhomesize==""){
+				$nearhomesize="null";
+			}else{
+				$nearhomesize="'".$nearhomesize."'";
+			}if($nearhometel==""){
+				$nearhometel="null";
+			}else{
+				$nearhometel="'".$nearhometel."'";
+			}if($nearhomeprice==""){
+				$nearhomeprice="null";
+			}else{
+				$nearhomeprice="'".$nearhomeprice."'";
+			}if($landoffice==""){
+				$landoffice="null";
+			}else{
+				$landoffice="'".$landoffice."'";
+			}if($landoffice_branch==""){
+				$landoffice_branch="null";
+			}else{
+				$landoffice_branch="'".$landoffice_branch."'";			
+			}if($date==""){
+				$date="null";
+			}else{
+				$date="'".$date."'";
+			}if($marketvalue==""){
+				$marketvalue="null";
+			}else{
+				$marketvalue="'".$marketvalue."'";
+			}if($salevalue==""){
+				$salevalue="null";
+			}else{
+				$salevalue="'".$salevalue."'";
+			}if($feel_checker==""){
+				$feel_checker="null";
+			}else{
+				$feel_checker="'".$feel_checker."'";
+			}if($securID==""){
+				$securID="null";
+			}if($file==""){
+				$file="null";
+			}else{
+				$file="'".$file."'";
+			}if($CusID==""){
+				$CusID="null";
+			}else{
+				$CusID="'".$CusID."'";
+			}if($id_user==""){
+				$id_user="null";
+			}else{
+				$id_user="'".$id_user."'";
+			}if($auditorID==""){
+				$auditorID="null";
+			}else{
+				$auditorID="'".$auditorID."'";
+			}
+
+			
+
+			
+			
+if($wall_brick=="0" && $wall_wood_brick=="0" && $wall_wood=="0" && $wall_other=="0"){
+
+		$wall_brick="null";
+		$wall_wood_brick="null";
+		$wall_wood="null";
+		$wall_other="null";
+}
+if($ground_top_con=="0" && $ground_top_wood=="0" && $ground_top_parquet=="0" && $ground_top_ceramic=="0" && $ground_top_other=="0" ){
+		
+		$ground_top_con="null"; 
+		$ground_top_wood="null";
+		$ground_top_parquet="null";
+		$ground_top_ceramic="null";
+		$ground_top_other="null";
+}
+if($ground_bot_con=="0" && $ground_bot_wood=="0" && $ground_bot_parquet=="0" && $ground_bot_ceramic=="0" && $ground_bot_other=="0"){
+	
+		$ground_bot_con="null";
+		$ground_bot_wood="null";
+		$ground_bot_parquet="null";
+		$ground_bot_ceramic="null";
+		$ground_bot_other="null";
+}
+if($roof_frame_iron=="0" && $roof_frame_con=="0" && $roof_frame_wood=="0" && $roof_frame_unknow=="0" && $roof_frame_other=="0"){
+
+		$roof_frame_iron="null";
+		$roof_frame_con="null";
+		$roof_frame_wood="null";
+		$roof_frame_unknow="null";
+		$roof_frame_other="null";
+}
+if($roof_zine=="0" && $roof_deck=="0" && $roof_tile_duo=="0" && $roof_tile_monern=="0" && $roof_other=="0"){
+
+		$roof_zine="null";
+		$roof_deck="null";
+		$roof_tile_duo="null";
+		$roof_tile_monern="null";
+		$roof_other="null";
+}
+if($ceiling_gypsum=="0" && $ceiling_tile=="0" && $ceiling_structure=="0" && $ceiling_nothing=="0" && $ceiling_other=="0"){
+
+		$ceiling_gypsum="null";
+		$ceiling_tile="null";
+		$ceiling_structure="null";
+		$ceiling_nothing="null";
+		$ceiling_other="null";
+}
+if($door_wood=="0" && $door_glass=="0" && $door_plywood=="0" && $door_iron=="0" && $door_other=="0"){
+
+		$door_wood="null";
+		$door_glass="null";
+		$door_plywood="null";
+		$door_iron="null";
+		$door_other="null";
+}
+if($window_open_glass=="0" && $window_silde_glass=="0" && $window_scale_glass=="0" && $window_wood=="0" && $window_other=="0"){
+
+		$window_open_glass="null";
+		$window_silde_glass="null";
+		$window_scale_glass="null";
+		$window_wood="null";
+		$window_other="null";
+}
+if($rest_wc=="0" && $rest_basin=="0" && $rest_tub=="0" && $rest_other=="0"){
+
+		$rest_wc="null";
+		$rest_basin="null";
+		$rest_tub="null";
+		$rest_other="null";
+}
+if($position_address_right_map=="0" && $position_address_fail_map=="0" && $position_address_success=="0" && $position_address_navigation=="0" && $position_address_fail=="0"){
+
+		$position_address_right_map="null";
+		$position_address_fail_map="null";
+		$position_address_success="null";
+		$position_address_navigation="null";
+		$position_address_fail="null";
+}
+if($land_shape_rectangle=="0" && $land_shape_polygon=="0" && $land_shape_triangle=="0" && $land_shape_trapezuid=="0" && $land_shape_square=="0"){
+
+		$land_shape_rectangle="null";
+		$land_shape_polygon="null";
+		$land_shape_triangle="null";
+		$land_shape_trapezuid="null";
+		$land_shape_square="null";
+}
+if($land_state_coverall=="0" && $land_state_cover=="0" && $land_state_hole=="0"){
+
+		$land_state_coverall="null";
+		$land_state_cover="null";
+		$land_state_hole="null";
+}
+if($land_level_match=="0" && $land_level_height=="0" && $land_level_low=="0"){
+
+		$land_level_match="null";
+		$land_level_height="null";
+		$land_level_low="null";
+}
+if($useful_home=="0" && $useful_commerce=="0" && $useful_rent=="0" && $useful_stored=="0" && $useful_industry=="0" && $useful_other=="0" && $useful_agriculture=="0"){
+		
+		$useful_home="null";
+		$useful_commerce="null";
+		$useful_rent="null";
+		$useful_stored="null";
+		$useful_industry="null";
+		$useful_other="null";
+		$useful_agriculture="null";
+}
+if($utilities_electricity=="0" && $utilities_electricroad=="0" && $utilities_plumbing=="0" && $utilities_groundwater=="0" && $utilities_drain=="0" && $utilities_phone=="0"){
+
+		$utilities_electricity="null";
+		$utilities_electricroad="null";
+		$utilities_plumbing="null";
+		$utilities_groundwater="null";
+		$utilities_drain="null";
+		$utilities_phone="null";
+}
+if($environment_trade=="0" && $environment_dirt=="0" && $environment_highvoltage=="0" && $environment_temple=="0" && $environment_shrine=="0" && $environment_tomb=="0" && $environment_military=="0" && $environment_home=="0" && $environment_slum=="0" && $environment_factory=="0"){
+		
+		$environment_trade="null";
+		$environment_dirt="null";
+		$environment_highvoltage="null";
+		$environment_temple="null";
+		$environment_shrine="null";
+		$environment_tomb="null";
+		$environment_military="null";
+		$environment_home="null";
+		$environment_slum="null";
+		$environment_factory="null";
+		
+}
+if($bind_rent=="0" && $bind_pawn=="0" && $bind_all=="0" && $bind_rentbuy=="0" && $bind_nothing=="0"){
+	
+		$bind_rent="null";
+		$bind_pawn="null";
+		$bind_all="null";
+		$bind_rentbuy="null";
+		$bind_nothing="null";
+}
+			
+			$strup = "UPDATE nw_securities_detail SET  
+				feature=$feature,
+				feature_other=$feature_other, 
+				height=$height, 
+				size_build=$size_build, 
+			   size_area=$size_area, 
+			   structure_build=$struncture_build, 
+			   wall_brick=$wall_brick,
+			   wall_wood_brick=$wall_wood_brick, 
+			   wall_wood=$wall_wood, 
+			   wall_other=$wall_other,
+			   wall_other_detail=$wall_other_detail, 
+			   ground_top_con=$ground_top_con , 
+			   ground_top_wood=$ground_top_wood, 
+			   ground_top_parquet=$ground_top_parquet, 
+			   ground_top_ceramic=$ground_top_ceramic, 
+			   ground_top_other=$ground_top_other, 
+			   ground_top_other_detail=$ground_top_other_detail, 
+			   ground_bot_con=$ground_bot_con, 
+			   ground_bot_wood=$ground_bot_wood, 
+			   ground_bot_parquet=$ground_bot_parquet, 
+			   ground_bot_ceramic=$ground_bot_ceramic, 
+			   ground_bot_other=$ground_bot_other, 
+			   ground_bot_other_detail=$ground_bot_other_detail, 
+			   roof_frame_iron=$roof_frame_iron, 
+			   roof_frame_con=$roof_frame_con, 
+			   roof_frame_wood=$roof_frame_wood, 
+			   roof_frame_unknow=$roof_frame_unknow, 
+			   roof_frame_other=$roof_frame_other, 
+			   roof_frame_other_detail=$roof_frame_other_detail, 
+			   roof_zine=$roof_zine, 
+			   roof_deck=$roof_deck, 
+			   roof_tile_duo=$roof_tile_duo, 
+			   roof_tile_monern=$roof_tile_monern, 
+			   roof_other=$roof_other, 
+			   roof_other_detail=$roof_other_detail, 
+			   ceiling_gypsum=$ceiling_gypsum, 
+			   ceiling_tile=$ceiling_tile, 
+			   ceiling_structure=$ceiling_structure, 
+			   ceiling_nothing=$ceiling_nothing, 
+			   ceiling_other=$ceiling_other, 
+			   ceiling_other_detail=$ceiling_other_detail,
+			   door_wood=$door_wood, 
+			   door_glass=$door_glass, 
+			   door_plywood=$door_plywood, 
+			   door_iron=$door_iron, 
+			   door_other=$door_other,
+			   door_other_detail=$door_other_detail,
+			   window_open_glass=$window_open_glass, 
+			   window_slide_glass=$window_silde_glass, 
+			   window_scale_glass=$window_scale_glass, 
+			   window_wood=$window_wood, 
+			   window_other=$window_other, 
+			   window_other_detail=$window_other_detail,
+			   rest_wc=$rest_wc, 
+			   rest_basin=$rest_basin, 
+			   rest_tub=$rest_tub,
+			   rest_other=$rest_other, 
+			   rest_other_detail=$rest_other_detail,
+			   quan_cave=$quan_cave, 
+			   quan_unit=$quan_units, 
+			   quan_room=$quan_room, 
+			   floor_number=$floor_number,
+			   fire=$fire, 
+			   room_height=$room_height,
+			   build_inside_area=$build_inside_area,
+			   roof_interval=$roof_interval, 
+			  \"Deed_quantity\"=$deed_quantity, 
+			  cost_near=$cost_near, 
+			  cost_checker=$cost_checker,
+			  typedocument=$typedocument, 
+			   typebuild=$typebuild,
+			   typebuild_floor=$typebuild_floor,
+			   size_build_width=$size_build_width,
+			   size_build_long=$size_build_long, 
+			   deed_owner=$deed_owner, 
+			   deed_owner_area=$deed_owner_area, 
+			   deed_owner_area_size1=$deed_owner_area_size1,
+			   deed_owner_area_size2=$deed_owner_area_size2, 
+			   address=$address,
+			   position_add_right_map=$position_address_right_map, 
+			   position_add_fail_map=$position_address_fail_map, 
+			   position_add_success=$position_address_success,
+			   position_add_fail=$position_address_fail, 
+			   position_add_navigation=$position_address_navigation, 
+			   position_add_navigation_name=$position_address_navigation_name,
+			   land_shape_rectangle=$land_shape_rectangle, 
+			   land_shape_square=$land_shape_square, 
+			   land_shape_trapqzuid=$land_shape_trapezuid, 
+			   land_shape_triangle=$land_shape_triangle,
+			   land_shape_polygon=$land_shape_polygon, 
+			   land_state_coverall=$land_state_coverall, 
+			   land_state_cover=$land_state_cover,
+			   land_state_cover_about=$land_state_cover_about, 
+			   land_state_hole=$land_state_hole, 
+			   land_state_hole_about1=$land_state_hole_about1, 
+			   land_state_hole_about2=$land_state_hole_about2, 
+			   land_level_match=$land_level_match, 
+			   land_level_height=$land_level_height, 
+			   land_level_height_about=$land_level_height_about, 
+			   land_level_low=$land_level_low,
+			   land_level_low_about=$land_level_low_about,
+			   communication=$communication, 
+			   road_type=$road_type, 
+			   road_state=$road_state, 
+			   road_state_detail=$road_state_detail, 
+			   road_to_build=$roadtobuild, 
+			   road_status=$road_status, 
+			   road_vehicles=$road_vehicles, 
+			   useful_home=$useful_home,
+			   useful_commerce=$useful_commerce,
+			   useful_rent=$useful_rent, 
+			   useful_stored=$useful_stored,
+			   useful_industry=$useful_industry, 
+			   useful_agriculture=$useful_agriculture, 
+			   useful_other=$useful_other, 
+			   useful_other_detail=$useful_other_detail, 
+			   utilities=$utilities, 
+			   utilities_electricity=$utilities_electricity, 
+			   utilities_plumbing=$utilities_plumbing,
+			   utilities_phone=$utilities_phone, 
+			   utilities_drain=$utilities_drain, 
+			   utilities_groundwater=$utilities_groundwater, 
+			   utilities_electri_road=$utilities_electricroad,
+			   environment=$environment, 
+			   environment_trade=$environment_trade, 
+			   environment_home=$environment_home, 
+			   environment_factory=$environment_factory,
+			   environment_slum=$environment_slum, 
+			   environment_military=$environment_military,
+			   environment_tomb=$environment_tomb, 
+			   environment_shrine=$environment_shrine, 
+			   environment_temple=$environment_temple, 
+			   environment_highvoltage=$environment_highvoltage, 
+			   environment_dirt=$environment_dirt, 
+			   environment_closeplace=$environment_closeplace, 
+			   bind_rent=$bind_rent,
+			   bind_rent_about=$bind_rent_about,
+			   bind_pawn=$bind_pawn, 
+			   bind_pawn_about=$bind_pawn_about, 
+			   bind_all=$bind_all, 
+			   bind_rentbuy=$bind_rentbuy, 
+			   bind_nothing=$bind_nothing, 
+			   expropriate=$expropriate, 
+			   advancementnow=$advancementnow,
+			   advancementcontinue=$advancementcontinue, 
+			   advancement=$advancement, 
+			   generality=$generality, 
+			   generality_detail=$generality_detail,
+			   nearhome_status=$nearhome_status,
+			   nearhomesize=$nearhomesize, 
+			   nearhometel=$nearhometel, 
+			   nearhomeprice=$nearhomeprice, 
+			   landoffice=$landoffice, 
+			   landoffice_branch=$landoffice_branch, 
+			   file=$file, 
+			   date=$date,
+			   marketvalue=$marketvalue, 
+			   salevalue=$salevalue, 
+			   \"securID\"=$securID, 
+			   feel_checker=$feel_checker, 
+			   \"CusID\"=$CusID, 
+			   id_user=$id_user,
+			   id_auditor=$auditorID
+				WHERE \"securID\"= '$securID'";
+			
+			
+			$objup = pg_query($strup);
+			
+					if($objup){
+					}else{
+						$status1++;
+					}
+					
+							if($status1 == 0){
+								//ACTIONLOG
+									$sqlaction = pg_query("INSERT INTO action_log(id_user, action_desc, action_time) VALUES ('$user_id', '(THCAP) ยืนยันบันทึกตรวจสอบหลักทรัพย์', '$datelog')");
+								//ACTIONLOG---
+								pg_query("COMMIT");
+								
+										echo "<meta http-equiv=\"refresh\" content=\"0; URL=approve.php\">";
+										echo "<script type='text/javascript'>alert('อนุมติ รายการประเมินหลักทรัพย์หมายเลข $securdeID เรียบร้อย')</script>";
+										exit();
+							}else{
+								pg_query("ROLLBACK");
+										echo "<meta http-equiv=\"refresh\" content=\"0; URL=approve.php\">";
+										echo "<script type='text/javascript'>alert('ไม่สามารถ อนุมัติ การประเมินหลักทรัพย์หมายเลข $securdeID ได้  โปรดลองใหม่ในภายหลัง')</script>";
+										exit();
+							}
+			}else{
+					pg_query("ROLLBACK");
+							echo "<meta http-equiv=\"refresh\" content=\"0; URL=approve.php\">";
+							echo "<script type='text/javascript'>alert('ไม่สามารถ อนุมัติ การประเมินหลักทรัพย์หมายเลข $securdeID ได้  โปรดลองใหม่ในภายหลัง')</script>";
+							exit();
+			}
+}else if($check == 'delup'){
+	
+	$appsecurID = $_POST['appsecurID'];
+	$securdeID = $_POST['securdeID'];
+	$reason = $_POST['reason'];
+
+	pg_query('BEGIN');			
+		$strSQL = "update \"approve_securities_detail\" SET \"status\" = '5',\"reason\" = '$reason' where \"appsecurID\" = '$appsecurID' ";
+		$objQuery = pg_query($strSQL);
+	
+		
+		if($objQuery){
+		}else{
+			$status++;
+		}
+			
+				if($status == 0){
+					//ACTIONLOG
+						$sqlaction = pg_query("INSERT INTO action_log(id_user, action_desc, action_time) VALUES ('$user_id', '(THCAP) ยืนยันบันทึกตรวจสอบหลักทรัพย์', '$datelog')");
+					//ACTIONLOG---
+					pg_query("COMMIT");
+					
+							echo "<meta http-equiv=\"refresh\" content=\"0; URL=approve.php\">";
+							echo "<script type='text/javascript'>alert('ปฎิเสธการประเมินหลักทรัพย์หมายเลข $securdeID เรียบร้อย')</script>";
+							exit();
+				}else{
+					pg_query("ROLLBACK");
+							echo "<meta http-equiv=\"refresh\" content=\"0; URL=approve.php\">";
+							echo "<script type='text/javascript'>alert('ไม่สามารถปฎิเสธการประเมินหลักทรัพย์หมายเลข $securdeID ได้ โปรดลองใหม่ในภายหลัง')</script>";
+							exit();
+				}
+		
+
+}else{
+
+		echo "<meta http-equiv=\"refresh\" content=\"0; URL=approve.php\">";
+		echo "<script type='text/javascript'>alert('--ข้อมูลมาไม่ครบ ไม่สามรถดำเนินการได้--')</script>";
+		exit();
+
+}
+
+?>

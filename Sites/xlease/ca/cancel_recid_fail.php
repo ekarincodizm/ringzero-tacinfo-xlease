@@ -1,0 +1,476 @@
+<?php
+include("../config/config.php");
+
+$recid = trim(pg_escape_string($_POST["idno_names"]));
+
+$qry_chk=pg_query("select * from \"CancelReceipt\" WHERE ref_receipt='$recid' ");
+$res_chk=pg_fetch_array($qry_chk);
+$numrow_chk=pg_num_rows($qry_chk);
+if($numrow_chk==1){
+    
+    $ms_cc=$res_chk["admin_approve"];
+    
+    if($ms_cc=='f'){
+        $status_cc = "<font color=\"#FFFF00\">ส่งข้อมูลขอยกเลิกใบเสร็จไปแล้ว รอการอนุมัติ";
+    }else{
+        $status_cc = "<font color=\"#ff0000\">ยกเลิกใบเสร็จไปแล้ว</font>";
+    }
+    
+    $txt_cc=$res_chk["c_memo"];
+    $bt_sent = "";
+    $show_select_type = 1;
+
+}else{
+    $status_cc = "<font color=\"#008000\">ยังไม่มีการยกเลิกใบเสร็จ</font>";
+    $txt_cc = "";
+    $bt_sent = '<input type="submit" name="submit" value="   บันทึก   ">';
+    $show_select_type = 0;
+}
+?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+<head>
+    <title><?php echo $_SESSION["session_company_name"]; ?></title>
+    <meta http-equiv="Content-Type" content="txt/html; charset=utf-8" />
+    <link type="text/css" rel="stylesheet" href="act.css"></link>
+</head>
+<body>
+ 
+<table width="700" border="0" cellspacing="0" cellpadding="0" style="margin-top:1px" align="center">
+    <tr>
+        <td>
+
+<div style="float:left"><input name="button" type="button" onclick="window.location='frm_cc_rec_fail.php'" value=" ย้อนกลับ " /></div>
+<div style="float:right"><input type="button" value="  Close  " onclick="javascript:window.close();"></div> 
+<div style="clear:both"></div>
+
+<div class="wrapper">
+
+<fieldset><legend><B>ยกเลิกใบเสร็จ - เงินโอนที่ออกผิดเลขที่สัญญา</B></legend>
+<script type="text/javascript">
+function popU(U,N,T) {
+    newWindow = window.open(U, N, T);
+}
+</script> 
+<?php
+$resType=substr($recid,2,1);
+if($resType=="R"){
+    
+    $showimagestatus = 0;
+    $qry_last=pg_query("select \"IDNO\",\"R_DueNo\",\"R_memo\" from \"Fr\" WHERE \"R_Receipt\"='$recid' ORDER BY \"R_DueNo\" DESC ");
+    if( $res_last=pg_fetch_array($qry_last) ){
+        $last_IDNO = $res_last["IDNO"];
+        $last_R_DueNo = $res_last["R_DueNo"];
+        $last_R_memo = $res_last["R_memo"];
+    }
+    
+    $qry_total=pg_query("select \"P_TOTAL\" from \"Fp\" WHERE \"IDNO\"='$last_IDNO' ");
+    if( $res_total=pg_fetch_array($qry_total) ){
+        $P_TOTAL = $res_total["P_TOTAL"];
+    }
+    
+    if($last_R_DueNo == $P_TOTAL){
+        $showimagestatus = 1;
+    }
+?>
+
+<table width="100%" border="0" cellSpacing="2" cellPadding="2" align="center" bgcolor="#79BCFF">
+<?php
+    $qry_p=pg_query("select \"IDNO\" from \"Fr\" WHERE \"R_Receipt\" = '$recid' ");
+    $numr=pg_num_rows($qry_p);
+    $s_res=pg_fetch_array($qry_p);
+    $ids=$s_res["IDNO"];
+
+if($numr==0){
+?>
+    <tr>
+        <td colspan="6">ไม่พบข้อมูล</td>
+    </tr>
+
+<?php
+}else{
+?>
+
+    <tr>
+        <td colspan="6">View Rec. id #<?php echo $recid; ?> : Status = <?php echo $status_cc; ?></td>
+    </tr>
+	<tr>
+        <td colspan="6" style="background-color:#FFFFFF;"><b>Detail Rec.</b><br />
+<?php
+	  $qry_name=pg_query("select * from \"VContact\" WHERE \"IDNO\"='$ids' ");
+	  $rs_dtl=pg_fetch_array($qry_name);
+	  
+	  if($rs_dtl["C_REGIS"]==""){
+          $rec_regis="ทะเบียน ".$rs_dtl["car_regis"];
+          $rec_cnumber="เลขถังแก๊ส ".$rs_dtl["gas_number"];
+          $res_band="ยี่ห้อแก๊ส ".$rs_dtl["gas_name"];
+      }else{
+          $rec_regis="ทะเบียน ".$rs_dtl["C_REGIS"];
+          $rec_cnumber="เลขตัวถัง ".$rs_dtl["C_CARNUM"];
+          $res_band="ยี่ห้อรถ ".$rs_dtl["C_CARNUM"];
+      }
+	  
+	  echo "ชื่อ/นามสกุล ".$rs_dtl["full_name"]."<br>".$rec_regis;
+	 ?>	 </td>
+    </tr>
+</table>
+
+<?php
+if($last_R_memo == "TR-ACC" OR $last_R_memo == "Bill Payment"){
+?>
+<div style="padding:5px; margin:5px 0px 5px 0px; background-color:#FFFFC4"><b>การยกเลิกใบเสร็จรายการนี้ จะมีผลต่อรายการดังต่อไปนี้ (เนื่องจากโอนผ่านธนาคารรายการเดียวกัน)</b><br />
+<?php
+$qry_dttp=pg_query("select \"PostID\" from \"DetailTranpay\" WHERE \"ReceiptNo\"='$recid' ");
+if( $res_dttp=pg_fetch_array($qry_dttp) ){
+    $PostID = $res_dttp["PostID"];
+}
+
+$qry_dttp2=pg_query("select \"ReceiptNo\",\"Amount\",\"TypePay\" from \"DetailTranpay\" WHERE \"PostID\"='$PostID' AND \"Cancel\"='FALSE' ");
+while( $res_dttp2=pg_fetch_array($qry_dttp2) ){
+    $ReceiptNo = $res_dttp2["ReceiptNo"];
+    $Amount = $res_dttp2["Amount"];
+    $TypePay = $res_dttp2["TypePay"];
+    
+    $qry_tp=pg_query("select \"TName\" from \"TypePay\" WHERE \"TypeID\"='$TypePay' ");
+    if( $res_tp=pg_fetch_array($qry_tp) ){
+        $TName = $res_tp["TName"];
+    }
+    
+    echo "- ReceiptNo : $ReceiptNo , Type : $TName , Amount : ". number_format($Amount,2) ."<br />";
+}
+?>
+</div>
+<?php
+}
+?>
+
+<table width="100%" border="0" cellSpacing="1" cellPadding="5" align="center" bgcolor="#F0F0F0">
+    <tr style="font-weight:bold;" valign="top" bgcolor="#79BCFF">
+        <td>IDNO</td>
+        <td>R_DueNo</td>
+        <td>R_Receipt</td>
+        <td>R_Money</td>
+        <td>PayType</td>
+        <td>Cancel</td>
+    </tr>
+
+<?php
+$qry_plog=pg_query("select * from \"Fr\" WHERE \"R_Receipt\" = '$recid' LIMIT(1) ");
+$numr=pg_num_rows($qry_plog);
+while($reslog=pg_fetch_array($qry_plog)){
+    
+    $qry_cc1=pg_query("select \"VatValue\" from \"VAccPayment\" WHERE \"IDNO\"='$reslog[IDNO]' LIMIT(1)");
+    if($res_cc1=pg_fetch_array($qry_cc1)){
+        $vat = $res_cc1['VatValue'];
+    }
+    
+    $i+=1;
+    if($i%2==0){
+        echo "<tr class=\"odd\">";
+    }else{
+        echo "<tr class=\"even\">";
+    }
+	$_SESSION["ses_idno"]=$reslog["IDNO"];
+?>
+    <td align="center"><a onclick="javascript:popU('../post/frm_cal_cuspayment.php?menu=','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1048,height=700')" style="cursor:pointer;"><font color="#0000FF"><u><?php echo $reslog["IDNO"]?></u></font></a></td>
+    <!--td align="center"><?php echo $reslog["IDNO"]; ?></td-->
+    <td align="center"><?php echo $reslog["R_DueNo"]; ?></td>
+    <td align="center"><?php echo $reslog["R_Receipt"]; ?></td>
+    <td align="right"><?php echo number_format($reslog["R_Money"]+$vat,2); ?></td>
+    <td align="center"><?php echo $reslog["PayType"]; ?></td>
+    <td align="center"><?php echo $reslog["Cancel"]; ?></td>
+</tr>
+  
+<form method="post" action="cancel_rec_process_fail.php">
+    <input type="hidden" name="fullname" value="<?php echo $rs_dtl["full_name"]; ?>" />
+	<input type="hidden" name="s_sta_rec" value="R" />
+	<input type="hidden" name="s_idno" id="s_idno" value="<?php echo $reslog["IDNO"]; ?>" />
+	<input type="hidden" name="s_recid" id="s_recid" value="<?php echo $reslog["R_Receipt"]; ?>" />
+	<input type="hidden" name="s_cdate" id="s_cdate" value="<?php echo date("Y-m-d");?>" />
+	<input type="hidden" name="s_cmoney" id="s_cmoney" value="<?php echo $reslog["R_Money"]+$vat; ?>" />
+    <input type="hidden" name="s_bank" id="s_bank" value="<?php echo $reslog["R_Bank"]; ?>" />
+	<input type="hidden" name="s_ref_prndate" id="s_ref_prndate" value="<?php echo $reslog["R_Prndate"]; ?>" />
+    <input type="hidden" name="s_ref_recdate" id="s_ref_prndate" value="<?php echo $reslog["R_Date"]; ?>" />
+	<input type="hidden" name="s_ref_recid" id="s_ref_recid" value="<?php echo $reslog["R_Receipt"]; ?>" />
+	<input type="hidden" name="s_paytype" id="s_paytype" value="<?php echo $reslog["PayType"]; ?>" />
+    <input type="hidden" name="s_memo" id="s_memo" value="<?php echo $reslog["R_memo"]; ?>" />
+    <input type="hidden" name="check_postid" id="check_postid" value="<?php echo $PostID; ?>" />
+
+<?php
+if($showimagestatus == 1){
+?>
+    <tr bgcolor="#FFFFFF">
+        <td colspan="6" align="center"><img src="cancelreceipt.gif" border="0" width="329" height="30"></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+        <td colspan="6"><br></td>
+    </tr>
+<?php
+}
+?>
+    <tr bgcolor="#FFFFFF">
+        <td colspan="6"><b>ระบุเหตุผลที่ยกเลิก</b></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+        <td colspan="6"><textarea  name="cc_memo" cols="80" rows="3"   /><?php echo $txt_cc; ?></textarea></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+        <td colspan="6" align="center"><?php echo $bt_sent; ?></td>
+    </tr>
+</form> 
+</table>
+
+ <?php
+        } //ปิด while
+    } // ปิด else
+}elseif($resType=="N" || $resType=="K"){ //===================== จบ TYPE R ==========================//
+?>
+
+<table width="100%" border="0" cellSpacing="2" cellPadding="2" align="center" bgcolor="#79BCFF">
+<?php
+    $qry_p=pg_query("select \"IDNO\",\"O_memo\" from \"FOtherpay\" WHERE \"O_RECEIPT\" = '$recid' ");
+    $numr=pg_num_rows($qry_p);
+    $s_res=pg_fetch_array($qry_p);
+    $ids=$s_res["IDNO"];
+    $last_O_memo=$s_res["O_memo"];
+    
+if($numr==0){
+?>
+    <tr>
+        <td colspan="6">ไม่พบข้อมูล</td>
+    </tr>
+
+<?php
+}else{
+?>
+
+    <tr>
+        <td colspan="6">View Rec. id #<?php echo $recid; ?> : Status = <?php echo $status_cc; ?></td>
+    </tr>
+    <tr>
+        <td colspan="6" style="background-color:#FFFFFF;"><b>Detail Rec.</b><br />
+<?php
+      $qry_name=pg_query("select * from \"VContact\" WHERE \"IDNO\"='$ids' ");
+      $rs_dtl=pg_fetch_array($qry_name);
+      
+      if($rs_dtl["C_REGIS"]==""){
+          $rec_regis="ทะเบียน ".$rs_dtl["car_regis"];
+          $rec_cnumber="เลขถังแก๊ส ".$rs_dtl["gas_number"];
+          $res_band="ยี่ห้อแก๊ส ".$rs_dtl["gas_name"];
+      }else{
+          $rec_regis="ทะเบียน ".$rs_dtl["C_REGIS"];
+          $rec_cnumber="เลขตัวถัง ".$rs_dtl["C_CARNUM"];
+          $res_band="ยี่ห้อรถ ".$rs_dtl["C_CARNUM"];
+      }
+      
+      echo "ชื่อ/นามสกุล ".$rs_dtl["full_name"]."<br>".$rec_regis;
+     ?>     </td>
+    </tr>
+</table>
+
+
+<?php
+if($last_O_memo == "TR-ACC" OR $last_O_memo == "Bill Payment"){
+?>
+<div style="padding:5px; margin:5px 0px 5px 0px; background-color:#FFFFC4"><b>การยกเลิกใบเสร็จรายการนี้ จะมีผลต่อรายการดังต่อไปนี้ (เนื่องจากโอนผ่านธนาคารรายการเดียวกัน)</b><br />
+<?php
+$qry_dttp=pg_query("select \"PostID\" from \"DetailTranpay\" WHERE \"ReceiptNo\"='$recid' ");
+if( $res_dttp=pg_fetch_array($qry_dttp) ){
+    $PostID = $res_dttp["PostID"];
+}
+
+$qry_dttp2=pg_query("select \"ReceiptNo\",\"Amount\",\"TypePay\" from \"DetailTranpay\" WHERE \"PostID\"='$PostID' ");
+while( $res_dttp2=pg_fetch_array($qry_dttp2) ){
+    $ReceiptNo = $res_dttp2["ReceiptNo"];
+    $Amount = $res_dttp2["Amount"];
+    $TypePay = $res_dttp2["TypePay"];
+    
+    $qry_tp=pg_query("select \"TName\" from \"TypePay\" WHERE \"TypeID\"='$TypePay' ");
+    if( $res_tp=pg_fetch_array($qry_tp) ){
+        $TName = $res_tp["TName"];
+    }
+    
+    echo "- ReceiptNo : $ReceiptNo , Type : $TName , Amount : ". number_format($Amount,2) ."<br />";
+}
+?>
+</div>
+<?php
+}
+?>
+
+
+<table width="100%" border="0" cellSpacing="1" cellPadding="5" align="center" bgcolor="#F0F0F0">
+    <tr style="font-weight:bold;" valign="top" bgcolor="#79BCFF">
+        <td>IDNO</td>
+        <td>O_DATE</td>
+        <td>O_RECEIPT</td>
+        <td>O_MONEY</td>
+        <td>O_Type</td>
+        <td>O_PRNDATE</td>
+    </tr>
+
+<?php
+$qry_plog=pg_query("select * from \"FOtherpay\" WHERE \"O_RECEIPT\" = '$recid' LIMIT(1) ");
+$numr=pg_num_rows($qry_plog);
+while($res_ns=pg_fetch_array($qry_plog)){
+    $i+=1;
+    if($i%2==0){
+        echo "<tr class=\"odd\">";
+    }else{
+        echo "<tr class=\"even\">";
+    }
+?>
+    <td align="center"><?php echo $res_ns["IDNO"]; ?></td>
+    <td align="center"><?php echo $res_ns["O_DATE"]; ?></td>
+    <td align="center"><?php echo $res_ns["O_RECEIPT"]; ?></td>
+    <td align="right"><?php echo number_format($res_ns["O_MONEY"],2); ?></td>
+    <td align="center"><?php echo $res_ns["O_Type"]; ?></td>
+    <td align="center"><?php echo $res_ns["O_PRNDATE"]; ?></td>
+</tr>
+
+<form method="post" action="cancel_rec_process_fail.php">
+    <input type="hidden" name="fullname" value="<?php echo $rs_dtl["full_name"]; ?>" />
+	<input type="hidden" name="s_sta_rec" value="N" />
+	<input type="hidden" name="s_idno" id="s_idno" value="<?php echo  $res_ns["IDNO"]; ?>" />
+	<input type="hidden" name="s_recid" id="s_recid" value="<?php echo $res_ns["O_RECEIPT"]; ?>" />
+	<input type="hidden" name="s_cdate" id="s_cdate" value="<?php echo date("Y-m-d");?>" />
+	<input type="hidden" name="s_cmoney" id="s_cmoney" value="<?php echo $res_ns["O_MONEY"]; ?>" />
+    <input type="hidden" name="s_bank" id="s_bank" value="<?php echo $res_ns["O_BANK"]; ?>" />
+	<input type="hidden" name="s_ref_prndate" id="s_ref_prndate" value="<?php echo $res_ns["O_PRNDATE"]; ?>" />
+    <input type="hidden" name="s_ref_recid" id="s_ref_recid" value="<?php echo $res_ns["O_RECEIPT"]; ?>" />
+	<input type="hidden" name="s_paytype" id="s_paytype" value="<?php echo $res_ns["PayType"]; ?>" />
+	<input type="hidden" name="s_ref_recdate" id="s_ref_prndate" value="<?php echo $res_ns["O_DATE"]; ?>" />
+    <input type="hidden" name="s_memo" id="s_memo" value="<?php echo $res_ns["O_memo"]; ?>" />
+    <input type="hidden" name="check_postid" id="check_postid" value="<?php echo $PostID; ?>" />
+    
+    <tr bgcolor="#FFFFFF">
+        <td colspan="6"><b>ระบุเหตุผลที่ยกเลิก</b></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+        <td colspan="6"><textarea  name="cc_memo" cols="80" rows="3"   /><?php echo $txt_cc; ?></textarea></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+        <td colspan="6" align="center"><?php echo $bt_sent; ?></td>
+    </tr>
+</form>    
+</table>
+ <?php
+        }
+    }
+}elseif($resType=="V"){
+?>
+ 
+<table width="100%" border="0" cellSpacing="2" cellPadding="2" align="center" bgcolor="#79BCFF">
+<?php
+    $qry_p=pg_query("select \"IDNO\" from \"FVat\" WHERE \"V_Receipt\" = '$recid' ");
+    $numr=pg_num_rows($qry_p);
+    $s_res=pg_fetch_array($qry_p);
+    $ids=$s_res["IDNO"];
+
+if($numr==0){
+?>
+    <tr>
+        <td colspan="6">ไม่พบข้อมูล</td>
+    </tr>
+
+<?php
+}else{
+?>
+
+    <tr>
+        <td colspan="6">View Rec. id #<?php echo $recid; ?> : Status = <?php echo $status_cc; ?></td>
+    </tr>
+    <tr>
+        <td colspan="6" style="background-color:#FFFFFF;"><b>Detail Rec.</b><br />
+<?php
+      $qry_name=pg_query("select * from \"VContact\" WHERE \"IDNO\"='$ids' ");
+      $rs_dtl=pg_fetch_array($qry_name);
+      
+      if($rs_dtl["C_REGIS"]==""){
+          $rec_regis="ทะเบียน ".$rs_dtl["car_regis"];
+          $rec_cnumber="เลขถังแก๊ส ".$rs_dtl["gas_number"];
+          $res_band="ยี่ห้อแก๊ส ".$rs_dtl["gas_name"];
+      }else{
+          $rec_regis="ทะเบียน ".$rs_dtl["C_REGIS"];
+          $rec_cnumber="เลขตัวถัง ".$rs_dtl["C_CARNUM"];
+          $res_band="ยี่ห้อรถ ".$rs_dtl["C_CARNUM"];
+      }
+      
+      echo "ชื่อ/นามสกุล ".$rs_dtl["full_name"]."<br>".$rec_regis;
+     ?>     </td>
+    </tr>
+</table>
+
+
+<table width="100%" border="0" cellSpacing="1" cellPadding="5" align="center" bgcolor="#F0F0F0">
+    <tr style="font-weight:bold;" valign="top" bgcolor="#79BCFF">
+        <td>IDNO</td>
+        <td>V_DueNo</td>
+        <td>V_Receipt</td>
+        <td>V_Date</td>
+        <td>VatValue</td>
+        <td>Paid_Status</td>
+        <td>Cancel</td>
+    </tr>
+<?php
+$qry_plog=pg_query("select * from \"FVat\" WHERE \"V_Receipt\" = '$recid' LIMIT(1) ");
+$numr=pg_num_rows($qry_plog);
+while($res_v=pg_fetch_array($qry_plog)){
+    $i+=1;
+    if($i%2==0){
+        echo "<tr class=\"odd\">";
+    }else{
+        echo "<tr class=\"even\">";
+    }
+?>
+    <td align="center"><?php echo $res_v["IDNO"]; ?></td>
+    <td align="center"><?php echo $res_v["V_DueNo"]; ?></td>
+    <td align="center"><?php echo $res_v["V_Receipt"]; ?></td>
+    <td align="center"><?php echo $res_v["V_Date"]; ?></td>
+    <td align="right"><?php echo number_format($res_v["VatValue"],2); ?></td>
+    <td align="center"><?php echo $res_v["Paid_Status"]; ?></td>
+    <td align="center"><?php echo $res_v["Cancel"]; ?></td>
+</tr>
+	
+<form method="post" action="cancel_rec_process_fail.php">
+    <input type="hidden" name="fullname" value="<?php echo $rs_dtl["full_name"]; ?>" />
+	<input type="hidden" name="s_sta_rec" value="V" />
+	<input type="hidden" name="s_idno" id="s_idno" value="<?php echo   $res_v["IDNO"]; ?>" />
+	<input type="hidden" name="s_recid" id="s_recid" value="<?php echo $res_v["V_Receipt"]; ?>" />
+	<input type="hidden" name="s_cdate" id="s_cdate" value="<?php echo date("Y-m-d");?>" />
+	<input type="hidden" name="s_cmoney" id="s_cmoney" value="<?php echo $res_v["VatValue"]; ?>" />
+    <input type="hidden" name="s_bank" id="s_bank" value="" />
+	<input type="hidden" name="s_ref_prndate" id="s_ref_prndate" value="<?php echo $res_v["V_PrnDate"]; ?>" />
+    <input type="hidden" name="s_ref_recid" id="s_ref_recid" value="<?php echo $res_v["V_Receipt"]; ?>" />                                   
+	<input type="hidden" name="s_ref_recdate" id="s_ref_prndate" value="<?php echo $res_v["V_Date"]; ?>" />
+	<input type="hidden" name="s_paytype" id="s_paytype" value="" />
+    <input type="hidden" name="s_memo" id="s_memo" value="<?php echo $res_v["V_memo"]; ?>" />
+
+    <tr bgcolor="#FFFFFF">
+        <td colspan="7"><b>ระบุเหตุผลที่ยกเลิก</b></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+        <td colspan="7"><textarea  name="cc_memo" cols="80" rows="3"   /><?php echo $txt_cc; ?></textarea></td>
+    </tr>
+    <tr bgcolor="#FFFFFF">
+        <td colspan="7" align="center"><?php echo $bt_sent; ?></td>
+    </tr>
+</form>    
+</table>    
+
+<?php
+        }
+    }
+}
+?>
+
+</fieldset>
+
+</div>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

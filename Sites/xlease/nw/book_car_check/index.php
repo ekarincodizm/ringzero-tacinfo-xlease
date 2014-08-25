@@ -1,0 +1,104 @@
+<?php
+session_start();
+if( empty($_SESSION["av_iduser"]) ){
+    header("Location:../index.php");
+    exit;
+}
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+<head>
+    <title><?php echo $_SESSION["session_company_name"]; ?></title>
+    <meta http-equiv="Content-Type" content="txt/html; charset=utf-8" />
+    <link type="text/css" rel="stylesheet" href="act.css"></link>
+	
+    <link type="text/css" href="../../jqueryui/css/ui-lightness/jquery-ui-1.8.2.custom.css" rel="stylesheet" />  
+    <script type="text/javascript" src="../../jqueryui/js/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="../../jqueryui/js/jquery-ui-1.8.2.custom.min.js"></script>   
+<script language=javascript>
+$(document).ready(function(){
+
+    $("#idno").autocomplete({
+        source: "gdata_idno.php",
+        minLength:1
+    });
+	
+	 $("#idno_names_search").autocomplete({
+        source: "bookcar.php",
+        minLength:1
+    });
+});
+
+</script>
+</head>
+<body>
+ 
+<table width="500" border="0" cellspacing="0" cellpadding="0" style="margin-top:1px" align="center">
+    <tr>
+        <td>     
+			<div class="header"><h1></h1></div>
+			<div class="wrapper">
+			<div align="right"><input type="button" value="  Close  " onclick="javascript:window.close();"></div> 
+			<fieldset><legend><B>เพิ่มใบนัดตรวจสภาพรถ</B></legend>
+
+				<form name="search" method="post" action="frm_carcheck.php">
+					<table width="100%" border="0" cellSpacing="0" cellPadding="5" align="center">
+						<tr align="center">
+							
+							<td align="left">
+								<input name="idno_names" type="hidden" id="idno_names"  />
+								<input type="text" id="idno" name="idno" size="60" />
+								<input type="submit" name="submit" value="   ค้นหา   ">
+							</td>
+					   </tr>
+					   <tr>  
+							
+							<td align="left">
+								<font color="gray">*เลขที่สัญญา,เลขทะเบียน</font>
+							</td>
+					   </tr>
+					</table>
+				</form>
+
+			</fieldset> 
+			</div>
+        </td>
+    </tr>
+</table> 
+<table width="600" border="0" cellspacing="0" cellpadding="0" style="margin-top:1px" align="center" >
+    <tr>
+        <td>  
+			<fieldset><legend><B>ค้นหาใบนัดตรวจสภาพรถ</B></legend>
+			<div class="header"><h1></h1></div>
+			<div class="wrapper">
+			<div align="right"></div> 
+			<fieldset><legend>*โปรดดูเลขที่สัญญาและทะเบียนรถ เพราะเลขที่สัญญาอาจซ้ำกันได้</legend>
+
+				<form name="search" method="post" action="PDF.php" target="_blank">
+					<table width="100%" border="0" cellSpacing="0" cellPadding="5" align="center">
+						<tr align="center">
+							
+							<td align="left">						
+								<input type="text" id="idno_names_search" name="idno_names_search" size="75" />
+								<input type="submit" name="submit" value="   ค้นหา   ">
+							</td>
+					   </tr>
+					   <tr>  
+							
+							<td align="left">
+								<font color="gray">*เลขที่สัญญา,เลขทะเบียน,ชื่อลูกค้า</font>
+							</td>
+					   </tr>
+					</table>
+				</form>
+
+			</fieldset> 
+			</div>
+			</fieldset> 
+        </td>
+    </tr>
+</table>         
+
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+<?php
+@ini_set('display_errors', '1');
+include("../config/config.php");
+
+header ("Content-type: text/html; charset=utf-8");
+header ("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
+header ("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT"); // always modified
+header ("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
+header ("Pragma: no-cache"); // HTTP/1.0
+
+$type = pg_escape_string($_POST['type']); 
+
+$qry_inf1=pg_query("select costofgas from gas.\"Model\" WHERE \"modelid\" = '$type' ");
+if($res_inf1=pg_fetch_array($qry_inf1)){
+    $costofgas = $res_inf1["costofgas"];
+    $show = $costofgas;
+}
+echo $show;
+?>

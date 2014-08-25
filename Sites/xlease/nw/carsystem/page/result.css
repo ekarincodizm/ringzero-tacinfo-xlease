@@ -1,0 +1,114 @@
+@charset "UTF-8";
+body {
+	margin: 0px;
+	padding: 0px;
+}
+#divImageResult {
+	width: 680px;
+	height:600px;
+}
+#divNumResultText {
+	float: right;
+}
+#divNumResultText span {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 14px;
+	font-weight: normal;
+	color: #555;
+	text-decoration: none;
+}
+.divEachResult.activeResult {
+	background-color:transparent;
+	background-image:-moz-linear-gradient(center top, rgb(255,255,255) 0px, rgb(245,245,245) 100%);
+	background-repeat:repeat;
+	background-attachment:scroll;
+	background-position:0% 0%;
+	background-clip:border-box;
+	background-origin:padding-box;
+	background-size:auto auto;
+	cursor:pointer;
+}
+.divEachResult {
+	float:left;
+	padding-top:12px;
+	padding-right:1px;
+	padding-bottom:10px;
+	padding-left:2px;
+	padding-left-rtl-source:physical;
+	padding-left-rtl-source:physical;
+	padding-right-rtl-source:physical;
+	padding-right-rtl-source:physical;
+	width::670px;
+	border-bottom-width:1px;
+	border-bottom-style:dotted;
+	border-bottom-color:rgb(170,170,170);
+}
+#divEachResult {
+	margin-top: 20px;
+}
+#divExamText {
+	background-image: url(images/camera.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	height: 20px;
+	width: 150px;
+	text-decoration: none;
+	padding-left: 20px;
+	font-size: 13px;
+	font-weight: bold;
+	color: #333;
+}
+#taxiPreview {
+	padding: 2px;
+	border: 1px solid #aaa;
+}
+#tdPostSellText {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 15px;
+	color: #0064c8;
+	text-decoration: none;
+	font-weight: bold;
+}
+.postSellDetail {
+	font-family: Tahoma, arial, Helvetica,sans-serif;
+	font-size: 12px;
+	font-weight: normal;
+	color: #333;
+	text-decoration: none;
+}
+.postSellDetail1 {
+	font-family: Tahoma, arial, Helvetica,sans-serif;
+	font-size: 15px;
+	font-weight: bold;
+	color: #f89c00;
+	text-decoration: none;
+	padding-bottom: 15px;
+}
+.postSellDetail2 {
+	font-family: Tahoma, arial, Helvetica,sans-serif;
+	font-size: 12px;
+	font-weight: normal;
+	color: #333;
+	text-decoration: none;
+	padding-bottom: 5px;
+}
+#tdPricePerMonth {
+	border-left-width: 1px;
+	border-left-style: dotted;
+	border-left-color: #ccc;
+	padding-left: 5px;
+}
+.highlightInfo {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 12px;
+	font-weight: normal;
+	color: #0064b8;
+	text-decoration: none;
+}
+.highlightInfo1 {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 12px;
+	font-weight: normal;
+	color: #cc0000;
+	text-decoration: none;
+}

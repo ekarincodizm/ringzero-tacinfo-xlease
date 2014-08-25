@@ -1,0 +1,22 @@
+@charset "utf-8";
+/* CSS Document */
+
+#txt{
+	padding:5px 0px 0px;
+	font-size:16px;
+	height:30px;
+	width:1024px;
+	text-align:center;
+}
+#txt2{
+	margin:26px 0px 0px 523px;
+	padding:5px 10px 0px 10px;
+	text-align: right;
+	width: 480px;
+	background: url(images/menuu.png) top left no-repeat;
+}
+#txt3{
+	padding:15px 50px 0px 0px;
+	text-align:left;
+	width: 970px;
+}

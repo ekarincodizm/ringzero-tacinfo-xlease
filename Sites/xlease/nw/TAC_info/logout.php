@@ -1,0 +1,16 @@
+<?php
+	session_start();
+	$path="";
+	if($_SESSION['userType']=="admin")
+	{
+		$path="admin.php";
+	}
+	else
+	{
+		$path="login.php";
+	}
+	session_unregister("username");
+	session_unregister("loginTime");
+	session_unregister("userType");
+	header("Location:$path")
+?>

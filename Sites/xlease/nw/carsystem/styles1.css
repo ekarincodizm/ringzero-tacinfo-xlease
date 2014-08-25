@@ -1,0 +1,394 @@
+@CHARSET "UTF-8";
+ ul,li,ol{
+	 Simple page reset 
+	margin:0;
+	padding:0;
+}
+.tabContainer{
+	 The UL 
+	float:left;
+	padding-right:13px;
+}
+
+#contentHolder{
+	background-color:#FFFFFF;
+	border:2px solid #FFFFFF;
+	margin:15px;
+	color:#444444;
+	padding:5px;
+	overflow:auto;
+}
+
+#tabContent{
+	background-color:#555;
+	border:1px solid #666;
+	margin-top:-15px;
+	width:100%;
+}
+
+#tabContent, .tabContainer li a,#contentHolder{
+	-webkit-box-shadow:0 0 2px black;
+	-moz-box-shadow:0 0 2px black;
+	box-shadow:0 0 2px black;
+}
+
+.tabContainer li{
+	 This will arrange the LI-s next to each other 
+	display:inline;
+}
+
+.tabContainer li a,.tabContainer li a:visited{
+	 Styling the hyperlinks of the tabs as colorful buttons 
+	
+	float:left;
+	font-size:16px;
+	display:block;
+	 display:block allows for additinal CSS rules to take effect, such as paddings: 
+	display:block;
+	height:29px;
+	 Giving positioning 
+	position:relative;
+	 CSS3 text-shadow 
+	text-shadow:1px 1px 1px #CCCCCC;
+	line-height: 29px;
+	font-weight: bold;
+	margin-top: 4px;
+	margin-right: 5px;
+	margin-bottom: 4px;
+	margin-left: 5px;
+	padding-top: 7px;
+	padding-right: 16px;
+	padding-bottom: 1px;
+	padding-left: 16px;
+}
+
+#overLine{
+	 The line above the active button. 
+	position:absolute;
+
+	height:1px;
+	background-color:white;
+	width:90px;
+	
+	float:left;
+	left:1px;
+	top:-5px;
+	overflow:hidden;
+}
+
+#mainBorder{
+	position:relative;
+	width:770px;
+	margin-top: 0;
+	margin-right: auto;
+	margin-bottom: auto;
+	margin-left: auto;
+}
+
+
+ul .left{
+	 The left span in the hyperlink 
+	
+	height:37px;
+	left:0;
+	position:absolute;
+	top:0;
+	width:10px;
+}
+
+ul .right{
+	 The right span in the hyperlink 
+	
+	height:37px;
+	right:0;
+	position:absolute;
+	top:0;
+	width:10px;
+}
+
+ Styling the colors individually: 
+
+ul a.green{	background:url(img/green_mid.png) repeat-x top center;	color:#24570f;}
+ul a.green span.left{ background:url(img/green_left.png) no-repeat left top;}
+ul a.green span.right{ background:url(img/green_right.png) no-repeat right top;}
+
+
+ul a.blue{	background:url(img/blue_mid.png) repeat-x top center;	color:#03426e;}
+ul a.blue span.left{ background:url(img/blue_left.png) no-repeat left top;}
+ul a.blue span.right{ background:url(img/blue_right.png) no-repeat right top;}
+
+ The hover states: 
+ul a:hover{	background-position:bottom center; text-decoration:none;}
+ul a:hover span.left{ background-position:left bottom;}
+ul a:hover span.right{ background-position:right bottom;}
+
+.preloader{
+	display:block;
+	margin:120px auto;
+}
+
+.clear{
+	 Old-school clear fix hack to clear the floats: 
+	clear:both;
+	height:1px;
+	overflow:hidden;
+}
+
+ The styles below are only necessary for the styling of the demo page: */
+
+a, a:visited {
+	color:#0196e3;
+	text-decoration:none;
+	outline:none;
+}
+
+a:hover{
+	text-decoration:underline;
+}
+a img{
+border:0;
+}
+#divVSpace {
+	height: 30px;
+	width: 700px;
+}
+div#top div#nav{
+float:left;
+clear:both;
+width:500px;
+height:52px;
+margin:22px 0 0;
+background:url url(images/nav-bg.png) 0 0 no-repeat;
+}
+div#top div#nav ul{
+float:left;
+width:500px;
+height:52px;
+list-style-type:none;
+}
+div#nav ul li{
+float:left;
+height:52px;
+}
+div#nav ul li a{
+border:0;
+height:52px;
+display:block;
+line-height:52px;
+text-indent:-9999px;
+}
+div#nav ul li a{
+	background:url(images/nav.png) no-repeat;
+}
+#navigate {
+	height: 26px;
+	background-color: #dadada;
+	border: 1px solid #ccc;
+	text-align: center;
+}
+
+.browse_page{
+	clear:both;
+	height:26px;
+	margin-top:5px;
+	display:block;
+	text-align:center;
+	float: right;
+	margin-right: 5px;
+}
+.browse_page a,.browse_page a:hover{
+	display:block;
+	height:18px;
+	width:18px;
+	font-size:10px;
+	float:left;
+	margin-right:2px;
+	border:1px solid #CCCCCC;
+	background-color:#F4F4F4;
+	color:#0a85cb;
+	text-align:center;
+	line-height:18px;
+	font-weight:bold;
+	text-decoration:none;
+}
+.browse_page a:hover{
+	border:1px solid #0A85CB;
+	background-color:#0A85CB;
+	color:#FFFFFF;
+}
+.browse_page a.selectPage{
+	display:block;
+	height:18px;
+	width:18px;
+	font-size:10px;
+	float:left;
+	margin-right:2px;
+	border:1px solid #0A85CB;
+	background-color:#0A85CB;
+	color:#FFFFFF;
+	text-align:center;
+	line-height:18px;
+	font-weight:bold;
+}
+.browse_page a.SpaceC{
+	display:block;
+	height:18px;
+	width:18px;
+	font-size:10px;
+	float:left;
+	margin-right:2px;
+	border:0px dotted #0A85CB;
+	font-size:11px;
+	background-color:#FFFFFF;
+	color:#333333;
+	text-align:center;
+	line-height:18px;
+	font-weight:bold;
+}
+.browse_page a.naviPN{
+	width:50px;
+	font-size:12px;
+	display:block;
+	height:18px;
+	float:left;
+	border:1px solid #CCCCCC;
+	background-color:#F4F4F4;
+	color:#0a85cb;
+	text-align:center;
+	line-height:18px;
+	font-weight:bold;	
+}
+.browse_page a.naviPN:hover{
+	width:50px;
+	font-size:12px;
+	display:block;
+	height:18px;
+	float:left;
+	border:1px solid #CCCCCC;
+	background-color:#0A85CB;
+	color:#fff;
+	text-align:center;
+	line-height:18px;
+	font-weight:bold;	
+}
+#divImageResult {
+	width: 700px;
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-bottom: 20px;
+	padding-left: 0px;
+	overflow: auto;
+}
+#divNumResultText {
+	float: right;
+}
+#divNumResultText span {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 14px;
+	font-weight: normal;
+	color: #555;
+	text-decoration: none;
+}
+.divEachResult.activeResult {
+	background-color:transparent;
+	background-image:-moz-linear-gradient(center top, rgb(255,255,255) 0px, rgb(245,245,245) 100%);
+	background-repeat:repeat;
+	background-attachment:scroll;
+	background-position:0% 0%;
+	background-clip:border-box;
+	background-origin:padding-box;
+	background-size:auto auto;
+	cursor:pointer;
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#ffffff, endColorstr=#f5f5f5)";
+}
+.divEachResult {
+	float:left;
+	padding-top:12px;
+	padding-right:1px;
+	padding-bottom:10px;
+	padding-left:2px;
+	padding-left-rtl-source:physical;
+	padding-left-rtl-source:physical;
+	padding-right-rtl-source:physical;
+	padding-right-rtl-source:physical;
+	width::660px;
+	border-bottom-width:1px;
+	border-bottom-style:dotted;
+	border-bottom-color:rgb(170,170,170);
+}
+#divEachResult {
+	margin-top: 20px;
+}
+#divExamText {
+	background-image: url(images/camera.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	height: 20px;
+	width: 150px;
+	text-decoration: none;
+	padding-left: 20px;
+	font-size: 13px;
+	font-weight: bold;
+	color: #333;
+}
+#taxiPreview {
+	padding: 2px;
+	border: 1px solid #aaa;
+}
+#tdPostSellText {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 15px;
+	color: #0064c8;
+	text-decoration: none;
+	font-weight: bold;
+	text-align: left;
+}
+.postSellDetail {
+	font-family: Tahoma, arial, Helvetica,sans-serif;
+	font-size: 12px;
+	font-weight: normal;
+	color: #333;
+	text-decoration: none;
+	text-align: left;
+}
+.postSellDetail1 {
+	font-family: Tahoma, arial, Helvetica,sans-serif;
+	font-size: 15px;
+	font-weight: bold;
+	color: #f89c00;
+	text-decoration: none;
+	padding-bottom: 15px;
+	text-align: left;
+}
+.postSellDetail2 {
+	font-family: Tahoma, arial, Helvetica,sans-serif;
+	font-size: 12px;
+	font-weight: normal;
+	color: #333;
+	text-decoration: none;
+	padding-bottom: 5px;
+	text-align: left;
+}
+#tdPricePerMonth {
+	border-left-width: 1px;
+	border-left-style: dotted;
+	border-left-color: #ccc;
+	padding-left: 5px;
+}
+.highlightInfo {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 12px;
+	font-weight: normal;
+	color: #0064b8;
+	text-decoration: none;
+}
+.highlightInfo1 {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 12px;
+	font-weight: normal;
+	color: #cc0000;
+	text-decoration: none;
+}#divalbumcontainer {
+	width: 800px;
+	margin: auto;
+}

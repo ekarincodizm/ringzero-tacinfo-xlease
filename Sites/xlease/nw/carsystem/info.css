@@ -1,0 +1,759 @@
+@charset "UTF-8";
+body {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 11px;
+	color: #333;
+	margin: 0px;
+	padding: 0px;
+	height: 100%;
+	width: 100%;
+	overflow: auto;
+}
+#tdColorBG {
+	background-color: #fff;
+}
+a {
+	text-decoration: none;
+	border-top-style: none;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+}
+h2 a {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 15px;
+	font-weight: bold;
+	color: #e9c227;
+	text-decoration: none;
+}
+#main {
+	width: 800px;
+	padding-bottom: 5px;
+	vertical-align: top;
+	overflow: auto;
+	position: relative;
+	margin: 0px;
+}
+#td_Telephone2 {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 13px;
+	font-weight: normal;
+	color: #d2020b;
+	text-decoration: none;
+	height: 25px;
+	width: 130px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-right-style: dashed;
+	border-bottom-style: dashed;
+	border-right-color: #aaa;
+	border-bottom-color: #aaa;
+}
+#td_Telephone2_5 {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 13px;
+	font-weight: normal;
+	color: #d2020b;
+	text-decoration: none;
+	height: 25px;
+	width: 130px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-right-style: solid;
+	border-bottom-style: dashed;
+	border-right-color: #aaa;
+	border-bottom-color: #aaa;
+}
+#tb_postCarSell {
+	width: 550px;
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 13px;
+	font-weight: bold;
+	color: #555;
+	text-decoration: none;
+}
+option {
+}
+
+.tbxlong {
+	width: 400px;
+	height: 30px;
+	border: 1px solid #dfdfdf;
+	border-radius:5px;
+	line-height: 30px;
+}
+.middleLong {
+	height: 30px;
+	width: 157px;
+	line-height: 30px;
+	border-radius:5px;
+	border: 1px solid #dfdfdf;
+}
+.middleLong1 {
+	height: 30px;
+	width: 165px;
+	line-height: 30px;
+	border-radius:5px;
+	border: 1px solid #dfdfdf;
+}
+.middleLong2 {
+	height: 30px;
+	width: 138px;
+	line-height: 30px;
+	border-radius:5px;
+	border: 1px solid #dfdfdf;
+}
+#lbxTypeProduct {
+	height: 30px;
+	width: 200px;
+	line-height: 30px;
+	border: 1px solid #dfdfdf;
+	border-radius:5px;
+}
+#tbxYearCar {
+	height: 30px;
+	width: 144px;
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 13px;
+	font-weight: normal;
+	color: #aaa;
+	text-decoration: none;
+	font-style: italic;
+	line-height: 30px;
+	border: 1px solid #dfdfdf;
+	border-radius:5px;
+}
+#tdAlignLeft {
+	padding-left: 37px;
+}
+#tarDetailCarSell {
+	width: 400px;
+	height: 200px;
+	border: 1px solid #dfdfdf;
+	border-radius:5px;
+}
+#tbInPostCarSell {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 13px;
+	font-weight: bold;
+	color: #555;
+}
+.spanAlignLeft {
+	text-align: left;
+	width: 100px;
+	margin: 0px;
+	padding: 0px;
+}
+
+#btnSubmitCarSell {
+	margin-left: 90px;
+}
+#divPostCarSell {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 13px;
+	font-weight: normal;
+	color: #555;
+	text-decoration: none;
+	background-color: #fff;
+}
+#tbSearch {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 13px;
+	font-weight: bold;
+	color: #555;
+	text-decoration: none;
+	margin-left: 20px;
+}
+.tbxWidth160 {
+	height: 25px;
+	width: 162;
+	margin-left: 10px;
+	border: 1px solid #ccc;
+}
+.tdSearchRow1 {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 13px;
+	font-weight: bold;
+	color: #555;
+	text-decoration: none;
+	padding-left: 10px;
+}
+.tbxWidth2Col {
+	width: 338px;
+	margin-left: 10px;
+	height: 25px;
+	border: 1px solid #ccc;
+}
+#tbxSearchCar {
+	height: 25px;
+	width: 600px;
+	border: 1px solid #ccc;
+	margin-left: 10px;
+}
+select {
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-top-width:1px;
+	border-right-width:1px;
+	border-right-width-ltr-source:physical;
+	border-bottom-width:1px;
+	border-left-width:1px;
+	border-left-width-ltr-source:physical;
+	border-right-style-ltr-source:physical;
+	border-left-style-ltr-source:physical;
+	border-top-color:rgb(177,183,187);
+	border-right-color:rgb(177,183,187);
+	border-right-color-ltr-
+}
+#content_box5 {
+	width: 770px;
+	background-color: rgb(244, 244, 244);
+	background-image: url(images/bgnoise.gif);
+	background-repeat:repeat;
+	background-attachment:scroll;
+	background-position:opt opt;
+	background-clip: border-box;
+	background-origin: padding-box;
+	background-size: auto auto;
+	padding-top: 10px;
+	border-top-width:1px;
+	border-right-width:1px;
+	border-right-width-ltr-source:physical;
+	border-bottom-width:1px;
+	border-left-width:1px;
+	border-left-width-ltr-source:physical;
+	border-top-style:solid;
+	border-right-style:solid;
+	border-right-style-ltr-source:physical;
+	border-bottom-style:solid;
+	border-left-style:solid;
+	border-left-style-ltr-source:physical;
+	border-top-color:rgb(221,221,221);
+	border-right-color:rgb(221,221,221);
+	border-right-color-ltr-source:physical;
+	border-bottom-color:rgb(221,221,221);
+	border-left-color:rgb(221,221,221);
+	border-left-color-ltr-source:physical;
+	-moz-border-top-colors:none;
+	-moz-border-right-colors:none;
+	-moz-border-bottom-colors:none;
+	-moz-border-left-colors:none;
+	-moz-border-image:none;
+	border-top-left-radius:5px;
+	border-top-right-radius:5px;
+	border-bottom-left-radius:5px;
+	border-bottom-right-radius:5px;
+	box-shadow:0pt 2px 0pt rgb(170,170,170);
+	padding-bottom: 10px;
+}
+#content_box5_1 {
+	width: 770px;
+	background-color: rgb(244, 244, 244);
+	background-image: url(images/bgnoise.gif);
+	background-repeat:repeat;
+	background-attachment:scroll;
+	background-position:opt opt;
+	background-clip: border-box;
+	background-origin: padding-box;
+	background-size: auto auto;
+	padding-top: 10px;
+	border-top-width:1px;
+	border-right-width:1px;
+	border-right-width-ltr-source:physical;
+	border-bottom-width:1px;
+	border-left-width:1px;
+	border-left-width-ltr-source:physical;
+	border-top-style:solid;
+	border-right-style:solid;
+	border-right-style-ltr-source:physical;
+	border-bottom-style:solid;
+	border-left-style:solid;
+	border-left-style-ltr-source:physical;
+	border-top-color:rgb(221,221,221);
+	border-right-color:rgb(221,221,221);
+	border-right-color-ltr-source:physical;
+	border-bottom-color:rgb(221,221,221);
+	border-left-color:rgb(221,221,221);
+	border-left-color-ltr-source:physical;
+	-moz-border-top-colors:none;
+	-moz-border-right-colors:none;
+	-moz-border-bottom-colors:none;
+	-moz-border-left-colors:none;
+	-moz-border-image:none;
+	border-top-left-radius:5px;
+	border-top-right-radius:5px;
+	border-bottom-left-radius:5px;
+	border-bottom-right-radius:5px;
+	box-shadow:0pt 2px 0pt rgb(170,170,170);
+	padding-bottom: 5px;
+}
+#divSearchResult {
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+option {
+	height: 20px;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #eee;
+	padding-left: 10px;
+	line-height: 20px;
+}
+.tdTo {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 13px;
+	font-weight: bold;
+	color: #555;
+	text-decoration: none;
+}
+.tbxBetween {
+	height: 25px;
+	width: 151px;
+	margin-left: 10px;
+	border: 1px solid #ccc;
+}
+.tdSearchRow2 {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 13px;
+	font-weight: bold;
+	color: #555;
+	text-decoration: none;
+	padding-left: 10px;
+}
+.tbxWidth_2 {
+	height: 25px;
+	width: 134px;
+	margin-left: 10px;
+	border: 1px solid #ccc;
+}
+.tbxWidth_2Col {
+	width: 114px;
+	margin-left: 10px;
+	height: 25px;
+	border: 1px solid #ccc;
+}
+.tbxBetween_2 {
+	height: 25px;
+	width: 96px;
+	margin-left: 10px;
+	border: 1px solid #ccc;
+}
+#tdSearchCar {
+	padding-top: 10px;
+	padding-left: 10px;
+}
+#quickSearch {
+	float: right;
+	position: relative;
+	top: -3px;
+	right: 8px;
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 11px;
+	font-weight: normal;
+	color: #42acf6;
+	text-decoration: none;
+}
+#quickSearch1 {
+	float: right;
+	position: relative;
+	top: -3px;
+	right: 8px;
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 11px;
+	font-weight: normal;
+	color: #42acf6;
+	text-decoration: none;
+}
+#quickSearch2 {
+	float: right;
+	position: relative;
+	top: -1px;
+	right: 10px;
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 13px;
+	color: #555;
+	text-decoration: none;
+	display: inline;
+}
+#tbFirstSearch {
+	margin-top: 5px;
+}
+#divCarInfo {
+	background-image: url(images/bgnoise.gif);
+	background-repeat-x: repeat;
+	background-repeat-y: repeat;
+	background-attachment: initial;
+	background-position-x: 0px;
+	background-position-y: 0px;
+	background-origin: initial;
+	background-clip: initial;
+	background-color: #F4F4F4;
+	border-radius: 7px;
+	-moz-border-radius: 7px;
+	-webkit-border-radius: 7px;
+	border-top-left-radius: 7px;
+	border-top-right-radius: 7px;
+	border-bottom-right-radius: 7px;
+	border-bottom-left-radius: 7px;
+	margin: 7px;
+	padding: 5px;
+	height: auto;
+}
+#divCarAlbum {
+	background-image: url(images/bgnoise.gif);
+	background-repeat-x: repeat;
+	background-repeat-y: repeat;
+	background-attachment: initial;
+	background-position-x: 0px;
+	background-position-y: 0px;
+	background-origin: initial;
+	background-clip: initial;
+	background-color: #F4F4F4;
+	border-radius: 7px;
+	-moz-border-radius: 7px;
+	-webkit-border-radius: 7px;
+	border-top-left-radius: 7px;
+	border-top-right-radius: 7px;
+	border-bottom-right-radius: 7px;
+	border-bottom-left-radius: 7px;
+	margin: 7px;
+	padding-top: 20px;
+	padding-right: 10px;
+	padding-bottom: 10px;
+	padding-left: 10px;
+}
+.carInfoTitle {
+	background-color: rgb(191,191,191);
+	margin-right: 5px;
+	margin-left: 5px;
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 17px;
+	font-weight: bold;
+	color: #336a91;
+	text-decoration: none;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	text-align: left;
+	vertical-align: middle;
+	padding-right: 10px;
+	padding-left: 10px;
+}
+.carInfoTitle1 {
+	background-color: rgb(191,191,191);
+	margin-right: 5px;
+	margin-left: 5px;
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 17px;
+	font-weight: bold;
+	color: #4c88b2;
+	text-decoration: none;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	text-align: left;
+	vertical-align: middle;
+	padding-right: 10px;
+	padding-left: 10px;
+	cursor:pointer;
+}
+#divCarInfoHead {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 14px;
+	color: #333;
+	text-decoration: none;
+	text-align: left;
+	vertical-align: middle;
+	padding-top: 10px;
+	padding-left: 5px;
+}
+
+#divCarInfoText {
+	margin: 5px;
+	position: relative;
+	left: 5px;
+	top: 0px;
+	padding-top: 5px;
+	padding-right: 10px;
+	padding-bottom: 10px;
+	padding-left: 10px;
+}
+#divCarInfoImage {
+	margin: 5px;
+	padding: 10px;
+	position: relative;
+	top: 0px;
+	right: 5px;
+	float: right;
+}
+#ulCarInfoText {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 13px;
+	font-weight: normal;
+	color: #333;
+	text-decoration: none;
+	text-align: left;
+	vertical-align: top;
+	list-style-type: none;
+	line-height: 25px;
+}
+.imagePreview {
+	padding: 4px;
+	border: 1px solid #ccc;
+	background-color: #fff;
+}
+
+#ulCarInfoImage {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 12px;
+	font-weight: normal;
+	color: #333;
+	text-decoration: none;
+	text-align: left;
+	vertical-align: top;
+	list-style-type: none;
+	line-height: 25px;
+}
+.CarInfoImageBG {
+	float: right;
+	background-color: white;
+	border-radius: 7px;
+	-moz-border-radius: 7px;
+	-webkit-border-radius: 7px;
+	border: #DDD 1px solid;
+}
+.hilightText {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 13px;
+	color: #0064b8;
+	text-decoration: none;
+}
+.hilightText1 {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 13px;
+	color: #0064b8;
+	text-decoration: none;
+}
+.normallHilightText {
+	font-family: Tahoma, Geneva, sans-serif;
+	color: #cc0000;
+	text-decoration: none;
+}
+
+.bigHiligthText {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 15px;
+	color: #f59c00;
+	text-decoration: none;
+}
+#divSliderShowTitle {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 15px;
+	font-weight: bold;
+	color: #333;
+	text-decoration: none;
+	text-align: left;
+	padding-left: 10px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+#spanSearchLabel {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	color: #555;
+	text-decoration: none;
+}
+#fsSearchBox {
+	background-image: url(images/bgnoise.gif);
+	background-repeat: repeat;
+	height: 40px;
+	width: 758px;
+	border: 1px solid #ccc;
+}
+#fsSearchBox legend {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 12px;
+	color: #555;
+	text-decoration: none;
+}
+#tbxCarNumber3 {
+	width: 300px;
+}
+#tbxTelephoneNumber3 {
+	width: 300px;
+}
+#tbNavigate {
+	margin-top: 30px;
+}
+ul#navigation {
+	position: absolute;
+	margin: 0px;
+	padding: 0px;
+	top: 10px;
+	left: 0px;
+	list-style: none;
+	z-index:9999;
+}
+ul#navigation li {
+    width: 100px;
+}
+ul#navigation li a {
+    display: block;
+    margin-left: -2px;
+    width: 100px;
+    height: 60px;    
+    background-color:#fff;
+    background-repeat:no-repeat;
+    background-position:center center;
+    border:1px solid #fcfcfc;
+	border-bottom-right-radius:10px;
+	border-top-right-radius:10px;
+    -moz-border-radius:0px 10px 10px 0px;
+    -webkit-border-bottom-right-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -khtml-border-bottom-right-radius: 10px;
+    -khtml-border-top-right-radius: 10px;
+    -moz-box-shadow: 0px 4px 3px #000;
+    -webkit-box-shadow: 0px 4px 3px #000;
+    
+    opacity: 0.9;
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+}
+ul#navigation .home a{
+    background-image:url(../icons/home.png);
+}
+ul#navigation .admin a      {
+	background-image:url(../icons/adminmenu.png);
+}
+ul#navigation .back a      {
+    background-image:url(../icons/back.png);
+}
+#divheader1 {
+	width: 100%;
+	position: relative;
+	margin-bottom: 20px;
+	z-index: 999;
+}
+#divfooter1 {
+	width: 100%;
+	overflow: auto;
+	position: relative;
+	margin: 0px;
+	padding: 0px;
+}
+#content {
+    min-height: 320px;
+    width: 800px;
+    padding-top: 5px;
+}
+#tdheadpostSellCar {
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	color: #fff;
+	text-decoration: none;
+	line-height: 40px;
+	height: 40px;
+	background-image: linear-gradient(top, rgb(92,200,250) 11%, rgb(36,135,171) 100%);
+	background-image: -o-linear-gradient(top, rgb(92,200,250) 11%, rgb(36,135,171) 100%);
+	background-image: -moz-linear-gradient(top, rgb(92,200,250) 11%, rgb(36,135,171) 100%);
+	background-image: -webkit-linear-gradient(top, rgb(92,200,250) 11%, rgb(36,135,171) 100%);
+	background-image: -ms-linear-gradient(top, rgb(92,200,250) 11%, rgb(36,135,171) 100%);
+	
+	background-image: -webkit-gradient(
+		linear,
+		left top,
+		left bottom,
+		color-stop(0.11, rgb(92,200,250)),
+		color-stop(1, rgb(36,135,171))
+	);
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#5cc8fa, endColorstr=#2487ab)";
+	border-top-left-radius:5px;
+	border-top-right-radius:5px;
+	padding-left: 10px;
+	text-align: left;
+}
+#btnSubmitSellCar {
+	float: right;
+	margin-top: 20px;
+	margin-bottom: 30px;
+	margin-right: 20px;
+}
+#btnSubmitSellCar{
+	-moz-box-shadow:inset 0px 1px 0px 0px #ffffff;
+	-webkit-box-shadow:inset 0px 1px 0px 0px #ffffff;
+	box-shadow:inset 0px 1px 0px 0px #ffffff;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) );
+	background:-moz-linear-gradient( center top, #ededed 5%, #dfdfdf 100% );
+
+	background-color:#ededed;
+	-moz-border-radius:5px;
+	-webkit-border-radius:5px;
+	border-radius:5px;
+	border:1px solid #dcdcdc;
+	display:inline-block;
+	color:#444;
+	font-family:Tahoma, Geneva, sans-serif;
+	font-size:13px;
+	font-weight:normal;
+	text-decoration:none;
+	text-shadow:1px 1px 0px #ffffff;
+	line-height: 30px;
+	padding-right: 24px;
+	padding-left: 24px;
+	height: 30px;
+}
+#btnSubmitSellCar:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #dfdfdf), color-stop(1, #ededed) );
+	background:-moz-linear-gradient( center top, #dfdfdf 5%, #ededed 100% );
+	background-color:#dfdfdf;
+}
+#btnSubmitSellCar:active {
+	position:relative;
+	top:1px;
+}
+
+.alignTopRight {
+	position: relative;
+	top: -47px;
+	right: 0px;
+}
+.alignTopRight1 {
+	position: absolute;
+	top: -21px;
+	right: 5px;
+}
+#spryselect4 {
+	width: 215px;
+	position: relative;
+}
+#spryselect5 {
+	position: relative;
+}
+#spryselect6 {
+	position: relative;
+}
+
+
+#sprytextfield1 {
+	position: relative;
+}
+#sprytextfield2 {
+	position: relative;
+}
+#spryselect7 {
+	position: relative;
+}
+#spryselect8 {
+	position: relative;
+}
+#sprytextfield3 {
+	position: relative;
+}
+#sprytextfield4 {
+	position: relative;
+}
+#sprytextfield5                 {
+	position: relative;
+}

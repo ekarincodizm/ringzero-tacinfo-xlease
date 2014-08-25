@@ -1,0 +1,54 @@
+.crud
+{
+	display: none;
+}
+
+.crud_active
+{
+	display: block;
+}
+
+table.datagrid {
+	font-family:"Lucida Grande","Trebuchet MS",Helvetica,Arial,sans-serif;
+	background-color: #CDCDCD;
+	margin:0px 0pt 15px;
+	font-size: 10pt;
+	/*width: 100%;*/
+	text-align: left;
+}
+table.datagrid thead tr th, table.datagrid tfoot tr th {
+	background-color: #e6EEEE;
+	border: 1px solid #FFF;
+	font-size: 9pt;
+	font-weight: bold;
+	padding: 4px;
+}
+table.datagrid thead tr .header {
+	background-image: url(img/bg.gif);
+	background-repeat: no-repeat;
+	background-position: center right;
+	cursor: pointer;
+}
+table.datagrid tbody td {
+	color: #3D3D3D;
+	padding: 4px;
+	background-color: #FFF;
+	vertical-align: top;
+}
+table.datagrid tbody tr.odd td {
+	background-color:#e0e0e6;
+}
+table.datagrid thead tr .headerSortUp {
+	background-image: url(img/asc.gif);
+}
+table.datagrid thead tr .headerSortDown {
+	background-image: url(img/desc.gif);
+}
+table.datagrid thead tr .headerSortDown, table.datagrid thead tr .headerSortUp {
+background-color: #8dbdd8;
+}
+table.datagrid tbody tr.over td
+{
+	background-color: #4E7EAE;
+	color: #fff;
+}

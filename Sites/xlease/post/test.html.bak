@@ -1,0 +1,394 @@
+<form id="frm_edit" name="frm_edit" method="post" action="frm_tranfer_add_ok.php">
+<table width="100%" border="0" cellpadding="1" cellspacing="1" bgcolor="#FFFFFF">
+    <tr>
+        <td colspan="6" style="background-color:#84C1FF;"><b>ข้อมูลผู้ทำสัญญา</b></td>
+    </tr>
+    <tr>
+        <td width="13%"><b>ชื่อ-สกุล</b></td>
+
+        <td width="37%">สิริยากร  แทนวิสุทธิ์ (220-05063)</td>
+        <td width="10%"><b>สัญชาติ</b></td>
+        <td width="40%">ไทย</td>
+    </tr>
+    <tr>
+        <td><b>อายุ</b></td>
+        <td colspan="3">29</td>
+
+    </tr>
+    <tr>
+        <td><b>ชื่อ คู่สมรส</b></td>
+        <td>-</td>
+        <td><b>บัตรแสดงตัว</b></td>
+        <td>ประชาชน</td>
+    </tr>
+
+    <tr>
+        <td><b>เลขที่</b></td>
+        <td>5/708</td>
+        <td><b>เลขที่บัตร</b></td>
+        <td>3 3610 06774 33 5</td>
+    </tr>
+    <tr>
+
+        <td><b>หมู่ที่</b></td>
+        <td>-</td>
+        <td><b>วันที่ออกบัตร</b></td>
+        <td>2003-01-02</td>
+    </tr>
+    <tr>
+        <td><b>ซอย</b></td>
+
+        <td>-</td>
+        <td><b>ออกให้โดย</b></td>
+        <td>อ.ภูเขียว</td>
+    </tr>
+    <tr>
+        <td><b>ถนน</b></td>
+        <td colspan="3">-</td>
+
+    </tr>
+    <tr>
+        <td><b>แขวง/ตำบล</b></td>
+        <td colspan="3">บางพูด</td>
+    </tr>
+    <tr>
+        <td><b>เขต/อำเภอ</b></td>
+
+        <td colspan="3">ปากเกร็ด</td>
+    </tr>
+    <tr>
+        <td><b>จังหวัด</b></td>
+        <td colspan="3">นนทบุรี</td>
+    </tr>
+    <tr>
+
+        <td colspan="4">&nbsp;</td>
+    </tr>
+    
+    <tr>
+        <td colspan="6" style="background-color:#84C1FF;"><b>ข้อมูลผู้รับโอน</b></td>
+    </tr>
+    <tr>
+        <td colspan="4" bgcolor="#FFFFD9">
+            <b>ตรวจสอบชื่อ : </b>ชื่อ-สกุล 
+            <input name="fa_cusid" type="hidden" id="fa_cusid" value="">
+
+            <input type="text" id="name" name="name" size="60" value="">
+            <input type="button" name="buttonclear" onclick="clear_cus();" value="เพิ่มข้อมูลใหม่">
+        </td>
+    </tr>
+    </table>
+    
+    <table width="100%" border="0" cellpadding="1" cellspacing="1" bgcolor="#FFFFFF">
+    <tr>
+        <td valign="top">
+
+<table width="100%" border="0" cellpadding="1" cellspacing="1" bgcolor="#FFFFFF">
+    <tr>
+        <td><b>คำนำหน้าชื่อ</b></td>
+        <td><input type="text" id="add_firstname" name="add_firstname" size="10"></td>
+    </tr>
+    <tr>
+        <td><b>ชื่อ</b></td>
+        <td><input type="text" id="add_name" name="add_name" size="13"> <b>สกุล</b> <input type="text" id="add_surname" name="add_surname" size="13"></td>
+
+    </tr>
+    <tr>
+        <td><b>ชื่อ คู่สมรส</b></td>
+        <td><input type="text" name="add_pair" value=""></td>
+    </tr>
+    <tr>
+        <td><b>เลขที่</b></td>
+        <td><input type="text" name="add_address" value=""></td>
+
+    </tr>
+    <tr>
+        <td><b>หมู่ที่</b></td>
+        <td><input type="text" name="add_moo" value=""></td>
+    </tr>
+    <tr>
+        <td><b>ซอย</b></td>
+        <td><input type="text" name="add_soi" value=""></td>
+
+    </tr>
+    <tr>
+        <td><b>ถนน</b></td>
+        <td><input type="text" name="add_road" value=""></td>
+    </tr>
+    
+    <tr>
+        <td><b>แขวง/ตำบล</b></td>
+        <td><input type="text" name="add_tambon" value=""></td>
+
+    </tr>
+    <tr>
+        <td><b>เขต/อำเภอ</b></td>
+        <td><input type="text" name="add_ampur" value=""></td>
+    </tr>
+    <tr>
+        <td><b>จังหวัด</b></td>
+        <td>
+
+        <select name="add_province" size="1">
+        <option value="">เลือก</option>
+        <option value="กระบี่">กระบี่</option>
+        <option value="กรุงเทพ">กรุงเทพมหานคร</option>
+        <option value="กาญจนบุรี">กาญจนบุรี</option>
+        <option value="กาฬสินธุ์">กาฬสินธุ์</option>
+
+        <option value="กำแพงเพชร">กำแพงเพชร</option>
+        <option value="ขอนแก่น">ขอนแก่น</option>
+        <option value="จันทบุรี">จันทบุรี</option>
+        <option value="ฉะเชิงเทรา">ฉะเชิงเทรา</option>
+        <option value="ชลบุรี">ชลบุรี</option>
+        <option value="ชัยนาท">ชัยนาท</option>
+
+        <option value="ชัยภูมิ">ชัยภูมิ</option>
+        <option value="ชุมพร">ชุมพร</option>
+        <option value="เชียงราย">เชียงราย</option>
+        <option value="เชียงใหม่">เชียงใหม่</option>
+        <option value="ตรัง">ตรัง</option>
+        <option value="ตราด">ตราด</option>
+
+        <option value="ตาก">ตาก</option>
+        <option value="นครนายก">นครนายก</option>
+        <option value="นครปฐม">นครปฐม</option>
+        <option value="นครพนม">นครพนม</option>
+        <option value="นครราชสีมา">นครราชสีมา</option>
+        <option value="นครศรีธรรมราช">นครศรีธรรมราช</option>
+
+        <option value="นครสวรรค์">นครสวรรค์</option>
+        <option value="นนทบุรี">นนทบุรี</option>
+        <option value="นราธิวาส">นราธิวาส</option>
+        <option value="น่าน">น่าน</option>
+        <option value="บุรีรัมย์">บุรีรัมย์</option>
+        <option value="ปทุมธานี">ปทุมธานี</option>
+
+        <option value="ประจวบคีรีขันธ์">ประจวบคีรีขันธ์</option>
+        <option value="ปราจีนบุรี">ปราจีนบุรี</option>
+        <option value="ปัตตานี">ปัตตานี</option>
+        <option value="พระนครศรีอยุธยา">พระนครศรีอยุธยา</option>
+        <option value="พะเยา">พะเยา</option>
+        <option value="พังงา">พังงา</option>
+
+        <option value="พัทลุง">พัทลุง</option>
+        <option value="พิจิตร">พิจิตร</option>
+        <option value="พิษณุโลก">พิษณุโลก</option>
+        <option value="เพชรบุรี">เพชรบุรี</option>
+        <option value="เพชรบูรณ์">เพชรบูรณ์</option>
+        <option value="แพร่">แพร่</option>
+
+        <option value="ภูเก็ต">ภูเก็ต</option>
+        <option value="มหาสารคาม">มหาสารคาม</option>
+        <option value="มุกดาหาร">มุกดาหาร</option>
+        <option value="แม่ฮ่องสอน">แม่ฮ่องสอน</option>
+        <option value="ยโสธร">ยโสธร</option>
+        <option value="ยะลา">ยะลา</option>
+
+        <option value="ร้อยเอ็ด">ร้อยเอ็ด</option>
+        <option value="ระนอง">ระนอง</option>
+        <option value="ระยอง">ระยอง</option>
+        <option value="ราชบุรี">ราชบุรี</option>
+        <option value="ลพบุรี">ลพบุรี</option>
+        <option value="ลำปาง">ลำปาง</option>
+
+        <option value="ลำพูน">ลำพูน</option>
+        <option value="เลย">เลย</option>
+        <option value="ศรีษะเกษ">ศรีษะเกษ</option>
+        <option value="สกลนคร">สกลนคร</option>
+        <option value="สงขลา">สงขลา</option>
+        <option value="สตูล">สตูล</option>
+
+        <option value="สมุทรปราการ">สมุทรปราการ</option>
+        <option value="สมุทรสงคราม">สมุทรสงคราม</option>
+        <option value="สมุทรสาคร">สมุทรสาคร</option>
+        <option value="สระแก้ว">สระแก้ว</option>
+        <option value="สระบุรี">สระบุรี</option>
+        <option value="สิงห์บุรี">สิงห์บุรี</option>
+
+        <option value="สุโขท้ย">สุโขท้ย</option>
+        <option value="สุพรรณบุรี">สุพรรณบุรี</option>
+        <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
+        <option value="สุรินทร์">สุรินทร์</option>
+        <option value="หนองคาย">หนองคาย</option>
+        <option value="หนองบัวลำภู">หนองบัวลำภู</option>
+
+        <option value="อ่างทอง">อ่างทอง</option>
+        <option value="อำนาจเจริญ">อำนาจเจริญ</option>
+        <option value="อุดรธานี">อุดรธานี</option>
+        <option value="อุตรดิตถ์">อุตรดิตถ์</option>
+        <option value="อุทัยธานี">อุทัยธานี</option>
+        <option value="อุบลราชธานี">อุบลราชธานี</option>
+
+        </select>        
+        </td>
+    </tr>
+</table>
+        
+        </td>
+        <td valign="top">
+        
+<table width="100%" border="0" cellpadding="1" cellspacing="1" bgcolor="#FFFFFF">
+    <tr>
+        <td><b>สัญชาติ</b></td>
+
+        <td><input type="text" name="add_reg" value="ไทย"></td>
+    </tr>
+    <tr>
+        <td><b>อายุ</b></td>
+        <td><input type="text" name="add_birthdate" value=""></td>
+    </tr>
+    <tr>
+        <td><b>บัตรแสดงตัว</b></td>
+
+        <td><input type="text" name="add_card" value=""></td>
+    </tr>
+    <tr>
+        <td><b>เลขที่บัตร</b></td>
+        <td><input type="text" name="add_idcard" value=""></td>
+    </tr>
+    <tr>
+        <td><b>วันที่ออกบัตร</b></td>
+
+        <td><input name="add_dateidcard" type="text" readonly="true" value="2010-12-23"/>
+                <input name="buttonadd_dateidcard" type="button" onclick="displayCalendar(document.frm_edit.add_dateidcard,'yyyy-mm-dd',this)" value="ปฏิทิน" /></td>
+    </tr>
+    <tr>
+        <td><b>ออกให้โดย</b></td>
+        <td><input type="text" name="add_bycard" value=""></td>
+    </tr>
+    <tr>
+
+        <td><b>ที่ติดต่อ</b></td>
+        <td rowspan="3"><textarea name="add_contactadd" rows="4" cols="40"></textarea></td>
+    </tr>
+</table>
+
+        </td>
+    </tr>
+</table>
+
+<br />    
+
+<table width="100%" border="0" cellpadding="1" cellspacing="1" bgcolor="#FFFFFF">
+    <tr>
+        <td colspan="4"  style="background-color:#84C1FF;"><b>ขัอมูลผู้ค้ำประกัน</b></td>
+    </tr>
+
+	
+    <tr>
+	    <td></td>
+		<td colspan="3">1. น.ส. กนกวรรณ แทนวิสุทธิ์</td>
+	</tr>
+
+    <tr>
+        <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="4" style="background-color:#84C1FF;"><b>ข้อมูลรถแท็กซี่</b></td>
+
+    </tr>
+    <tr>
+        <td><b>ยี่ห้อรถ</b></td>
+
+        <td colspan="3">TOYOTA   LIMO</td>
+    </tr>
+    <tr>
+        <td><b>รุ่นปี</b></td>
+        <td colspan="3">2007</td>
+    </tr>
+    <tr>
+
+        <td><b>เลขตัวถัง</b></td>
+        <td colspan="3">MR053ZEC107148746</td>
+    </tr>
+    <tr>
+        <td><b>เลขเครื่องยนต์</b></td>
+        <td colspan="3">3ZZ-4659783</td>
+    </tr>
+
+    <tr>
+        <td><b>ทะเบียน</b></td>
+        <td colspan="3">ทร 9183</td>
+    </tr>
+    <tr>
+        <td><b>จังหวัดที่จดทะเบียน</b></td>
+        <td colspan="3"> </td>
+
+    </tr>
+    <tr>
+        <td><b>สี</b></td>
+        <td colspan="3">ฟ้า</td>
+    </tr>
+    <tr>
+        <td><b>เลขไมล์</b></td>
+
+        <td colspan="3">25</td>
+    </tr>
+    <tr>
+        <td><b>วันที่ต่ออายุภาษี</b></td>
+        <td colspan="3">2011-06-11</td>
+    </tr>
+    <tr>
+
+        <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="6" style="background-color:#84C1FF;"><b>ข้อมูลสัญญา</b></td>
+    </tr>
+    <tr>
+        <td><b>วันที่ทำสัญญา</b></td>
+        <td colspan="3"><input type="text" name="f_pstdate" value="2010-11-27" />
+
+                <input name="button2" type="button" onclick="displayCalendar(document.frm_edit.f_pstdate,'yyyy-mm-dd',this)" value="ปฏิทิน" /></td>
+    </tr>
+    <tr>
+        <td><b>วันที่งวดแรก</b></td>
+        <td colspan="3">
+        <input name="hid_startDate" id="hid_startDate" type="hidden" value="2010-12-08"/>
+        <input name="f_startDate" id="f_startDate" type="text" readonly="true" value="2010-12-08"/ onchange="SetDate();">
+        <input name="button" type="button" onclick="displayCalendar(document.frm_edit.f_startDate,'yyyy-mm-dd',this)" value="ปฏิทิน" /> <span style="color:#808080">(เลขวันที่ จะไม่เปลี่ยนแปลง)</span></td>
+
+    </tr>
+    <tr>
+        <td><b>ค่างวดรวม vat</b></td>
+        <td>15,813.00</td>
+        <td colspan="2"><b>ค่างวดไม่รวม vat =</b> 14,778.50 | <b>vat ค่างวด =</b> 1,034.50</td>
+
+    </tr>
+    <tr>
+        <td><b>จำนวนงวด</b></td>
+        <td colspan="3">6</td>
+    </tr>
+    <tr>
+        <td><b>ดาวน์รวม vat</b></td>
+
+        <td>0.00</td>
+        <td colspan="2"><b>ดาวน์ไม่รวม vat =</b> 0.00 | <b>vat ดาวน์ =</b> 0.00</td>
+    </tr>
+    <tr>
+        <td><b>เงินต้นลูกค้า</b></td>
+
+        <td colspan="3">0.00</td>
+    </tr>
+    <tr>
+        <td><b>เงินต้นทางบัญชี</b></td>
+        <td colspan="3">86,117.20</td>
+    </tr>
+    <tr>
+
+        <td><b>ปีทางบัญชีที่ทำสัญญา</b></td>
+        <td colspan="3">2007</td>
+    </tr>
+    <tr>
+        <td colspan="4">&nbsp;</td>
+    </tr>
+    <tr>
+        <td colspan="4" align="center">
+			<input name="btn1" id="btn1" type="submit" value="บันทึก" /> 
+			<input type="button" value=" กลับ " onclick="window.location='frm_tranfer.php'" />
+		</td>
+
+    </tr>
+</table> 
+</form>

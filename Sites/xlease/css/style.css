@@ -1,0 +1,176 @@
+
+A 
+{
+
+}
+
+A:Hover 
+{
+
+}
+
+A img
+{
+  border: none;
+}
+
+H1
+{
+  font-family: tahoma;
+  font-size: 20px;
+  color: #1F397E;
+  font-weight: bold;
+}
+
+.text_bold
+{
+  font-family: tahoma;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.text_blue_bold
+{
+  font-family: tahoma;
+  font-size: 14px;
+  font-weight: bold;
+  color: blue;
+}
+
+.text_blue_tiny
+{
+  font-family: tahoma;
+  font-size: 8px;
+  font-weight: bold;
+  color: blue;  
+}
+
+fieldset
+{
+  font-family: tahoma;
+  font-size: 12px;  
+}
+
+label
+{
+  width: 80px;
+  text-align: right;
+  float: left;
+}
+
+#panelLeft
+{
+  width: 380px;
+  float: left;
+}
+
+#panelRight
+{
+  width: 380px;
+  float: right;
+  
+}
+
+.bluebox
+{
+  padding: 3px;
+  margin-top : 2px;  
+  font-family: tahoma;
+  font-size: 12px;  
+  border: #5555dd 1px dashed; 
+  background-color: #F0FEF4;
+}
+
+.insidebox
+{
+  margin: 2px;
+  padding: 1px;
+  font-family: tahoma;      
+  font-size: 12px;  
+  border: #BBBBBB 1px ridge; 
+  background-color: #FFFFFF;
+}
+
+.bluebox > table
+{
+  font-size: 12px; 
+}
+
+.btn_asc
+{
+  width: 25px;
+  cursor: pointer;
+  background-image: url('../postpayment/image/asc.gif');
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+.btn_desc
+{
+  width: 25px;
+  cursor: pointer;
+  background-image: url('../postpayment/image/desc.gif');
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+
+
+      
+
+
+
+.error
+{
+  font-family: sans-serif;
+  font-size: 16pt;
+  color: #dd0000;
+  font-weight: bold;  
+}
+
+.login
+{
+  font-family: sans-serif;
+  font-size: 20pt;
+  color: #555555;
+}
+
+.login_text
+{
+  font-family: sans-serif;
+  font-size: 20pt;
+  color: #555555;
+  border: #DEDEDE 1px solid;
+}
+
+FORM
+{
+  font-family: sans-serif;
+  font-size: 10pt;
+  font-weight: bold;
+  color: #555555;
+}
+
+.form
+{
+  border: gray 1px solid;
+  font-family: sans-serif;
+  font-size: 10pt;
+  color: black;
+}
+
+.form_button
+{
+  font-family: sans-serif;
+  font-size: 14pt;
+  color: #1e3578;
+}
+
+.form_slim
+{
+  font-family: sans-serif;
+  font-size: 10pt;
+  color: black;
+  border: #DEDEDE 1px solid;  
+}
+

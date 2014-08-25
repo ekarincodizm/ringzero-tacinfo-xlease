@@ -1,0 +1,35 @@
+<?php
+session_start();
+include("config/config.php");
+
+$cmd = pg_escape_string($_GET['cmd']); if($cmd == 1){ $cmd = "?cmd=1"; }
+$old_pass = pg_escape_string($_POST['old_pass']);
+$new_pass = pg_escape_string($_POST['new_pass']);
+$cnew_pass = pg_escape_string($_POST['cnew_pass']);
+
+$qry=pg_query("SELECT password FROM fuser WHERE id_user='".$_SESSION['av_iduser']."'");
+if($res=pg_fetch_array($qry)){
+    $password=$res["password"];
+}
+
+if($old_pass != $password){
+    header("Refresh: 0; url=change_pass.php$cmd");
+    echo "<script language=Javascript>alert ('รหัสผ่านเดิมไม่ถูกต้อง !');</script>";
+    exit(); 
+}elseif($new_pass != $cnew_pass){
+    header("Refresh: 0; url=change_pass.php$cmd");
+    echo "<script language=Javascript>alert ('รหัสผ่านใหม่ 2 ครั้งไม่เหมือนกัน !');</script>";
+    exit(); 
+}
+
+$upd_sql="UPDATE fuser SET \"password\"='$new_pass', last_datepassword=NOW() WHERE id_user='".$_SESSION['av_iduser']."';";
+if($result=pg_query($upd_sql)){
+    header("Refresh: 0; url=logout.php");
+    echo "<script language=Javascript>alert ('แก้ไขเรียบร้อยแล้ว ออกจากระบบ กรุณาล็อคอินด้วยรหัสผ่านใหม่ !');</script>";
+    exit();
+}else{
+    header("Refresh: 0; url=change_pass.php$cmd");
+    echo "<script language=Javascript>alert ('ไม่สามารถเปลี่ยนรหัสผ่านได้ กรุณาลองใหม่อีกครั้ง !');</script>";
+    exit();
+}
+?>

@@ -1,0 +1,126 @@
+@charset "utf-8";
+.tab_menu_contrainer {
+	display:block;
+	vertical-align:top;
+	text-align:left;
+}
+.menu_box {
+	display: block;
+	width: 100%;
+	position:relative;
+	padding:5px 0px 0px 0px;
+	margin:15px 0px 0px 0px;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #585858;
+}
+.prev {
+	position:absolute;
+	top:8px;
+	left:-28px;
+	width:26px;
+	height:26px;
+	background-image:url(../images/prev.png);
+	background-attachment:scroll;
+	background-repeat:no-repeat;
+	background-position:center center;
+	opacity:0.1;
+}
+.prev:hover {
+	background-image:url(../images/prev_active.png);
+	background-attachment:scroll;
+	background-repeat:no-repeat;
+	background-position:center center;
+	opacity:1;
+	cursor:pointer;
+}
+.next {
+	position:absolute;
+	top:8px;
+	right:-28px;
+	width:26px;
+	height:26px;
+	background-image:url(../images/next.png);
+	background-attachment:scroll;
+	background-repeat:no-repeat;
+	background-position:center center;
+	opacity:0.1;
+}
+.next:hover {
+	background-image:url(../images/next_active.png);
+	background-attachment:scroll;
+	background-repeat:no-repeat;
+	background-position:center center;
+	opacity:1;
+	cursor:pointer;
+}
+.tab_box {
+	height:30px;
+	overflow:hidden;
+	display:block;
+	position:relative;
+}
+.slide_tab {
+	margin-left:0px;
+	margin-right:0px;
+	margin-top:0px;
+	margin-bottom:0px;
+	padding: 0px;
+	list-style-type: none;
+	height:30px;
+	width:inherit !important;
+	overflow:hidden;
+}
+.tab {
+	display: inline;
+	list-style-type: none;
+}
+.tab a {
+	display:block;
+	margin-right: 1px;
+	height: 30px;
+	line-height: 30px;
+	border-top-left-radius:5px;
+	border-top-right-radius:5px;
+	padding-top: 0px;
+	padding-right: 10px;
+	padding-bottom: 0px;
+	padding-left: 10px;
+	cursor:pointer;
+	float:left;
+}
+.tab a:hover {
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-left-style: solid;
+	border-top-color: #585858;
+	border-right-color: #585858;
+	border-left-color: #585858;	
+}
+.tab.active a {
+	background-color:#02769c;
+	color:#fff;
+}
+.tab.active a:hover
+{
+	border:none;
+}
+.list_tab_menu {
+	display:block;
+	margin-bottom:15px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-right-color: #585858;
+	border-bottom-color: #585858;
+	border-left-color: #585858;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	min-height:100px;
+}

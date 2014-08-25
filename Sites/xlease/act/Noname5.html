@@ -1,0 +1,54 @@
+<html>
+<head>
+     <title>Test Page</title>
+
+     <script language="JavaScript" type="text/javascript">
+     
+     var textId = 2;
+
+     function addInput(btn)
+     {
+          var container = btn.parentElement;
+
+          var div = document.createElement("DIV");
+         
+          div.id = "div" + textId;
+
+          var first = document.createElement("<INPUT NAME=\"first" + textId + "\">");
+          var middle = document.createElement("<INPUT NAME=\"middle" + textId + "\">");
+          var last = document.createElement("<INPUT NAME=\"last" + textId + "\">");
+
+          var btn = document.createElement("INPUT");
+
+          btn.type = "button";
+          btn.value = "Delete";
+          btn.onclick = new Function("document.getElementById(\"" + div.id + "\").removeNode(true);");
+
+          div.appendChild(first);
+          div.appendChild(middle);
+          div.appendChild(last);
+
+          div.innerHTML += "&nbsp;";
+
+          div.appendChild(btn);
+
+          container.appendChild(div);
+
+          textId++;
+     }
+     
+     </script>
+</head>
+
+<body>
+     <form action="page2.html" method="POST">
+          <table id="tbl">
+               <tr>
+                    <td>
+                         <input type="text" id="text1" name="text1"> <input type="button" value="Add" onclick="addInput(this);">
+                    </td>
+               </tr>
+          </table>
+     </form>
+</body>
+</html>

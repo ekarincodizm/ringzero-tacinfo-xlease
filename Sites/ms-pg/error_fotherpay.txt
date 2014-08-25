@@ -1,0 +1,1 @@
+IDNO | O_DATE | O_RECEIPT | O_MONEY | O_STATE | O_BANK | O_PRNDATE | PayType | O_Description

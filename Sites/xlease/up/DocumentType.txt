@@ -1,0 +1,17 @@
+-- Table: "DocumentType"
+
+-- DROP TABLE "DocumentType";
+
+CREATE TABLE "DocumentType"
+(
+  id character varying(5) NOT NULL,
+  "name" character varying(50),
+  sub character varying(5),
+  "table" character varying(100),
+  fieldsearch character varying(100),
+  fieldshow character varying(100),
+  "schema" character varying(50),
+  CONSTRAINT "DocumentType_pkey" PRIMARY KEY (id)
+)
+WITH (OIDS=FALSE);
+ALTER TABLE "DocumentType" OWNER TO postgres;

@@ -1,0 +1,276 @@
+@charset "utf-8";
+body ,html{
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 12px;
+	font-style: normal;
+	line-height: 20px;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	color: #555;
+	text-decoration: none;
+	margin: 0px;
+	padding: 0px;
+	width: 100%;
+	height:100%;
+}
+
+h3 {
+	font-size: 15px;
+	font-weight: bold;
+	padding: 0px;
+	height: 25px;
+	margin: 0px;
+	color: #555;
+}
+h4 {
+	font-size: 12px;
+	font-weight: bold;
+	color: #555;
+	margin: 0px;
+	padding: 0px;
+	height: 16px;
+}
+
+label {
+	vertical-align:top;
+}
+th {
+	text-align: center;
+}
+
+th, td {
+	line-height: normal;
+	height: 28px;
+	padding-top: 3px;
+	padding-right: 7px;
+	padding-bottom: 3px;
+	padding-left: 7px;
+}
+
+
+input, select {
+	font-size:12px;
+}
+
+
+.container {
+	display: block;
+	height: 100%;
+	width: 1024px;
+	position: relative;
+	border-right-width: 1px;
+	border-left-width: 1px;
+}
+.top {
+	display: block;
+	margin: 0px;
+	width: 1014px;
+	padding-top: 0px;
+	padding-right: 5px;
+	padding-bottom: 5px;
+	padding-left: 5px;
+	position: relative;
+	text-align: left;
+	background-attachment: scroll;
+	background-image: url(../images/fadedBar.png);
+	background-repeat: no-repeat;
+	background-position: left bottom;
+	vertical-align: bottom;
+	clear: both;
+}
+
+.logo {
+	background-attachment: scroll;
+	background-image: url(../images/logo_tewdc_2013_small.png);
+	background-repeat: no-repeat;
+	background-position: left bottom;
+	display: inline-block;
+	height: 76px;
+	width: 200px;
+}
+.head_title {
+	display: inline-block;
+	margin: 0px;
+	padding: 0px;
+	height: 85px;
+	width: 810px;
+	position: relative;
+}
+.step_logo {
+	border-left-width: 2px;
+	border-left-style: solid;
+	border-left-color: #cbcbcb;
+	background-attachment: scroll;
+	background-image: url(../images/regis.png);
+	background-repeat: no-repeat;
+	background-position: left center;
+	display: inline-block;
+	height: 76px;
+	width: 205px;
+}
+
+.middle {
+	text-align: left;
+	display: block;
+	padding: 10px;
+	min-height: 500px;
+	width: 1014px;
+	position: relative;
+}
+.title {
+	font-size: 13px;
+	font-weight: bold;
+	color: #333;
+	text-decoration: none;
+	line-height: 30px;
+	display: block;
+	padding: 0px;
+	min-height: 30px;
+	width: 100%;
+	margin-top: 5px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	margin-left: 0px;
+}
+.content {
+	text-align: left;
+	display: block;
+	padding: 0px;
+	min-height: 455px;
+	width: 100%;
+	margin-top: 10px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	margin-left: 0px;
+}
+.bottom {
+	text-align: left;
+	display: block;
+	min-height: 250px;
+	width: 100%;
+	margin-top: 15px;
+}
+.bottom_content {
+	display: block;
+	margin: 0px;
+	padding: 0px;
+	min-height: 200px;
+	width: 100%;
+}
+.powered {
+	padding: 0px;
+	min-height: 40px;
+	width: 100%;
+	margin-top: 10px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	margin-left: 0px;
+}
+.align_right {
+	text-align: right;
+}
+.inline_block {
+	display: inline-block;
+	vertical-align: top;
+}
+.rule {
+	text-align: left;
+	display: block;
+	border: 1px solid #cbcbcb;
+	padding: 10px;
+	height: 415px;
+	width: 994px;
+	overflow: auto;
+	background-color: #efefef;
+}
+.except {
+	display: block;
+	width: 1014px;
+	margin-top: 15px;
+}
+.submit {
+	background-color: #cbcbcb;
+	display: block;
+	width: 994px;
+	margin-top: 10px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+	margin-left: 0px;
+	padding-top: 25px;
+	padding-right: 20px;
+	padding-bottom: 20px;
+	padding-left: 0px;
+	border-top-width: 1px;
+	border-top-style: solid;
+	border-top-color: #a9a9a9;
+}
+.note {
+	color: #888;
+	display: block;
+	margin-top: 10px;
+	padding: 0px;
+}
+.form_title {
+	line-height: 28px;
+	font-weight: bold;
+	text-decoration: none;
+	display: block;
+	height: 28px;
+	margin-top: 5px;
+	margin-bottom: 10px;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #cbcbcb;
+	font-size: 13px;
+}
+.input_container {
+	display: block;
+	padding: 10px;
+}
+.input_label {
+	text-align: left;
+	display: block;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+.input {
+	text-align: left;
+	display: block;
+}
+.req {
+	font-weight: bold;
+	color: #ff0000;
+	text-decoration: none;
+}
+.split {
+	display: block;
+	width: 100%;
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-bottom: 15px;
+	border-bottom-width: 1px;
+	border-bottom-style: dotted;
+	border-bottom-color: #cbcbcb;
+	padding-left: 0px;
+	margin-bottom: 15px;
+}
+.bold {
+	font-weight: bold;
+}
+.break_word {
+	word-wrap: break-word;
+}
+.alert-block {
+	display: block;
+	padding-right: 1%;
+	padding-left: 1%;
+}
+.margin-bottom {
+	margin-bottom: 10px;
+}
+.border_bottom {
+	border-bottom-width: 1px !important;
+	border-bottom-style: solid !important;
+	border-bottom-color: #cbcbcb !important;
+}

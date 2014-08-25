@@ -1,0 +1,32 @@
+<?php
+include("../config/config.php");
+
+$cmd=pg_escape_string($_POST['cmd']);
+$old_cusid=pg_escape_string($_POST['old_cusid']);
+$old_idno=pg_escape_string($_POST['old_idno']);
+$idno=pg_escape_string($_POST['idno']);
+$old_asid=pg_escape_string($_POST['asid']);
+
+if($cmd == "check_cusid"){
+    if($old_idno != $idno){
+        $qry_name=pg_query("select \"CusID\",\"asset_id\" from \"VContact\" WHERE \"IDNO\"='$idno'");
+        if($res_name=pg_fetch_array($qry_name)){
+            $CusID=$res_name["CusID"];
+            $asset_id=$res_name["asset_id"];
+        }
+        
+        if(($old_cusid == $CusID) || ($old_asid == $asset_id)){
+            $data['success'] = true;
+            $data['message'] = "เลขที่สัญญาถูกต้อง";
+        }else{
+            $data['success'] = false;
+            $data['message'] = "เลขที่สัญญาไม่ถูกต้อง!";
+        }
+    }else{
+        $data['success'] = false;
+        $data['message'] = "เลขที่สัญญาซ้ำรายการหลัก!";
+    }
+}
+
+echo json_encode($data);
+?>

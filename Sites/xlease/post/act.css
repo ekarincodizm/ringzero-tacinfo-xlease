@@ -1,0 +1,153 @@
+body {font-family:tahoma; color : #333333; font-size:12px;}
+H1 {font-family:tahoma; color : #333333; font-size:28px;}
+A { font-size:12px; text-decoration:none;}
+hr {
+	border:none;
+	border-top:solid 1px #333;
+	margin:10px 0px;
+}
+A:hover { color : #8B8B8B; font-size:12px; text-decoration:none;}
+A:visited { color : #333333; font-size:12px; text-decoration:none;} 
+input,select{font-family:tahoma; color : #333333; font-size:12px;}
+.header{
+	text-align:center;       
+}
+.wrapper{
+	width:700; float:center; padding:5px;
+}
+legend{
+    font-family: Tahoma;
+    font-size: 14px;    
+    color: #0000CC;
+}
+legend A{ color : #0000CC; font-size: 14px; text-decoration:none;}
+legend A:hover{ color : #0000CC; font-size: 14px; text-decoration:none;}
+legend A:visited{ color : #0000CC; font-size: 14px; text-decoration:none;}
+fieldset{
+    padding:3px;
+}
+.text_gray{
+    color:gray;
+}
+.text_comment{
+    color:red;
+	font-size: 11px;
+}
+.odd{
+	background-color:#EDF8FE;
+	font-size:11px
+}
+.even{
+	background-color:#D5EFFD;
+	font-size:11px
+}
+
+.greenbox{
+    background-color:#ECFFEC; padding: 3px 3px 3px 3px; border-style: dashed; border-width: 1px; border-color:#ACACAC; margin-bottom:3px;
+}
+
+.greenbox:hover{
+    background-color:#D5FFD5;
+}
+
+.greenbox a{
+    font-size:13px; text-decoration:none;color : #333333;
+}
+.greenbox a:hover{
+    font-size:13px; text-decoration:underline;color : #808080;
+}
+
+.yellowbox{
+    background-color:#FFFFDF; padding: 3px 3px 3px 3px; border-style: dashed; border-width: 1px; border-color:#ACACAC; margin-bottom:3px;
+}
+
+.redbox{
+    background-color:#FFCCCC; padding: 3px 3px 3px 3px; border-style: dashed; border-width: 1px; border-color:#ACACAC; margin-bottom:3px;
+}
+.graybox{
+    background-color:#F0F0F0; padding: 3px 3px 3px 3px; border-style: dashed; border-width: 1px; border-color:#D0D0D0; margin-bottom:3px;
+}
+.browse_page{
+	clear:both;
+	height:26px;
+	margin-top:5px;
+	display:block;
+	text-align:center;
+	float: right;
+	margin-right: 5px;
+}
+.browse_page a,.browse_page a:hover{
+	display:block;
+	height:18px;
+	width:18px;
+	font-size:10px;
+	float:left;
+	margin-right:2px;
+	border:1px solid #CCCCCC;
+	background-color:#F4F4F4;
+	color:#0a85cb;
+	text-align:center;
+	line-height:18px;
+	font-weight:bold;
+	text-decoration:none;
+}
+.browse_page a:hover{
+	border:1px solid #0A85CB;
+	background-color:#0A85CB;
+	color:#FFFFFF;
+}
+.browse_page a.selectPage{
+	display:block;
+	height:18px;
+	width:18px;
+	font-size:10px;
+	float:left;
+	margin-right:2px;
+	border:1px solid #0A85CB;
+	background-color:#0A85CB;
+	color:#FFFFFF;
+	text-align:center;
+	line-height:18px;
+	font-weight:bold;
+}
+.browse_page a.SpaceC{
+	display:block;
+	height:18px;
+	width:18px;
+	font-size:10px;
+	float:left;
+	margin-right:2px;
+	border:0px dotted #0A85CB;
+	font-size:11px;
+	background-color:#FFFFFF;
+	color:#333333;
+	text-align:center;
+	line-height:18px;
+	font-weight:bold;
+}
+.browse_page a.naviPN{
+	width:50px;
+	font-size:12px;
+	display:block;
+	height:18px;
+	float:left;
+	border:1px solid #CCCCCC;
+	background-color:#F4F4F4;
+	color:#0a85cb;
+	text-align:center;
+	line-height:18px;
+	font-weight:bold;	
+}
+.browse_page a.naviPN:hover{
+	width:50px;
+	font-size:12px;
+	display:block;
+	height:18px;
+	float:left;
+	border:1px solid #CCCCCC;
+	background-color:#0A85CB;
+	color:#fff;
+	text-align:center;
+	line-height:18px;
+	font-weight:bold;	
+}

@@ -1,0 +1,799 @@
+<form name="form" onsubmit="return false" >
+<script type="text/javascript">
+
+var join_type1 = $.ajax
+                ({
+                  type: "POST",
+                  url: "api.php",
+                  data: "cmd=join_type&id=1",
+                  async: false
+                }).responseText;
+				
+var join_type2 = $.ajax
+                ({
+                  type: "POST",
+                  url: "api.php",
+                  data: "cmd=join_type&id=2",
+                  async: false
+                }).responseText;
+
+  var cheque = [];  
+  var bank_obj;
+  var typepay_obj;   
+  var k = 0;
+  $(document).ready
+  (
+  
+    function () 
+    {
+      load_bank = $.ajax
+                  ({
+                    type: "POST",
+                    url: "api.php",
+                    data: "cmd=list_bank" ,
+                    async: false
+                  }).responseText;
+    
+      bank_obj = eval('(' + load_bank + ')');
+      
+      load_typepay = $.ajax
+                     ({
+                        type: "POST",
+                        url: "api.php",
+                        data: "cmd=list_typepay" ,
+                        async: false
+                     }).responseText;
+        
+      typepay_obj = eval('(' + load_typepay + ')'); 
+      
+      $("#keyword").autocomplete
+      (
+        "search_idno.php", 
+        {
+          width: 260,
+          selectFirst: false
+        }
+      );      
+      
+      $("#keyword").result
+      (
+        function(event, data, formatted) 
+        {
+          if (data)
+          {
+            $("#cusid").val(data[1]);
+          }
+        }
+      );   
+      
+      $("#keyword").bind('keypress', 
+                          function(e) 
+                          { 
+                            if ( e.which==10 || e.which==13 )
+                            {
+                              search();
+                            }
+                          } );               
+      
+      newCheque();
+    }
+  );   
+  function windowOpen(x) {
+var
+myWindow=window.open(x,'windowRef','width=600,height=400');
+if (!myWindow.opener) myWindow.opener = self;
+}
+  function format(data)
+  {
+    if ( data == null )
+    {
+      return ""; 
+    }
+    else
+    {
+      return data;
+    }
+  }            
+  
+  function newCheque()
+  {
+    html = "<div class='bluebox' id='cheque_" + (cheque.length + 1) + "'>"
+         + "  <span class='text_bold'>เช็ค # " + (cheque.length + 1) + "</span><br>"
+         + "  <table cellspacing='3'>"
+         + "    <tr>"
+         + "      <td width='100'>เลขที่เช็ค</td>"
+         + "      <td width='150'>วันที่สั่งจ่าย</td>"
+         + "      <td width='350'>ธนาคาร</td>"
+         + "      <td width='100'>จำนวนเงิน</td>"
+         + "    </tr>"
+         
+         + "    <tr>" 
+         + "      <td><input id='chequeno_" + (cheque.length + 1) + "' name='chequeno_" + (cheque.length + 1) + "' type='text' size='10' /></td>"
+         + "      <td><input id='chequedate_" + (cheque.length + 1) + "' name='chequedate_" + (cheque.length + 1) + "' type='text' size='10' readonly='readonly' /></td>"
+         + "      <td><select id='chequebank_" + (cheque.length + 1) + "' name='chequebank_" + (cheque.length + 1) + "' size='1'></select>  สาขา<input id='chequebankbranch_" + (cheque.length + 1) + "' name='chequebankbranch_" + (cheque.length + 1) + "' type='text' size='10'><input id='chequeoutbkk_" + (cheque.length + 1) + "' name='chequeoutbkk_" + (cheque.length + 1) + "' type='checkbox'>ตจว.</td>"
+         + "      <td><input id='chequeamount_" + (cheque.length + 1) + "' name='chequeamount_" + (cheque.length + 1) + "' type='text' size='8'></td>"
+         + "    </tr>"
+         + "  </table>"
+         
+         + "  <div id='chequedetail_" + (cheque.length + 1) + "' class='insidebox' style='margin-top:15px;'>"         
+         + "    <table id='list_" + (cheque.length + 1) + "' class='tb' border='0' cellpadding='0' cellspacing='1' width='100%'>"
+         + "      <thead>"
+         + "        <tr>"
+         + "          <th width='50'>รายการ</th>"
+         + "          <th width='100'>สัญญาเลขที่</th>"
+         + "          <th></th>"
+         + "          <th width='100'>รายการจ่ายเงิน</th>"
+         + "          <th width='100'>&nbsp;</th>"
+         + "          <th width='100'>จำนวนเงิน</th>"
+         + "          <th width='70'>&nbsp;</th>"
+         + "        </tr>"
+         + "      </thead>"
+         + "      <tbody>"
+         + "      </tbody>"
+         
+         + "      <tfoot>"
+         + "        <tr>"
+         + "          <th></th>" 
+
+         + "          <th>"
+         + "            <input id='e_idno_" + (cheque.length + 1) + "' name='e_idno_" + (cheque.length + 1) + "' type='text' size='12' onkeyup='idno_detail(" + (cheque.length + 1) + ");' />"
+         + "          </th>"
+         
+         + "          <th>"
+         + "            <span id='idno_desc_" + (cheque.length + 1) + "' class='text_blue_tiny'></span>"         
+         + "          </th>"          
+                  
+         + "          <th>"
+         + "            <select id='cb_typepay_" + (cheque.length + 1) + "' name='cb_typepay_" + (cheque.length + 1) + "' size='1' onchange='update_ui(" + (cheque.length + 1) + ");'>"
+                    
+         + "            </select>"                              
+         + "          </th>" 
+                          
+         + "          <th>"
+         + "            <span id='period2_" + (cheque.length + 1) + "'></span><div id='period_" + (cheque.length + 1) + "'>"
+         + "              จำนวนงวด"
+         + "              <input id='e_period_" + (cheque.length + 1) + "' name='e_period_" + (cheque.length + 1) + "' type='text' value='1' size='3' onkeyup='update_amount_for_pmt(" + (cheque.length + 1) + "); '; />"
+         + "            </div>"
+         + "          </th>"
+                  
+         + "          <th align='right'>"
+         + "            <input id='e_amount_" + (cheque.length + 1) + "' name='e_amount_" + (cheque.length + 1) + "' type='text' />"
+         + "          </th>"
+                                                   
+         + "          <th>"
+         + "            <button title='เพิ่มรายการ' onclick='addItem(" + (cheque.length + 1) + ");' >เพิ่มรายการ</button>"
+         + "          </th>"
+         + "        </tr>"
+                
+         + "        <tr>"
+         + "          <th colspan='7'><hr></th>"    
+         + "        </tr>"  
+                
+         + "        <tr>"
+         + "          <th colspan='5' align='right'><span id='total_text_" + (cheque.length + 1) + "'></span></th>"
+         + "          <th align='right'><span id='total_num_" + (cheque.length + 1) + "'></span></th>"
+         + "          <th>&nbsp;</th>"   
+         + "        </tr>"
+
+         + "      </tfoot>"    
+         
+         + "    </table>"
+         + "  </div>"
+         + "</div><br>"; 
+         
+    $("#cheque_list").append(html);
+    $("#chequeno_" + (cheque.length + 1)).bind('keypress', 
+                                              function(e) 
+                                              { 
+                                                return ( e.which!=8 && e.which!=0 && (e.which<48 || e.which>57)) ? false : true ;
+                                              } ); 
+    
+    var bank_option = "";
+    
+    for (var b in bank_obj)
+    {
+      bank_option = bank_option + "<option value='" + bank_obj[b].bankcode + "'>" + bank_obj[b].bankname + "</option>";
+    }
+    
+    $("#chequebank_" + (cheque.length + 1)).html(bank_option); 
+    
+    $("#chequedate_" + (cheque.length + 1)).datepick
+    (       
+      $.extend
+      (
+        {
+          showStatus: true, 
+          showOn: 'both', 
+          buttonImageOnly: true, 
+          buttonImage: 'js/datepick/calendar.gif' 
+        }, 
+        
+        $.datepick.regional['th']
+      )
+    );
+    
+    $("#chequeamount_" + (cheque.length + 1)).bind('keypress', 
+                                                  function(e) 
+                                                  { 
+                                                    return ( e.which!=8 && e.which!=0 && e.which!=46 && (e.which<48 || e.which>57)) ? false : true ;
+                                                  } );
+
+    $("#e_amount_" + (cheque.length + 1)).bind('keypress', 
+                                              function(e) 
+                                              { 
+                                                return ( e.which!=8 && e.which!=0 && e.which!=46 && (e.which<48 || e.which>57)) ? false : true ;
+                                              } );
+                                              
+    $("#e_period_" + (cheque.length + 1)).bind('keypress', 
+                                              function(e) 
+                                              { 
+                                                return ( e.which!=8 && e.which!=0 && (e.which<48 || e.which>57)) ? false : true ;
+                                              } );                                              
+    
+    //$("#e_idno_" + (cheque.length + 1)).mask("99-99-99999");
+    
+    var typepay_option = "";
+    
+    for (var v in typepay_obj)
+    {
+      typepay_option  = typepay_option + '<option value="' + typepay_obj[v].id + '">' + typepay_obj[v].name + '</option>';
+    }
+    
+    $("#cb_typepay_" + (cheque.length + 1)).html(typepay_option);
+    
+    update_ui(cheque.length + 1);
+    
+    cheque[cheque.length] = {checkno : cheque.length + 1 , cheque_number : "" , cheque_date : "" , cheque_bank : "" , cheque_bankbranch : "" , cheque_outbkk : "" , cheque_amount : "" , payment : []};
+  }
+  
+  function search()
+  {
+    var check = $.ajax
+                ({
+                  type: "POST",
+                  url: "api.php",
+                  data: "cmd=check_cus&key=" + $("#keyword").val() + "&cus=" + $("#cusid").val() ,
+                  async: false
+                }).responseText;
+      
+    if (check == "1")
+    {
+      load_result($("#cusid").val());
+        
+      return false;
+    }
+    else
+    {
+      alert("ระบุข้อมูลลูกค้าผิด กรุณาลองใหม่");
+      
+      $("#cash1_1 > #cash1_idno").val("");
+      $("#cash1_1 > #cusid").val(""); 
+      
+      $("#cash1_1 > #cash1_idno").focus();
+    
+      return false;
+    }
+  }
+  
+  function load_result(cusid)
+  {
+    html = "<br><br><br><center><image src=\"postpayment/image/ajax-loader.gif\" /><br><br><span class=\"text_blue_bold\">กำลังเตรียมข้อมูล</span></center>"; 
+      
+    $("#search_result").html(html); 
+    
+    $.ajax
+    ({
+      type: "POST",
+      url: "api.php",
+      data: "cmd=load_cus&cusid=" + cusid , 
+      success:  function(msg)
+                {
+                  customer = eval('(' + msg + ')');
+
+                  html = "<span class='text_bold'>ข้อมูลลูกค้า </span>"
+                       + "<span class='text_blue_bold' id='customer_name'>" + customer.cusid + " : " + customer.cusname + "</span>";
+                  
+                  $("#search_result").html(html);
+                  
+                  for (var v in customer.asset)
+                  {
+                    html = "<div class='bluebox'>"
+                         + "  <table>"        
+                         + "    <tr>"
+                         + "      <td width='150'>สัญญาเลขที่&nbsp;" + customer.asset[v].idno + "</td>"
+                         + "      <td width='340'>สินทรัพย์ " + customer.asset[v].asset_type + " " + customer.asset[v].asset_name + "</td>"
+                         + "      <td width='200'>ค่างวด (รวมภาษี) &nbsp;&nbsp;" + (customer.asset[v].pmt + customer.asset[v].vat) + "</td>"
+                         + "      <td width='100'>เหลือ &nbsp;&nbsp;" + customer.asset[v].period + "&nbsp;งวด</td>"
+                         + "      <td width='20'>"
+                         + "        <div id='tab" + customer.asset[v].idno + "' class='btn_asc' onclick='toggle(\"" + customer.asset[v].idno + "\")'>&nbsp;</div>"
+                         + "      </td>"
+                         + "    </tr>"
+                         + "  </table>"
+                         + "</div>" 
+                         + "<div id='detail" + customer.asset[v].idno + "' style='height:200px; overflow:auto;'></div>";
+
+                    $("#search_result").append(html);
+                    $("#detail" + customer.asset[v].idno).hide(); 
+                    
+                    $("#tab" + customer.asset[v].idno).toggle
+                    (
+                      function () 
+                      {
+                        $(this).removeClass("btn_asc");      
+                        $(this).addClass("btn_desc"); 
+                      },
+                      
+                      function () 
+                      {
+                        $(this).removeClass("btn_desc");      
+                        $(this).addClass("btn_asc"); 
+                      }
+                    )
+                    
+                  } 
+                  
+                }
+                
+                
+    });
+
+  }  
+  
+  function toggle(item)
+  {
+    if ( $("#detail" + item).html() == "" ) 
+    {
+      html = "<br><br><br><center><image src=\"postpayment/image/ajax-loader.gif\" /><br><br><span class=\"text_blue_bold\">กำลังเตรียมข้อมูล</span></center>"; 
+      
+      $("#detail" + item).html(html);    
+    }
+
+    $("#detail" + item).toggle("slow"); 
+        
+    $.ajax
+    ({
+      type: "POST",
+      url: "api.php",
+      data: "cmd=load_detail&idno=" + item,
+      success:  function(msg)
+                {
+                  detail = eval('(' + msg + ')');
+                
+                  table = "<table class=\"tb2\">"
+                        + " <thead>"
+                        + "   <tr>"
+                        + "     <th>งวดที่</th>"
+                        + "     <th>วันที่นัด</th>"
+                        + "     <th>วันที่มาจ่าย</th>"
+                        + "     <th>ล่าช้า</th>"
+                        + "     <th>ค่าปรับ</th>"
+                        + "     <th>เลขที่ใบเสร็จ</th>"
+                        + "     <th>เลขที่ VAT</th>"
+                        + "     <th>จำนวนเงิน</th>"
+                        + "     <th>VAT</th>"
+                        + "   </tr>"
+                        + " </thead>"
+                        + " <tbody>";
+                        
+                  for (var d in detail)   
+                  {
+                    table+= "<tr>"
+                          + "     <th align=\"right\">" + detail[d].dueno + "</th>"
+                          + "     <th>" + format( detail[d].duedate )     + "</th>"
+                          + "     <th>" + format( detail[d].r_date )      + "</th>"
+                          + "     <th align=\"right\">" + format( detail[d].daydelay )    + "</th>"
+                          + "     <th align=\"right\">" + format( detail[d].calamtdelay ) + "</th>"
+                          + "     <th>" + format( detail[d].r_receipt )   + "</th>"
+                          + "     <th>" + format( detail[d].v_receipt )   + "</th>"
+                          + "     <th align=\"right\">" + format( detail[d].r_money )     + "</th>"
+                          + "     <th align=\"right\">" + format( detail[d].vatvalue )    + "</th>"
+                          + "</tr>";
+                  }                  
+                        
+                  table +=" </tbody>"
+                        + "</table>";
+                  
+                  
+
+                                  
+                  $("#detail" + item).html(table);
+                }
+    });
+  } 
+  
+  function idno_detail(chequeno)
+  {
+    var idno = $("#e_idno_" + chequeno).val();
+    
+    if (idno.indexOf('_') == -1)
+    {
+      $.ajax
+      ({
+        type: "POST",
+        url: "api.php",
+        data: "cmd=load_asset&idno=" + idno,
+        success:  function(msg) 
+                  {
+                    if (msg != "null")
+                    {
+                      asset = eval('(' + msg + ')');
+          
+                      html = asset.full_name + " : ";
+                      
+                      if (asset.c_carname != null)
+                      {
+                        html = html + "รถยนต์ " + asset.c_carname + " / " + asset.c_regis;
+                      }
+                      else if (asset.gas_name != null)  
+                      {
+                        html = html + "แก๊ส " + asset.gas_name + " / " + asset.car_regis;
+                      }
+                      
+                      $("#idno_desc_" + chequeno).html(html);
+                    }
+                    else
+                    {
+                      $("#idno_desc_" + chequeno).html("");
+                    }
+                    
+                    update_amount_for_pmt(chequeno);                      
+                  }
+      });      
+    }
+    else
+    {
+      $("#idno_desc_" + chequeno).html("");      
+    }
+  }
+  
+  function update_ui(chequeno)
+  {
+	  
+	var aa = 0;
+	var bb = 0;
+	for(i=1; i<=chequeno; i++){
+
+		
+var mySplitResult = join_type1.split("#");  
+for(z = 0; z < mySplitResult.length; z++){ 
+			if($('#cb_typepay'+ i).val() == mySplitResult[z]){
+			if($('#cb_idno'+ chequeno).val() == $('#cb_idno'+ i).val()){
+			aa ++;
+			}
+			//alert('aa '+$('#typepayment'+ i).val());
+		}
+}
+var mySplitResult = join_type2.split("#");  
+for(z = 0; z < mySplitResult.length; z++){ 
+		
+		if($('#cb_typepay'+ i).val() == mySplitResult[z]){
+			if($('#cb_idno'+ chequeno).val() == $('#cb_idno'+ i).val()){
+			bb ++;
+			}
+			//alert('bb '+$('#typepayment'+ i).val());
+		}
+}
+	}
+	if( (aa>0 && bb>0) || (aa>1) || (bb>1) ){
+		
+                alert('ห้ามเลือกประเภทรายการ ค่าเข้าร่วมซ้ำ !');
+				
+//document.getElementById('typepayment'+ id).selectedIndex=0;
+$('#cb_typepay'+ chequeno).attr('selectedIndex', 0); 
+		 return false;
+ 
+    }
+	
+			
+    if ( $("#cb_typepay_" + chequeno).val() == 1 )
+    {
+      $("#period_" + chequeno).show("slow");
+      $("#e_period_" + chequeno).val("1");
+      $("#e_amount_" + chequeno).attr("readonly", "readonly"); 
+
+      update_amount_for_pmt(chequeno);      
+    }
+
+    else
+    {
+		var ck_else = 0;
+		var mySplitResult = join_type1.split("#");  
+for(z = 0; z < mySplitResult.length; z++){ 
+if( $("#cb_typepay_"+ chequeno).val() == mySplitResult[z] ){ //ตรวจสอบถ้าเป็นค่าเข้าร่วม แรกเข้า
+		if(k!=1){
+			ck_else =1;
+         $("#e_amount_" + chequeno).attr("readonly", "readonly"); 
+$("#e_amount_" + chequeno).val("");
+      windowOpen('nw/join_cal/join_cal.php?idno='+ $("#e_idno_"+ chequeno).val()+ '&inputName=e_amount_'+ chequeno + '&pay_date='+$("#chequedate_" + (chequeno)).val()+'&change_pay_type=1&page_name=cheque1');
+
+           $("#period2_" + chequeno).load("api.php?cmd=load_join1&id="+ chequeno+'&idno='+ $("#e_idno_"+ chequeno).val()+ '&inputName=e_amount_'+ chequeno + '&pay_date='+$("#chequedate_" + (chequeno)).val()+'&change_pay_type=1&page_name=cheque1', function(){
+            $("#period2_" + chequeno).show();
+            
+
+            });
+            
+   // k=1 ;
+		}else{
+			 alert('ค่าเข้าร่วม สามารถเลือกได้รายการเดียวเท่านั้น!');
+			//$('#cb_typepay_'+ chequeno).val('เลือก');
+                return false;
+		}
+          
+     
+    }
+}
+		var mySplitResult = join_type2.split("#");  
+for(z = 0; z < mySplitResult.length; z++){ 
+		
+		if( $("#cb_typepay_"+ chequeno).val() == mySplitResult[z] ){ //ตรวจสอบถ้าเป็นค่าเข้าร่วม ธรรมดา
+		if(k!=1){
+			ck_else =1;
+         $("#e_amount_" + chequeno).attr("readonly", "readonly"); 
+$("#e_amount_" + chequeno).val("");
+        windowOpen('nw/join_cal/join_cal.php?idno='+ $("#e_idno_"+ chequeno).val()+ '&inputName=e_amount_'+ chequeno + '&pay_date='+$("#chequedate_" + (chequeno)).val()+'&change_pay_type=0&page_name=cheque1');
+
+				
+				 $("#period2_" + chequeno).load("api.php?cmd=load_join1&id="+ chequeno+'&idno='+ $("#e_idno_"+ chequeno).val()+ '&inputName=e_amount_'+ chequeno + '&pay_date='+$("#chequedate_" + (chequeno)).val()+'&change_pay_type=0&page_name=cheque1', function(){
+            $("#period2_" + chequeno).show();
+            
+			
+
+            });
+			//k=1 ;
+				}else{
+			 alert('ค่าเข้าร่วม สามารถเลือกได้รายการเดียวเท่านั้น!');
+			 //$('#cb_typepay_'+ chequeno).val('เลือก');
+                return false;
+			
+		}
+          
+    
+    }
+}
+if(ck_else ==0){
+      $("#period_" + chequeno).hide("slow");
+      $("#period2_" + chequeno).hide("slow");
+      $("#e_amount_" + chequeno).val("");
+      $("#e_amount_" + chequeno).removeAttr("readonly");    
+}
+    }
+  }
+  
+  function update_amount_for_pmt(chequeno)
+  {
+    if ( $("#cb_typepay_" + chequeno).val() == 1 )
+    {
+      var idno = $("#e_idno_" + chequeno).val();
+      
+      if (idno.indexOf('_') == -1)
+      {
+        load_asset =  $.ajax
+                      ({
+                        type: "POST",
+                        url: "api.php",
+                        data: "cmd=load_asset&idno=" + idno ,
+                        async: false
+                      }).responseText;
+                      
+        asset = eval('(' + load_asset + ')');  
+        
+        var pmt = asset.p_month;
+        var vat = asset.p_vat; 
+          
+        $("#e_amount_" + chequeno).val( parseFloat( $("#e_period_" + chequeno).val() ) *  (pmt + vat));    
+      } 
+    }
+  }
+  
+  function addItem(chequeno)
+  {
+    var idno = $("#e_idno_" + chequeno).val();
+    
+    if (idno.indexOf('_') != -1) 
+    {
+      alert("ข้อมูลเลขที่สัญญาไม่ถูกต้อง");  
+    }
+    else if ( isNaN($("#e_amount_" + chequeno).val()) | ($("#e_amount_" + chequeno).val() == ""))
+    {
+      alert("ข้อมูลจำนวนเงินไม่ถูกต้อง");
+      
+      $("#e_amount_" + chequeno).focus();
+    }
+    else
+    {      
+      load_asset =  $.ajax
+              ({
+                type: "POST",
+                url: "api.php",
+                data: "cmd=load_asset&idno=" + idno ,
+                async: false
+              }).responseText;
+                    
+      if (load_asset == "null")
+      {
+        alert("ไม่พบข้อมูลตามเลขที่สัญญา");        
+      }
+      else
+      {
+        var i = cheque[chequeno - 1].payment.length;
+        cheque[chequeno - 1].payment[i] = { idno : idno , typepay: $("#cb_typepay_" + chequeno).val() , amount : $("#e_amount_" + chequeno).val() };
+
+        $("#cb_typepay_" + chequeno).val("200");
+        update_ui(chequeno);
+        $("#e_amount_" + chequeno).val("");
+        
+        update_table();
+      }
+    }
+  }
+  
+  function update_table()
+  {
+    for (i = 0 ; i < cheque.length ; i++)
+    {
+      $("#list_" + (i + 1) + " > tbody").empty(); 
+      
+      var index = 1; 
+      var total = 0;   
+      
+      for (j = 0 ; j < cheque[i].payment.length ; j++)
+      {
+        if (cheque[i].payment[j] != "undefined")
+        {       
+          var typepayStr = typepay_obj[cheque[i].payment[j].typepay].name;
+            
+          var amt = new Number(cheque[i].payment[j].amount);
+          amtStr = amt.toFixed(2);
+          
+          total = total + amt;
+
+          html = "<tr>"     
+               + "  <th>" + index + "</th>" 
+               + "  <th>" + cheque[i].payment[j].idno + "</th>"
+               + "  <th>&nbsp;</th>"
+               + "  <th>" + typepayStr + "</th>" 
+               + "  <th>&nbsp;</th>"
+               + "  <th align=\"right\">" + amtStr + "</th>"
+               + "  <th>&nbsp;</th>"
+               + "</tr>";
+               
+          $("#list_" + (i + 1) + " > tbody").append(html); 
+        }   
+        
+        index = index + 1; 
+      }
+      
+      $("#total_text_" + (i + 1)).html("รวม");  
+      $("#total_num_" + (i + 1)).html(total.toFixed(2));      
+    }
+  }
+  
+  function save()
+  {
+    var error = 0;
+    
+    //validate
+    for (i = 0 ; i < cheque.length ; i++)  
+    { 
+      if ( $("#chequeno_" + (i + 1)).val() == "" )
+      {
+        error = error + 1;
+        
+        alert("เช็ค# " + (i + 1) + " ยังไม่ได้ระบุเลขที่เช็ค");  
+        
+        break;
+      }
+      else if ( $("#chequedate_" + (i + 1)).val() == "" )
+      {
+        error = error + 1; 
+        
+        alert("เช็ค# " + (i + 1) + " ยังไม่ได้ระบุวันที่สั่งจ่าย");  
+        
+        break;S
+      }
+      else if ( $("#chequebankbranch_" + (i + 1)).val() == "" )
+      {
+        error = error + 1; 
+        
+        alert("เช็ค# " + (i + 1) + " ยังไม่ได้ระบุสาขาธนาคาร");  
+        
+        break;         
+      } 
+      else if ( isNaN($("#chequeamount_" + (i + 1)).val()) | ($("#chequeamount_" + (i + 1)).val() == ""))
+      {
+        error = error + 1; 
+        
+        alert("เช็ค# " + (i + 1) + " ระบุมูลค่าไม่ถูกต้อง");  
+        
+        break;        
+      } 
+      else 
+      {
+        var chequeamount = new Number( $("#chequeamount_" + (i + 1)).val() );
+        var payamount    = new Number( $("#total_num_" + (i + 1)).html() ); 
+        
+        if (chequeamount.toFixed(2) != payamount.toFixed(2))
+        {
+          error = error + 1;
+          
+          alert("เช็ค# " + (i + 1) + " มูลค่าเช็คไม่ตรงกับการจ่ายเงิน");  
+          
+          break;          
+        }
+      }
+      
+      cheque[i].cheque_number     = $("#chequeno_" + (i + 1)).val();
+      cheque[i].cheque_date       = $("#chequedate_" + (i + 1)).val();
+      cheque[i].cheque_bank       = $("#chequebank_" + (i + 1)).val();
+      cheque[i].cheque_bankbranch = $("#chequebankbranch_" + (i + 1)).val();     
+      cheque[i].cheque_outbkk     = $("#chequeoutbkk_" + (i + 1)).is(':checked');
+      cheque[i].cheque_amount     = $("#chequeamount_" + (i + 1)).val(); 
+    }
+    
+    if (error == 0)
+    {
+      $("#btn_save").attr("disabled", true);
+      $("#btn_addcheque").attr("disabled", true);
+    
+      $.post
+      (
+        "api.php", 
+        { 
+          cmd : "pay_cheque1" , 
+          payment : JSON.stringify(cheque) 
+        } ,
+        
+        function(data)
+        {
+          if (data == "1")
+          {
+            alert("บันทึกรายการเรียบร้อย");
+            location.href = "frm_postav.php";
+          }
+        }  
+      );    
+    }
+  }
+  
+</script>
+
+
+<h1 id="caption">Post</h1>  
+
+<br>
+
+<span class="text_bold">จ่ายเช็ค</span>
+
+<br><br>
+
+<div id="cheque_list">
+  
+</div>
+
+<div id="panelLeft">
+  <button id="btn_addcheque" title="เพิ่มเช็ค" onclick="newCheque();">เพิ่มเช็ค</button>
+</div>
+
+<div id="panelRight" align="right">
+  <button id="btn_save" title="บันทึกรายการ" onclick="save();">บันทึกรายการ</button>
+</div>
+
+<div id="footer" style="clear:both;">
+</div>
+
+<br><br>
+
+<div id="search_keyword" class="text_bold">
+  <h1>ค้นหาข้อมูลลูกค้า</h1>
+  <label>Keyword :&nbsp;</label>
+  <input id="keyword" name="keyword" type="text" size="25" />
+  <input type="hidden" id="cusid" name="cusid" value="" />
+  <button title="แสดงรายการ" onclick="search();">แสดงรายการ</button>
+</div>
+
+<br>
+
+<div id="search_result">
+  
+</div>
+</form>

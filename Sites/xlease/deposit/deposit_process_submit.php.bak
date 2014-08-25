@@ -1,0 +1,83 @@
+<?php
+include("../config/config.php");
+
+$idno=pg_escape_string($_POST['idno']);
+$datepicker=pg_escape_string($_POST['datepicker']);
+$divmoney=pg_escape_string($_POST['divmoney']);
+$discount=pg_escape_string($_POST['discount']);
+$old_cusid=pg_escape_string($_POST['old_cusid']);
+$old_asid=pg_escape_string($_POST['old_asid']);
+$money=pg_escape_string($_POST['money']);
+$counter=pg_escape_string($_POST['counter']);
+
+$status=0;
+
+pg_query("BEGIN WORK");
+
+$arr_datepicker = explode("#",$datepicker);
+
+if($money == 0){
+    $data['success'] = false;
+    $data['message'] = "จำนวนเงินไม่ถูกต้อง";
+    echo json_encode($data);
+    exit;
+}
+
+if($money > $arr_datepicker[1]){
+    $data['success'] = false;
+    $data['message'] = "จำนวนเงินไม่ถูกต้อง";
+}else{
+    
+    $status=0;
+    $data_arr = "";
+    
+    if($divmoney > 0){ //ตรวจสอบหากมีการจ่ายค่่างวด ให้ทำ
+        $result = pg_query("select \"select_deposit_remain\"('$idno','$divmoney','$arr_datepicker[0]',1,'','$discount')");
+        $return1 = pg_fetch_result($result,0);
+        if(empty($return1)){ $status++; }else{ $data_arr .= "$return1,"; }
+    }
+    
+    $alert_text = "";
+    for($i=1; $i<=$counter; $i++){ //จ่ายค่าอื่นๆ
+        $typepayment = pg_escape_string($_POST['typepayment'.$i]);
+        $amt = pg_escape_string($_POST['amt'.$i]);
+        $newidno = pg_escape_string($_POST['newidno'.$i]);
+            
+        if($typepayment == 133){
+            $qry_chk=pg_query("select \"CusID\",\"asset_id\" from \"VContact\" WHERE \"IDNO\"='$newidno'");
+            if($res_chk=pg_fetch_array($qry_chk)){
+                $CusID=trim($res_chk["CusID"]);
+                $asset_id=trim($res_chk["asset_id"]);
+            }
+            if(($old_cusid != $CusID) && ($old_asid != $asset_id)){
+                $status++;
+                $alert_text = "ID ลูกค้า หรือ ID รถยนต์ ไม่ตรง [$old_cusid/$CusID] [$old_asid/$asset_id]";
+                break;
+            }else{
+                $result = pg_query("select \"select_deposit_remain\"('$idno','$amt','$arr_datepicker[0]','$typepayment','$newidno','0')");
+                $return2 = pg_fetch_result($result,0);
+                if(empty($return2)){ $status++; break; }else{ $data_arr .= "$return2,"; }
+            }
+        }else{
+            $result = pg_query("select \"select_deposit_remain\"('$idno','$amt','$arr_datepicker[0]','$typepayment','','0')");
+            $return3 = pg_fetch_result($result,0);
+            if(empty($return3)){ $status++; break; }else{ $data_arr .= "$return3,"; }
+        }
+    }
+
+
+    if($status == 0){
+        $data_arr = substr($data_arr,0,strlen($data_arr)-1);
+        pg_query("COMMIT");
+        $data['success'] = true;
+        $data['message'] = $data_arr;
+    }else{
+        pg_query("ROLLBACK");
+        $data['success'] = false;
+        $data['message'] = "ไม่สามารถบันทึกได้! $alert_text";
+    }
+    
+}
+
+echo json_encode($data);
+?>

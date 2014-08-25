@@ -1,0 +1,175 @@
+<?php
+include("../config/config.php");
+
+$av_officeid = $_SESSION["av_officeid"];
+
+$edt_cusbyyear = $_SESSION["tranfer_cusbyyear"];
+$edt_idno = $_SESSION["tranfer_idno"];
+$edt_duenum = $_SESSION["tranfer_duenum"];
+$edt_rdate = $_SESSION["tranfer_rdate"];
+$edt_start_duedate = $_SESSION["tranfer_start_duedate"];
+$edt_cus_compri = $_SESSION["tranfer_cus_compri"]; if(empty($edt_cus_compri)) $edt_cus_compri = 0;
+$edt_acc_compri = $_SESSION["tranfer_acc_compri"]; if(empty($edt_acc_compri)) $edt_acc_compri = 0;
+$DateUpdate =date("Y-m-d", strtotime("+1 day",strtotime($edt_rdate)));
+
+
+pg_query("BEGIN WORK");
+
+$status = 0;
+
+$qry_tran_id=pg_query("select generate_tran_id('$DateUpdate','$av_officeid')");
+$res_tran_id=pg_fetch_result($qry_tran_id,0);
+if( empty($res_tran_id) ){
+    $status++;
+}
+
+$update_fp="Update \"Fp\" SET \"P_CLDATE\"='$edt_rdate' ,\"P_ACCLOSE\"='TRUE' ,\"P_TransferIDNO\"='$res_tran_id' ,\"P_StopVatDate\"='$edt_rdate' ,\"P_StopVat\"='false' ,\"LockContact\"='false' WHERE \"IDNO\"='$edt_idno' ";
+if(!$result=pg_query($update_fp)){
+    $status++;
+}
+
+$fa_cusid = $_POST['fa_cusid']; //ตรวจสอบจากฐาน / กรอกใหม่
+$add_pstdate = $_POST["f_pstdate"];
+$add_startDate = $_POST["f_startDate"];
+
+if(!empty($fa_cusid)){
+    $sql_select=pg_query("select A.*,B.* from  \"Fa1\" A 
+    LEFT OUTER JOIN \"Fn\" B ON B.\"CusID\"=A.\"CusID\" 
+    where (A.\"CusID\" = '$fa_cusid') ");
+    if($res_cn=pg_fetch_array($sql_select)){
+        $add_firstname = $res_cn["A_FIRNAME"];
+        $add_name = $res_cn["A_NAME"];
+        $add_surname = $res_cn["A_SIRNAME"];
+        $add_reg = $res_cn["N_SAN"];
+        $add_birthdate = $res_cn["N_AGE"];
+        $add_pair = $res_cn["A_PAIR"];
+        $add_card = $res_cn["N_CARD"];
+        $add_address = $res_cn["A_NO"];
+        $add_idcard = $res_cn["N_IDCARD"];
+        $add_moo = $res_cn["A_SUBNO"];
+        $add_dateidcard = $res_cn["N_OT_DATE"];
+        $add_soi = $res_cn["A_SOI"];
+        $add_bycard = $res_cn["N_BY"];
+        $add_road = $res_cn["A_RD"];
+        $add_contactadd = $res_cn["N_ContactAdd"];
+        $add_tambon = $res_cn["A_TUM"];
+        $add_ampur = $res_cn["A_AUM"];
+        $add_province = $res_cn["A_PRO"];
+		$add_idref = $res_cn["N_CARDREF"];
+		if($add_idcard=="")
+		{
+			$add_idcard=$add_idref;
+		}
+		else
+		{
+			$add_card="บัตรประชาชน";
+		}
+    }
+}else{
+    $add_firstname = $_POST["add_firstname"];
+    $add_name = $_POST["add_name"];
+    $add_surname = $_POST["add_surname"];
+    $add_reg = $_POST["add_reg"];
+    $add_birthdate = $_POST["add_birthdate"];
+    $add_pair = $_POST["add_pair"];
+    $add_card = $_POST["add_card"];
+    $add_address = $_POST["add_address"];
+    $add_idcard = $_POST["add_idcard"];
+    $add_moo = $_POST["add_moo"];
+    $add_dateidcard = $_POST["add_dateidcard"];
+    $add_soi = $_POST["add_soi"];
+    $add_bycard = $_POST["add_bycard"];
+    $add_road = $_POST["add_road"];
+    $add_contactadd = $_POST["add_contactadd"];
+    $add_tambon = $_POST["add_tambon"];
+    $add_ampur = $_POST["add_ampur"];
+    $add_province = $_POST["add_province"];
+}
+
+function insertZero($inputValue,$digit){
+    $str = "" . $inputValue;
+    while (strlen($str) < $digit){
+        $str = "0" . $str;
+    }
+    return $str;
+}
+
+$qrylast=pg_query("select count(\"CusID\") AS rescount from \"Fa1\"");
+$reslast=pg_fetch_array($qrylast); 
+$resc=$reslast['rescount'];
+if($resc==0){
+    $res_sn=1;
+}else{
+    $res_sn=$resc+1;
+}
+$cus_sn = "C".insertZero($res_sn,5);
+if(empty($cus_sn)){
+    $status++;
+}
+
+$in_sql="insert into \"Fa1\" (\"CusID\",\"A_FIRNAME\",\"A_NAME\",\"A_SIRNAME\",\"A_PAIR\",\"A_NO\",\"A_SUBNO\",\"A_SOI\",\"A_RD\",\"A_TUM\",\"A_AUM\",\"A_PRO\") values 
+('$cus_sn','$add_firstname','$add_name','$add_surname','$add_pair','$add_address','$add_moo','$add_soi','$add_road','$add_tambon','$add_ampur','$add_province')";
+if(!$result=pg_query($in_sql)){
+    $status++;
+}
+
+if(empty($add_birthdate)) $add_birthdate = 0;
+
+$in_fn="insert into \"Fn\" (\"CusID\",\"N_STATE\",\"N_SAN\",\"N_AGE\",\"N_CARD\",\"N_IDCARD\",\"N_OT_DATE\",\"N_BY\",\"N_ContactAdd\") values 
+('$cus_sn','0','$add_reg','$add_birthdate','$add_card','$add_idcard','$add_dateidcard','$add_bycard','$add_contactadd')";
+if(!$result=pg_query($in_fn)){
+    $status++;
+}
+
+$qry_fp=pg_query("select * from \"Fp\" where \"IDNO\" ='$edt_idno' ");
+if( $res_fp=pg_fetch_array($qry_fp) ){
+    $TranIDRef2=$res_fp["TranIDRef2"];
+    $P_DOWN=$res_fp["P_DOWN"];
+    $P_MONTH=$res_fp["P_MONTH"];
+    $P_VatOfDown=$res_fp["P_VatOfDown"];
+    $P_VAT=$res_fp["P_VAT"];
+    $LockContact=$res_fp["LockContact"];
+    $asset_type=$res_fp["asset_type"];
+    $asset_id=$res_fp["asset_id"];
+    $ComeFrom=$res_fp["ComeFrom"];
+}
+
+$qry_ref1=pg_query("select \"gen_encode_ref1\"('$res_tran_id')");
+$res_ref1=pg_fetch_result($qry_ref1,0);
+if( empty($res_ref1) ){
+    $status++;
+}
+
+$ins_fp="insert into \"Fp\" (\"IDNO\",\"TranIDRef1\",\"TranIDRef2\",\"CusID\",\"P_STDATE\",\"P_DOWN\",\"P_TOTAL\",\"P_MONTH\",\"P_FDATE\",\"P_BEGIN\",\"P_BEGINX\",\"P_VatOfDown\",\"P_VAT\",\"LockContact\",asset_type,asset_id,\"ComeFrom\",\"P_CustByYear\") values 
+('$res_tran_id','$res_ref1','$TranIDRef2','$cus_sn','$add_pstdate','$P_DOWN','$edt_duenum','$P_MONTH','$add_startDate','$edt_cus_compri','$edt_acc_compri','$P_VatOfDown','$P_VAT','$LockContact','$asset_type','$asset_id','$ComeFrom','$edt_cusbyyear')";
+if(!$result=pg_query($ins_fp)){
+    $status++;
+}
+
+$ins_cc="insert into \"ContactCus\" (\"IDNO\",\"CusState\",\"CusID\") values ('$res_tran_id',0,'$cus_sn')";
+if(!$result=pg_query($ins_cc)){
+    $status++;
+}
+
+$qry_acc_pay=pg_query("select \"CreateAccPayment\"('$res_tran_id')");
+$res_acc_pay=pg_fetch_result($qry_acc_pay,0);
+if(!$res_acc_pay){
+    $status++;
+}
+
+$qry_cus_pay=pg_query("select \"CreateCusPayment\"('$res_tran_id')");
+$res_cus_pay=pg_fetch_result($qry_cus_pay,0);
+if(!$res_cus_pay){
+    $status++;
+}
+
+if($status == 0){
+    pg_query("ROLLBACK");
+    //pg_query("COMMIT");
+    echo 1;
+}else{
+    pg_query("ROLLBACK");
+    echo 2;
+}
+
+?>

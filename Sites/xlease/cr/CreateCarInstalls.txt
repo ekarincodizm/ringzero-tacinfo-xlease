@@ -1,0 +1,119 @@
+-- Function: carregis."CreateCarInstalls"(date, double precision[])
+
+-- DROP FUNCTION carregis."CreateCarInstalls"(date, double precision[]);
+
+CREATE OR REPLACE FUNCTION carregis."CreateCarInstalls"(postdate date, smeter double precision[])
+  RETURNS boolean AS
+$BODY$DECLARE
+
+	temmrr "Fc"%ROWTYPE;
+	carid varchar(12);
+	caryear integer;
+	expdate date;
+	idno varchar(12);
+	mtt text;
+	tdd date;
+
+	yy integer;
+	mm integer;
+	dyy integer;
+	dmm integer;
+	fyear integer;
+	num integer;
+	ctdate date;
+	truefalse boolean;
+	duedate date;
+	temgid varchar(12);
+	beg integer;
+
+	gdd integer;
+	gmm integer;
+	gyy date;
+	gyy2 integer;
+	gyy_ms integer;
+	gyy_lob integer;
+
+BEGIN
+	beg := 0;
+	gyy:=current_date;
+	gyy2:=EXTRACT(YEAR FROM gyy);
+	yy:=EXTRACT(YEAR FROM postdate); --หา ปี ปัจจุบัน
+	mm:=EXTRACT(MONTH FROM postdate); --หา เดือน ปัจจุบัน
+	FOR temmrr IN SELECT * FROM public."Fc" Where "Fc"."C_StartDate" is not null ORDER BY "Fc"."CarID" ASC LOOP
+	   carid := temmrr."CarID";
+	   caryear := temmrr."C_YEAR";
+	   expdate := temmrr."C_StartDate";
+	   
+	   fyear:=gyy2-caryear; -- หาจำนวนปีของรถ
+	   if fyear < 7 then
+	      num := 6;
+	   else
+	      num := 4;
+	   end if;
+
+	   select into idno "VContact"."IDNO" from public."VContact" Where ("VContact"."asset_id" = carid);
+	   if idno is not null then
+
+	   select MAX("CarTaxDue"."TaxDueDate") into tdd from carregis."CarTaxDue" Where ("CarTaxDue"."IDNO" = idno);
+	   select into mtt "CarTaxDue"."MeterTax" from carregis."CarTaxDue" Where ("CarTaxDue"."IDNO" = idno AND "CarTaxDue"."TaxDueDate" = tdd);
+
+	   if tdd isnull then
+	      gmm:=EXTRACT(MONTH FROM expdate);
+	      gdd:=EXTRACT(DAY FROM expdate);
+	      gyy_ms:=EXTRACT(YEAR FROM expdate);
+	      gyy_lob:= gyy2 - 1;
+	      if num = 6 then
+		if gyy_lob = gyy_ms then
+		  if gmm >= 7 then
+		     ctdate:= gyy_ms || '-' || gmm || '-' || gdd;
+		  else
+		     ctdate:= gyy2 || '-' || gmm || '-' || gdd;
+		  end if;	
+		else
+		   ctdate:= gyy2 || '-' || gmm || '-' || gdd;
+		end if;
+	      else
+		if gyy_lob = gyy_ms then
+		  if gmm >= 9 then
+		     ctdate:= gyy_ms || '-' || gmm || '-' || gdd;
+		  else
+		     ctdate:= gyy2 || '-' || gmm || '-' || gdd;
+		  end if;	
+		else
+		   ctdate:= gyy2 || '-' || gmm || '-' || gdd;
+		end if;
+	      end if;
+	   else
+	      ctdate:= tdd;
+	   end if;
+
+	   if mtt isnull then
+	      truefalse:='FALSE';
+	   else
+	      if mtt = 't' then
+	         truefalse:='FALSE';
+	      else
+	         truefalse:='TRUE';
+	      end if;
+	   end if;
+
+	   duedate:=ctdate + (num||' month')::INTERVAL;
+	   dyy:=EXTRACT(YEAR FROM duedate); --หา ปี ปัจจุบัน
+	   dmm:=EXTRACT(MONTH FROM duedate); --หา เดือน ปัจจุบัน
+	   if yy = dyy AND mm = dmm then
+	      beg := beg + 1;
+	      temgid := carregis.gen_id(postdate); -- GenID
+	      INSERT INTO carregis."CarTaxDue"("IDCarTax", "IDNO", "TaxDueDate", "MeterTax", "CusAmt") 
+	         values(temgid,idno,duedate,truefalse,smeter[beg]);
+	   end if;
+
+	   end if;
+	   
+	END LOOP;
+
+	RETURN true;
+
+END;$BODY$
+  LANGUAGE 'plpgsql' VOLATILE
+  COST 100;
+ALTER FUNCTION carregis."CreateCarInstalls"(date, double precision[]) OWNER TO postgres;

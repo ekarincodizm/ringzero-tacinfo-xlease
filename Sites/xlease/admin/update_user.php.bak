@@ -1,0 +1,33 @@
+<?php
+include("../config/config.php");
+ $v_fullname=pg_escape_string($_GET["f_fullname"]);
+ $v_username=pg_escape_string($_GET["f_username"]);
+ $v_pass=pg_escape_string($_GET["f_pass"]);
+ $v_gp=pg_escape_string($_GET["f_gp"]);
+ $v_office=pg_escape_string($_GET["f_office"]);
+ $v_status=pg_escape_string($_GET["f_status"]);
+ $v_id=pg_escape_string($_GET["id"]);
+
+
+  
+ $in_sql="update fuser SET   fullname='$v_fullname',username='$v_username',password='$v_pass',
+                             office_id='$v_office',user_group='$v_gp',status_user='$v_status'
+					   WHERE id_user='$v_id'  
+		   ";
+		  
+		  
+  
+ if($result=pg_query($in_sql))
+ {
+  $status ="Update ข้อมูลแล้ว";
+ }
+ else
+ {
+  $status ="error Update  fuser ".$in_sql;
+ }
+
+echo "<br>".$status;
+
+
+
+?>

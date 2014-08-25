@@ -1,0 +1,341 @@
+<?php
+include("../config/config.php");
+
+$cusid = $_GET['cusid'];
+$default_idno = $_GET['idno'];
+
+$qry_name=pg_query("select * from \"Fa1\" WHERE \"CusID\" = '$cusid'");
+if($res_name=pg_fetch_array($qry_name)){
+    $A_FIRNAME=trim($res_name["A_FIRNAME"]);
+    $A_NAME=trim($res_name["A_NAME"]);
+    $A_SIRNAME=trim($res_name["A_SIRNAME"]);
+    $fu_name = "$A_FIRNAME $A_NAME $A_SIRNAME";
+}
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+<head>
+    <title><?php echo $_SESSION['session_company_name']; ?></title>
+    <meta http-equiv="Content-Type" content="txt/html; charset=utf-8" />
+    <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+    
+    <link type="text/css" rel="stylesheet" href="act.css"></link>
+    
+    <link type="text/css" href="../jqueryui/css/ui-lightness/jquery-ui-1.8.2.custom.css" rel="stylesheet" />    
+    <script type="text/javascript" src="../jqueryui/js/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="../jqueryui/js/jquery-ui-1.8.2.custom.min.js"></script>
+
+<script language=javascript>
+function popU(U,N,T) {
+    newWindow = window.open(U, N, T);
+}
+</script>
+
+</head>
+<body>
+
+<table width="900" border="0" cellspacing="0" cellpadding="0" align="center">
+    <tr>
+        <td>
+
+<div style="float:left"><input type="button" value=" Back " class="ui-button" onclick="window.location='select.php';"></div>
+<div style="float:right"><input type="button" value=" Close " class="ui-button" onclick="window.close();"></div>
+<div style="clear:both"></div>
+
+<fieldset><legend><B>จ่ายเงินสด</B></legend>
+
+<div class="ui-widget">
+
+<div style="font-weight:bold; margin:10px 0px 10px 0px">ลูกค้า : <span style="color:#0000FF"><?php echo "$cusid $fu_name"; ?></span></div>
+
+<div id="listbox">
+<?php
+$gg = 0;
+$qry_fp=pg_query("select * from \"Fp\" WHERE \"CusID\" = '$cusid' ORDER BY \"IDNO\"");
+while($res_fp=pg_fetch_array($qry_fp)){
+    $gg++;
+    $IDNO=$res_fp["IDNO"];
+    $P_MONTH=$res_fp["P_MONTH"];
+    $P_VAT=$res_fp["P_VAT"];
+    
+    $arr_idno[] = $IDNO;
+    
+    $qry_un=pg_query("select * from \"UNContact\" WHERE \"IDNO\" = '$IDNO'");
+    if($res_un=pg_fetch_array($qry_un)){
+        $C_CARNAME=$res_un["C_CARNAME"];
+        $C_REGIS=$res_un["C_REGIS"];
+    }
+    
+    $qry_vcus=pg_query("select COUNT(\"IDNO\") AS cidno from \"VCusPayment\" WHERE \"IDNO\" = '$IDNO' AND \"R_Date\" is null");
+    if($res_vcus=pg_fetch_array($qry_vcus)){
+        $cidno=$res_vcus["cidno"];
+        $arr_cc[$IDNO] = $cidno;
+    }
+    
+    $bl=pg_query("select \"deposit_balance\"('$IDNO')");
+    $dp_balance=pg_fetch_result($bl,0);
+?>
+<div class="greenbox" id="<?php echo "DIV$IDNO"; ?>">
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+<tr>
+    <td width="15%">IDNO&nbsp;<a href="#" onclick="javascript:popU('../post/frm_viewcuspayment.php?idno_names=<?php echo $IDNO; ?>&type=outstanding','<?php echo "$IDNO_sdasdsadsa"; ?>','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=800')" title="ดูตารางการชำระเงิน"><b><?php echo $IDNO; ?></b></a></td>
+    <td width="20%"><?php echo $C_CARNAME; ?></td>
+    <td width="10%"><?php echo $C_REGIS; ?></td>
+    <td width="20%">ค่างวด (รวมภาษี)&nbsp;&nbsp;<?php echo number_format($P_MONTH+$P_VAT,2); ?></td>
+    <td width="15%">เหลือ &nbsp;&nbsp;<?php echo $cidno; ?>&nbsp;งวด</td>
+    <td width="20%">เงินรับฝาก&nbsp;&nbsp;<?php echo number_format($dp_balance,2); ?><input type="hidden" name="dbalance<?php echo $gg; ?>" id="dbalance<?php echo $gg; ?>" value="<?php echo $dp_balance; ?>"></td>
+</tr>
+</table>
+</div>
+<?php
+}
+?>
+</div>
+
+<?php
+if($gg == 0){
+    echo "<div class=\"yellowbox\" align=center>- ไม่พบข้อมูล -</div>";
+}else{
+?>
+
+<br />
+
+<table width="100%" cellpadding="3" cellspacing="0" border="0" style="background-color:#D8D8D8; border-style: dashed; border-width: 1px; border-color:#969696; margin-bottom:3px">
+<tr style="font-weight:bold">
+    <td width="20%">รายการ</td>
+    <td width="20%">สัญญาเลขที่</td>
+    <td width="20%">รายการจ่ายเงิน</td>
+    <td width="20%">&nbsp;</td>
+    <td width="20%">จำนวนเงิน</td>
+</tr>
+</table>
+
+<div id='TextBoxesGroup'>
+    <div id="TextBoxDiv1">
+
+<table width="100%" cellpadding="3" cellspacing="0" border="0" style="border-style: dashed; border-width: 1px; border-color:#969696; margin-bottom:3px">
+<tr>
+    <td width="20%">1</td>
+    <td width="20%">
+<select id="cb_idno1" name="cb_idno1" onchange="javascript:update_hcount(1)">
+<?php
+foreach ($arr_idno as $a){
+    if($a != $default_idno){
+        echo "<option value=\"$a\">$a</option>";
+    }else{
+        echo "<option value=\"$a\" selected>$a</option>";
+    }
+}
+?>
+</select>
+    </td>
+    <td width="20%">
+<select id="cb_typepay1" name="cb_typepay1" onchange="javascript:update_ui(1)">
+<?php
+$qry_fp=pg_query("select * from \"TypePay\" ORDER BY \"TypeID\" ASC");
+while($res_fp=pg_fetch_array($qry_fp)){
+    $TypeID=$res_fp["TypeID"];
+    $TName=$res_fp["TName"];
+    echo "<option value=\"$TypeID\">$TName</option>";
+}
+?>
+</select>
+    </td>
+    <td width="20%">
+<div id="pay_detail1" style="display:none"></div>
+    </td>
+    <td width="20%"><input id="e_amount1" name="e_amount1" type="text" onkeyup="javascript:update_sum(); check_299(1);"></td>
+</tr>
+</table>
+
+    </div>
+</div>
+
+<table width="100%" cellpadding="3" cellspacing="0" border="0" style="background-color:#FFD5D5; border-style: dashed; border-width: 1px; border-color:#969696; margin-bottom:3px">
+<tr style="font-weight:bold">
+    <td width="80%" colspan="4" align="right">รวมเงิน</td>
+    <td width="20%" align="right"><span id="divsummery">0</span></td>
+</tr>
+</table>
+
+<div style="margin-top:20px">
+<div style="float:left"><input type="button" value="บันทึกข้อมูล" id="submitButton"></div>
+<div style="float:right"><input type="button" value="+ เพิ่มรายการ" id="addButton"><input type="button" value="- ลบรายการ" id="removeButton"></div>
+<div style="clear:both"></div>
+<input type="hidden" id="counter" name="counter" value="1">
+</div>
+
+<?php } ?>
+
+</div>
+
+ </fieldset>
+
+        </td>
+    </tr>
+</table>
+
+<script type="text/javascript">
+var counter = 2;
+$(document).ready(function(){
+
+    $('#addButton').click(function(){
+        
+        var newTextBoxDiv = $(document.createElement('div'))
+            .attr("id", 'TextBoxDiv' + counter);
+
+table = '<table width="100%" cellpadding="3" cellspacing="0" border="0" style="border-style: dashed; border-width: 1px; border-color:#969696; margin-bottom:3px">'
++ ' <tr>'
++ ' <td width="20%">'+ counter +'</td>'
++ ' <td width="20%">'
++ ' <select id="cb_idno' + counter + '" name="cb_idno' + counter + '" onchange="javascript:update_hcount(' + counter + ')">'
++ ' <?php
+foreach($arr_idno as $a){
+    if($a != $default_idno){
+        echo "<option value=\"$a\">$a</option>";
+    }else{
+        echo "<option value=\"$a\" selected>$a</option>";
+    }
+}
+?>'
++ ' </select>'
++ ' </td>'
++ ' <td width="20%">'
++ ' <select id="cb_typepay' + counter + '" name="cb_typepay' + counter + '" onchange="javascript:update_ui(' + counter + ')">'
++ ' <?php
+$qry_fp=pg_query("select * from \"TypePay\" ORDER BY \"TypeID\" ASC");
+while($res_fp=pg_fetch_array($qry_fp)){
+    $TypeID=$res_fp["TypeID"];
+    $TName=$res_fp["TName"];
+    echo "<option value=$TypeID>$TName</option>";
+}
+?>'
++ ' </select>'
++ ' </td>'
++ ' <td width="20%"><div id="pay_detail' + counter + '" style="display:none">#</div></td>'
++ ' <td width="20%"><input id="e_amount' + counter + '" name="e_amount' + counter + '" type="text" onkeyup="javascript:update_sum(); check_299(' + counter + ');"></td>'
++ ' </tr>'
++ ' </table>';
+
+        newTextBoxDiv.html(table);
+
+        newTextBoxDiv.appendTo("#TextBoxesGroup");
+        $('#counter').val(counter);
+        counter++;
+    });
+    
+    $("#removeButton").click(function(){
+        if(counter==2){
+            alert("ห้ามลบ !!!");
+            return false;
+        }
+        $('#counter').val(counter);
+        counter--;
+        $("#TextBoxDiv" + counter).remove();
+        update_sum();
+    });
+    
+    $("#submitButton").click(function(){
+        var payment = [];
+        for( i=1; i<=$("#counter").val(); i++ ){
+            var c1 = $('#e_amount'+ i).val();
+            if ( isNaN(c1) || c1 == ""){
+                alert('ข้อมูลจำนวนเงินไม่ถูกต้อง');
+                $('#e_amount'+ i).focus();
+                return false;
+            }
+            payment[i] = {idno : $("#cb_idno"+ i).val() , typepay: $("#cb_typepay"+ i).val() , amount : $("#e_amount"+ i).val()};
+        }
+        
+        $.post("api.php",{
+            cmd : "save" , 
+            cusid : '<?php echo "$cusid"; ?>', 
+            payment : JSON.stringify(payment) 
+        },
+        function(data){
+            if(data == "1"){
+                alert("บันทึกรายการเรียบร้อย");
+                location.href = "select.php";
+            }else{
+                alert("ผิดผลาด ไม่สามารถบันทึกได้!");
+            }
+        });
+
+    });
+    
+});
+
+function update_ui(id){
+    if( $("#cb_typepay"+ id).val() == "1" ){
+        $.get('api.php?cmd=checkacclose&idno='+ $("#cb_idno"+ id).val(), function(data){
+            if(data == 't'){
+                alert('เลขที่สัญญานี้ ไม่สามารถทำรายการจ่ายเงิน ค่างวด ได้ !');
+                $("#cb_typepay"+ id).val('ลงขัน');
+            }else{
+                $("#e_amount"+ id).attr("readonly", "readonly");
+                update_hcount(id);
+            }
+        });
+    }else{
+        $("#e_amount"+ id).attr("readonly", "");
+        $("#pay_detail"+ id).hide("slow");
+        $('#e_amount'+ id).val('');
+        update_sum();
+    }
+}
+function update_hcount(id){
+    
+    if( $("#cb_typepay"+ id).val() == "1" ){
+        $.get('api.php?cmd=checkacclose&idno='+ $("#cb_idno"+ id).val(), function(data){
+            if(data == 't'){
+                alert('เลขที่สัญญานี้ ไม่สามารถทำรายการจ่ายเงิน ค่างวด ได้ !');
+                $("#cb_typepay"+ id).val('ลงขัน');
+                $("#e_amount"+ id).attr("readonly", "");
+                $("#pay_detail"+ id).hide("slow");
+                $('#e_amount'+ id).val('');
+                update_sum();
+            }else{
+                $("#pay_detail"+ id).show("slow");
+                $("#pay_detail"+ id).load("api.php?cmd=loadpayment&id="+ id +"&idno="+ $("#cb_idno"+ id).val() +"&payment="+ $("#cb_typepay"+ id).val());
+                
+                $.get('api.php?cmd=loadamount&idno='+ $("#cb_idno"+ id).val() +'&payment='+ $("#cb_typepay"+ id).val(), function(data){
+                    $('#e_amount'+ id).val(data);
+                    update_sum();
+                });
+            }
+        });
+    }
+    
+}
+function updateamount(id){
+    $.get('api.php?cmd=updateamount&id='+ id +'&cc='+ $("#cb_cc"+ id).val() +'&idno='+ $("#cb_idno"+ id).val() +'&payment='+ $("#cb_typepay"+ id).val(), function(data){
+        $('#e_amount'+ id).val(data);
+        update_sum();
+    });
+}
+function update_sum(){
+    var sss = 0;
+    for( i=1; i<=$("#counter").val(); i++ ){
+        var c1 = $('#e_amount'+ i).val();
+        if ( isNaN(c1) || c1 == ""){
+            c1 = 0;
+        }
+        sss += parseFloat(c1);
+    }
+    $("#divsummery").text(sss.toFixed(2));
+}
+function check_299(id){
+    if($("#cb_typepay"+ id).val() == 299){
+        var balance = new Number($("#dbalance"+ id).val() == null ? 0 : $("#dbalance"+ id).val());
+        if( $("#e_amount"+ id).val() > balance ){
+            alert("การลบเงินรับฝากต้องไม่เกินจำนวนเงินรับฝากที่มีอยู่");
+            $('#e_amount'+ id).val('');
+            update_sum();
+        }
+    }
+}
+</script>
+
+
+</body>
+</html>

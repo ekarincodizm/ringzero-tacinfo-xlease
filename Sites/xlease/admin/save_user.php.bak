@@ -1,0 +1,62 @@
+<?php
+include("../config/config.php");
+ $v_fullname=pg_escape_string($_GET["f_fullname"]);
+ $v_username=pg_escape_string($_GET["f_username"]);
+ $v_pass=pg_escape_string($_GET["f_pass"]);
+ $v_gp=pg_escape_string($_GET["f_gp"]);
+ $v_office=pg_escape_string($_GET["f_office"]);
+ $v_status=pg_escape_string($_GET["f_status"]);
+ 
+ 
+ //$v_id=pg_escape_string($_GET["id"]);
+ //find last id
+ 
+ $qry_uname=pg_query("select * from fuser where username='$v_username' ");
+ $nur_name=pg_num_rows($qry_uname);
+ if($nur_name > 0)
+ {
+  echo "ชื่อ username ซ้ำ";
+ }
+ else
+ {
+ 
+ 
+ $qrylastid=pg_query("select id_user from fuser");
+ $numrow=pg_num_rows($qrylastid);
+ 
+ $idplus=$numrow+1;
+ 
+ function insertZero($inputValue , $digit )
+		{
+			$str = "" . $inputValue;
+			while (strlen($str) < $digit)
+			{
+				$str = "0" . $str;
+			}
+			return $str;
+        }
+
+		
+		$id_plus=insertZero($idplus , 3);
+ // end find last id
+
+  
+
+$in_sql="insert into fuser(id_user,username,password,office_id,user_group,status_user,fullname)values('$id_plus','$v_username','$v_pass','$v_office','$v_gp','$v_status','$v_fullname')";
+		  
+		  
+  
+ if($result=pg_query($in_sql))
+ {
+  $status ="insert ข้อมูลแล้ว";
+ }
+ else
+ {
+  $status ="error insert  fuser ".$in_sql;
+ }
+
+echo "<br>".$status;
+
+}
+
+?>

@@ -1,0 +1,97 @@
+<table width="1000" border="0" cellspacing="0" cellpadding="0" style="margin-top:1px" align="center">
+<tr>
+	<td>
+		<div align="left"><h2>ประวัติการทำรายการ 30 รายการล่าสุด <a href="javascript:popU('show_all_history.php?','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1400,height=650')"><font color="#0000ff">(<u>ทั้งหมด</u>)</font></a></h2></div>
+		<div class="wrapper">		
+			<table width="100%" border="0" cellSpacing="1" cellPadding="3" align="center" bgcolor="#F0F0F0">
+		
+			<tr style="font-weight:bold;" valign="middle" bgcolor="#79BCFF" align="center">	
+				<td>รายการที่<a href="show_history.php?sort=&order="></td>
+				<td>เลขที่สัญญา</td>
+				<td>ประเภทสัญญา</td>
+				<td>วันที่ทำสัญญา</td>
+				<td>ผู้ทำรายการ</td>
+				<td>วันเวลาที่ทำรายการ</td>
+				<td>ผู้อนุมัติ</td>
+				<td>วันเวลาที่อนุมัติ</td>
+				<td>ดูรายละเอียด</td>
+				<td>ผลการอนุมัติ</td>
+			</tr>
+			<?php
+			$qry_con=pg_query("select a.\"contractID\",a.ini_add_user,a.ini_add_stamp,a.ini_appv_stamp,a.ini_appv_status,b.\"conType\",b.\"conDate\",thcap_get_iniinvestmentamt(a.\"contractID\") as investment,\"thcap_get_conEndDate\"(a.\"contractID\") as \"FconEndDate\"  from \"thcap_contract_inicost\" a
+			left join \"thcap_contract\" b on a.\"contractID\"= b.\"contractID\"
+			where a.\"ini_appv_status\"<>'2' group by a.\"contractID\",a.\"ini_add_stamp\",a.\"ini_add_user\",b.\"conType\",b.\"conDate\",a.\"ini_appv_stamp\",a.\"ini_appv_status\"  order by a.\"ini_appv_stamp\" DESC limit 30");
+			
+			$num_con=pg_num_rows($qry_con);
+			$i=0;
+			$num_his=0;
+			while($res_con=pg_fetch_array($qry_con)){
+			$i++;
+			$num_his++;
+				$contractID=$res_con["contractID"];
+				$contractType = $res_con["conType"]; 
+				$contractDate = $res_con["conDate"]; 
+				$inicostType = $res_con["costtype"]; 
+				$sumIniCost = $res_con["sumIniCost"];
+				$addUser = $res_con["ini_add_user"];
+				$addStamp = $res_con["ini_add_stamp"];
+				$appUser = $res_con["ini_appv_user"];
+				$appStamp = $res_con["ini_appv_stamp"];
+				$statusCon = $res_con["ini_appv_status"];
+				$autoID = $res_con["ini_auto_id"];
+				$investment = $res_con["investment"];
+				
+				$qry_chkStatus = pg_query("select * from public.\"thcap_mg_contract\" where \"contractID\" = '$contractID' ");
+				while($res_chkStatus = pg_fetch_array($qry_chkStatus))
+				{
+				$conStatus = $res_chkStatus["conStatus"]; // สถานะของสัญญา
+				}
+						
+						if($conStatus == "11")
+						{
+							echo "<tr bgcolor=\"#CCCCCC\">";
+						}
+				$qry_fullname_adduser = pg_query("select fullname from \"Vfuser\" where id_user = '$addUser' ");
+				$addFullname=pg_fetch_result($qry_fullname_adduser,0);
+				
+				$qry_fullname_appuser = pg_query("select fullname from \"Vfuser\" where id_user = '$addUser' ");
+				$appFullname=pg_fetch_result($qry_fullname_adduser,0);
+				
+				if($statusCon==0){
+					$statusConName="ไม่อนุมัติ";
+					$fontcolor="#ff0000";
+				} else {
+					$statusConName="อนุมัติ";
+					$fontcolor="#00ff00";
+				}
+				
+				if($i%2==0){
+				echo "<tr class=\"odd\" align=center>";
+			} else {
+				echo "<tr class=\"even\" align=center>";
+			}
+				echo "<td>$num_his</td>";
+				echo "<td><font color=\"#0000ff\"><u><a onclick=\"javascript:popU('../thcap_installments/frm_Index.php?show=1&idno=$contractID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=800')\" style=\"cursor:pointer\">$contractID</u></font></td>";
+				echo "<td>$contractType</td>";
+				echo "<td>$contractDate</td>";
+				echo "<td>$addFullname</td>";
+				echo "<td>$addStamp</td>";
+				echo "<td>$appFullname</td>";
+				echo "<td>$appStamp</td>";
+				echo "<td><font color=\"#0000ff\"><u><a onclick=\"javascript:popU('detail_Appv.php?contractID=$contractID&ini_auto_id=$autoID&conDate=$contractDate&conEndDate=$conEndDate&conType=$contractType&fullname=$addFulname&addStamp=$addStamp&addUser=$addUser&menu=1','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=600')\"style=\"cursor:pointer\"><img src=\"images/detail.gif\"/></a></u></font></td>";
+				echo "<td><font color=\"$fontcolor\">$statusConName</font></td>";
+			echo "</tr>";
+			} //endwhile
+			?>
+			<?php
+			if($num_con == 0){
+				echo "<tr><td colspan=12 align=center height=50><b>- ไม่พบข้อมูล -</b></td></tr>";
+			}
+			?>
+			<tr bgcolor="#6699FF">
+				<td colspan="12" align="left"><b>รายการทั้งหมด <?php echo $num_his;?> รายการ<b></td>
+			</tr>
+		</div>
+	</td>
+</tr>
+</table>

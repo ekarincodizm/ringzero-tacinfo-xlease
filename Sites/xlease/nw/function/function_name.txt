@@ -1,0 +1,66 @@
+﻿function ใน pg
+"thcap_receiptIDToContractID" -สำหรับหาเลขที่สัญญาจากเลขที่ใบเสร็จ
+"ta_get_user_emplevel"  -สำหรับหาว่าพนักงานคนนั้นมี emplevel อะไร
+
+
+funcition ใน  nw/function/
+nameMonth.php -สำหรับหาชื่อเดือนที่เป็นภาษาไทย (หาได้ทั้งชื่อเต็มและชื่อย่อ)
+
+
+//********การทดสอบว่าหน้าที่เราเปิดนั้น ใช้เวลานานแค่ไหน สามารถใช้โค้ดได้ดังนี้
+
+function getTime(){ //function php
+     list($mc, $sc) = explode(" ", microtime());
+// microtime() จะส่งค่ากลับมาเป็น micro seconds กับ seconds โดยที่ 2 ค่านี้ถูกแบ่งด้วยช่องว่าง
+     return (float)$sc + (float)$mc;
+// ได้เวลาออกมาเป็น วินาที + ไมโครวินาที
+} 
+
+//ตัวอย่างการใช้งาน
+
+$time1 = getTime(); //ใส่ไว้ก่อนคำสั่งวน loop
+while(){ //วนลูปตามปกติ
+   -- --
+}
+
+$time2 = getTime();
+$resultTime=($time2)-($time1);
+echo ($resultTime);
+
+**************//
+
+function ใน nw/function/
+load_purpose.php 
+ function load_all_purpose_from_table_thcap_purpose()
+  //สำหรับดึงรายการวัตถุประสงค์ ของใบสำคัญรับ,.ใบสำคัญจ่าย,ใบสำคัญรายวันทั่วไป 
+  //ตัวอย่างการใช้งาน
+
+   $query_x = load_all_purpose_from_table_thcap_purpose();
+   $num_row = pg_num_rows($query_x); // echo 'New No. Of Row Is'.$num_row;
+       		
+   for($i=0; $i<$num_row; $i++)
+   { 
+      $data =  pg_fetch_array($query_x); 
+      echo $data['thcap_purpose_id']; // เลขรหัสจุดประสงค์ของใบสำคัญ
+      echo $data['thcap_purpose_name']; // ชื่อจุดประสงค์ เช่น จ่ายเป็นค่าภาษี ตั้งลูกหนี้ประเภท กู้เงิน เป็นต้น 	  
+					  
+   }
+
+funcition ใน  nw/function/
+load_date_table_ thcap_temp_money_hold_secure.php
+
+function load_dataDate_from_thcap_temp_money_hold_secure()
+// สำหรับดึงช้อมูลวันที่ แบบ Distinct จากตาราง thcap_temp_money_hold_secure แล้วเรียงข้อมูลจากมากไปหาน้อบ
+// ตัวอย่างการใช้งาน 
+ .
+ $query_x = load_dataDate_from_thcap_temp_money_hold_secure();
+ 
+ $data =  pg_fetch_array($query_x); $num_row = pg_num_rows($query_x);
+
+ for($i=0; $i<$num_row; $i++)
+ {
+     $data =  pg_fetch_array($query_x); 
+     echo $data['dataDate'];
+ } 	
+						 
+

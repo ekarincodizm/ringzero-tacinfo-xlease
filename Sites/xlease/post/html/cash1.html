@@ -1,0 +1,105 @@
+<h1 id="caption">Post</h1>
+
+<br><br>
+
+<span class="text_bold">จ่ายเงินสด</span>
+
+<br><br>
+
+<div id="panelLeft">
+
+  <fieldset>
+    <legend>ระบุข้อมูลลูกค้า</legend> 
+
+    <br>
+    
+    <form id="cash1_1" name="cash1_1" method="post" onsubmit="return cash1_1_validate(event);"> 
+      <input type="hidden" id="cmd" name="cmd" value="cash1_1" />
+      <input type="hidden" id="cusid" name="cusid" value="" />
+      <label>IDNO :&nbsp;</label>
+      <img src="post/image/btnFind.jpg" align="top">
+      <input id="cash1_idno" name="cash1_idno" type="text" size="25" />
+      <input type="image" src="post/image/btnNext.gif" align="top" />
+    </form>
+    
+    <br>
+    
+    <form name="cash1_2">
+      <input type="hidden" name="cmd" value="cash1_2" />
+      <label>ลูกค้านอก :&nbsp;</label>
+      <img src="post/image/btnFind.jpg" align="top">
+      <input id="cash1_idno" name="cash1_idno" type="text" size="25">
+      <input type="image" src="post/image/btnNext.gif" align="top" />
+      <img src="post/image/btnAdd.jpg" align="top"> 
+    </form>
+                
+  </fieldset>
+  
+</div>
+
+<div id="panelRight">
+<br><br><br><br> <br><br><br><br> <br><br><br><br> <br><br><br><br>   
+</div> 
+
+<div id="footer" style="clear:both;">
+</div>
+
+<br><br><br><br>
+
+<script type="text/javascript">
+  
+  $().ready
+  (
+    function()
+    {
+      $("#cash1_idno").autocomplete
+      (
+        "search_idno.php", 
+        {
+          width: 260,
+          selectFirst: false
+        }
+      );
+      
+      $("#cash1_idno").result
+      (
+        function(event, data, formatted) 
+        {
+          if (data)
+          {
+            $("#cash1_1 > #cusid").val(data[1]);
+          }
+        }
+      );
+      
+    }
+  )
+
+  function cash1_1_validate(e)
+  {
+    var check = $.ajax
+                ({
+                  type: "POST",
+                  url: "api.php",
+                  data: "cmd=check_cus&key=" + $("#cash1_1 > #cash1_idno").val() + "&cus=" + $("#cash1_1 > #cusid").val() ,
+                  async: false
+                }).responseText;
+                
+    if (check == "1")
+    {
+      return true;
+    }
+    else
+    {
+      alert("ระบุข้อมูลลูกค้าผิด กรุณาลองใหม่");
+      
+      $("#cash1_1 > #cash1_idno").val("");
+      $("#cash1_1 > #cusid").val(""); 
+      
+      $("#cash1_1 > #cash1_idno").focus();
+    
+      return false;
+    }
+  }
+  
+</script> 

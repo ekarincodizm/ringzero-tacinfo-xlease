@@ -1,0 +1,271 @@
+<?php
+session_start();
+include("../config/config.php");
+
+$get_groupid = $_SESSION["av_usergroup"];
+$get_userid = $_SESSION["av_iduser"];
+//$arr_idno = $_SESSION["arr_idno"];
+$get_idno = $_GET["idno"];
+//$get_cusid = $_GET["scusid"];
+
+$search_top = $get_idno;
+do{
+    $qry_top=pg_query("select * from \"Fp\" WHERE \"P_TransferIDNO\"='$search_top'");
+    $res_top=pg_fetch_array($qry_top);
+    $CusID=$res_top["CusID"];
+    $arr_idno[$res_top["IDNO"]]=$CusID;
+    $search_top=$res_top["IDNO"];
+}while(!empty($search_top));
+
+$qry_top=pg_query("select * from \"Fp\" WHERE \"IDNO\"='$get_idno'");
+$res_top=pg_fetch_array($qry_top);
+$CusID=$res_top["CusID"];
+$P_TransferIDNO=$res_top["P_TransferIDNO"];
+$arr_idno[$get_idno]=$CusID;
+
+if(!empty($P_TransferIDNO)){
+    do{
+        $qry_fp2=pg_query("select A.*,B.* from \"Fp\" A LEFT OUTER JOIN \"Fa1\" B on A.\"CusID\" = B.\"CusID\" where A.\"IDNO\" ='$P_TransferIDNO'");
+        $res_fp2=pg_fetch_array($qry_fp2);
+        $CusID=$res_fp2["CusID"];
+        $arr_idno[$P_TransferIDNO]=$CusID;
+        $P_TransferIDNO=$res_fp2["P_TransferIDNO"];
+    }while(!empty($P_TransferIDNO));
+}
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>AV. leasing co.,ltd</title>
+
+    <link type="text/css" href="../jqueryui/css/ui-lightness/jquery-ui-1.8.2.custom.css" rel="stylesheet" />    
+    <script type="text/javascript" src="../jqueryui/js/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="../jqueryui/js/jquery-ui-1.8.2.custom.min.js"></script>
+
+<script type="text/javascript">
+$(function(){
+    $("#tabs").tabs();
+    $("#tabs").tabs('select', '<?php echo $_SESSION["ses_idno"]; ?>');
+
+});
+</script>
+
+<style type="text/css">
+.ui-tabs{
+    font-family:tahoma;
+    font-size:12px
+}
+</style>
+
+<style type="text/css">
+body {
+    font-family:tahoma;
+    color : #333333;
+    font-size:12px;
+}
+.title_top{
+    font-family: tahoma;
+    font-size:19px;
+    font-weight: bold;
+    margin: 0;
+    padding: 0 0 3px 0;
+    text-align: right;
+}
+TEXTAREA,SELECT,INPUT{
+	font-family: Tahoma;
+	color: #3A3A3A;
+}
+H1 {
+    font-size: 18px;
+}
+.title {
+    text-align: center;
+}
+.TextTitle{
+    color: #006600;
+    font-size: 11px;
+    font-weight: bold;
+}
+</style>
+
+</head>
+<body>
+
+<div class="title_top">รายละเอียดการติดต่อ</div>
+
+<?php
+if(empty($get_groupid) OR empty($get_userid)){
+    echo "<div align=center>ผิดผลาด ไม่พบข้อมูล แผนกหรือผู้ใช้งาน</div>";
+    exit;
+}
+?>
+
+<div id="tabs"> <!-- เริ่ม tabs -->
+<ul>
+<?php
+//สร้าง list รายการ โอนสิทธิ์
+foreach($arr_idno as $ii => $v){
+    if(empty($ii)){
+        continue;
+    }
+    echo "<li><a href=\"#tabs-$ii\">$ii</a></li>";
+}
+?>
+</ul>
+
+<?php
+foreach($arr_idno as $i => $v){
+    if(empty($i)){
+        continue;
+    }
+    
+    $get_cusid = $v;
+    $get_idno = $i;
+    
+    //กำหนดสี ให้กับข้อมูลล่าสุด
+    if($_SESSION["ses_idno"] == $get_idno){
+        $bgcolor = "#FFFFFF";
+    }else{
+        $bgcolor = "#FFFFFF";
+    }
+    //จบ กำหนดสี
+?>
+
+<div id="tabs-<?php echo $get_idno; ?>">
+<div style="background-color:<?php echo $bgcolor; ?>">
+
+<!-- ===== เลือก ===== -->
+<div align="right" style="padding-top: 5px;">
+<form name="frm_fuc<?php echo $v; ?>" method="post" action="follow_up_cus.php?idno=<?php echo $get_idno; ?>&scusid=<?php echo $get_cusid; ?>">
+Group : 
+<SELECT NAME="group" onchange="document.frm_fuc<?php echo $v; ?>.submit()";>
+	<OPTION VALUE="ALL">ทั้งหมด
+<?php
+	$qry_fg=pg_query("select * from \"department\" ORDER BY id_qroup ASC");
+	while($res_fg=pg_fetch_array($qry_fg)){
+		if($_POST['group'] == $res_fg["id_qroup"]){
+?>
+			<OPTION VALUE="<?php echo $res_fg["id_qroup"]; ?>" selected><?php echo $res_fg["dep_name"]; ?>
+<?php
+		}else{
+?>
+			<OPTION VALUE="<?php echo $res_fg["id_qroup"]; ?>"><?php echo $res_fg["dep_name"]; ?>
+<?php
+		}
+	}	
+?>
+</SELECT>
+User : 
+<SELECT NAME="userid" onchange="document.frm_fuc<?php echo $v; ?>.submit()";>
+	<OPTION VALUE="ALL">ทั้งหมด
+<?php
+if( isset($_POST['userid']) ){
+    if( $_POST['group'] == 'ALL' ){
+        $qry_fu=pg_query("select id_user,fullname from \"Vfuser\" ORDER BY id_user ASC");
+    }else{
+        $qry_fu=pg_query("select id_user,fullname from \"Vfuser\" WHERE user_group='$_POST[group]' ORDER BY id_user ASC");    
+    }
+}else{
+    $qry_fu=pg_query("select id_user,fullname from \"Vfuser\" ORDER BY id_user ASC");
+}    
+	while($res_fu=pg_fetch_array($qry_fu)){
+		if($_POST['userid'] == $res_fu["id_user"]){
+?>
+			<OPTION VALUE="<?php echo $res_fu["id_user"]; ?>" selected><?php echo $res_fu["fullname"]; ?>
+<?php
+		}else{
+?>
+			<OPTION VALUE="<?php echo $res_fu["id_user"]; ?>"><?php echo $res_fu["fullname"]; ?>
+<?php
+		}
+	}
+?>
+</SELECT>
+</form>
+</div>
+<!-- ===== จบ เลือก ===== -->
+
+<div align="right" style="padding-top:5px; padding-bottom:5px;">
+<img src="icoPrint.png" border="0" width="17" height="14">&nbsp;<a href="follow_up_cus_print.php?idno=<?php echo $get_idno; ?>&scusid=<?php echo $get_cusid; ?>" target="_blank">พิมพ์ข้อมูลทั้งหมด</a>
+</div>
+
+<fieldset><legend><b>เพิ่มข้อมูล</b></legend>
+<?php
+$qry_cn=pg_query("select \"IDNO\",\"full_name\",\"asset_type\",\"C_REGIS\",\"car_regis\",\"asset_id\" from \"VContact\"  WHERE (\"IDNO\"='$get_idno')");
+$res_cn=pg_fetch_array($qry_cn);
+
+if($res_cn["asset_type"] == 1){ 
+    $regis = $res_cn["C_REGIS"]; 
+} else { 
+    $regis = $res_cn["car_regis"]; 
+}
+?>
+
+<div style="float:left">ชื่อ : <?php echo $res_cn["full_name"]; ?></div>
+<div style="float:right">วันที่ปัจจุบัน : <?php echo date('d-m-Y'); ?></div>
+<div style="clear:both;">&nbsp;</div>
+<div style="float:left">เลขที่สัญญา : <?php echo $res_cn["IDNO"]; ?></div>
+<div style="float:right">ทะเบียนรถ : <?php echo $regis; ?></div>
+<div style="clear:both;">&nbsp;</div>
+
+<div style="padding-top:5px;">
+<form name="frm_fuc" method="post" action="save_follow_up_cus.php">
+<span class="TextTitle">รายละเอียด</span><br />
+<TEXTAREA NAME="followdetail" ROWS="6" COLS="85"></TEXTAREA><br />
+<INPUT TYPE="submit" VALUE="  บันทึก  ">
+<INPUT TYPE="hidden" NAME="GroupID" VALUE="<?php echo "$get_groupid"; ?>">
+<INPUT TYPE="hidden" NAME="userid" VALUE="<?php echo "$get_userid"; ?>">
+<INPUT TYPE="hidden" NAME="u_idno" VALUE="<?php echo "$get_idno"; ?>">
+<INPUT TYPE="hidden" NAME="u_cusid" VALUE="<?php echo "$get_cusid"; ?>">
+</form>
+</div>
+</fieldset>
+
+<fieldset><legend><b>ข้อมูลที่ได้เจรจา</b></legend>
+<div style="background-color: #ffffff; padding: 2px">
+<?php
+if(isset($_POST['group']) OR isset($_POST['userid'])){
+	if($_POST['group'] == "ALL" AND $_POST['userid'] == "ALL"){
+		$qry_fuc=pg_query("select * from \"FollowUpCus\" WHERE (\"IDNO\"='$get_idno') AND (\"CusID\"='$get_cusid') ORDER BY auto_id DESC");
+	}elseif($_POST['group'] == "ALL" AND $_POST['userid'] != "ALL"){
+		$qry_fuc=pg_query("select * from \"FollowUpCus\" WHERE (\"userid\"='$_POST[userid]') AND (\"IDNO\"='$get_idno') AND (\"CusID\"='$get_cusid') ORDER BY auto_id DESC");
+	}elseif($_POST['group'] != "ALL" AND $_POST['userid'] == "ALL"){
+		$qry_fuc=pg_query("select * from \"FollowUpCus\" WHERE (\"GroupID\"='$_POST[group]') AND (\"IDNO\"='$get_idno') AND (\"CusID\"='$get_cusid') ORDER BY auto_id DESC");
+	}else{
+		$qry_fuc=pg_query("select * from \"FollowUpCus\" WHERE (\"userid\"='$_POST[userid]') AND (\"GroupID\"='$_POST[group]') AND (\"IDNO\"='$get_idno') AND (\"CusID\"='$get_cusid') ORDER BY auto_id DESC");
+	}
+}else{
+	$qry_fuc=pg_query("select * from \"FollowUpCus\" WHERE (\"IDNO\"='$get_idno') AND (\"CusID\"='$get_cusid') ORDER BY auto_id DESC"); // Not WHERE !!!
+}
+
+$numr=pg_num_rows($qry_fuc);
+if($numr==0){ echo "<div align=center>- ไม่พบข้อมูล -</div>"; }
+while($res_fuc=pg_fetch_array($qry_fuc)){
+	$qry_fun=pg_query("select fullname from \"Vfuser\" WHERE (\"id_user\"='$res_fuc[userid]')");
+	$res_fun=pg_fetch_array($qry_fun);
+?>
+    <div style="background-color: #C0C0C0">
+        <div style="float:left; padding:2px">User : <b><?php echo $res_fun["fullname"]; ?></b></div>
+        <div style="float:right; padding:2px">วันที่เจรจา : <b><?php echo $res_fuc["FollowDate"]; ?></b></div>
+        <div style="clear:both;"></div>
+    </div>
+    <div style="background-color: #F0F0F0; padding:2px"><?php echo $res_fuc["FollowDetail"]; ?></div>
+    <div style="background-color: #FFFFFF; clear:both; height:10px"></div>
+<?php
+}
+?>
+</div>
+</fieldset>
+
+</div>
+</div>
+
+<?php
+}
+?>
+
+</div>
+
+</body>
+</html>

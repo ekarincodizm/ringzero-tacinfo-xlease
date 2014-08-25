@@ -1,0 +1,147 @@
+<?php
+session_start();
+include("../../config/config.php");
+$NT_ID = pg_escape_string($_GET['NT_ID']);
+
+if($datepicker==""){
+	$datepicker=nowDate();
+}
+
+$query_detailpdf = pg_query("select * from \"thcap_pdf_nt\" where \"NT_ID\" = '$NT_ID'");
+$result = pg_fetch_array($query_detailpdf);
+$numrows = pg_num_rows($query_detailpdf);
+if($numrows >0){
+	$NT_ID= $result["NT_ID"];
+	$contractID= $result["contractID"];
+	
+	$unpaid_detailall_amt= $result["unpaid_detailall_amt"];
+	
+	$arraypay_next= $result["arraypay_next"];
+	$amountpay_next= $result["amountpay_next"];
+	$amountpay_all= $result["amountpay_all"];
+
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+<head>
+    <title><?php echo $_SESSION['session_company_name']; ?></title>
+    <meta http-equiv="Content-Type" content="txt/html; charset=utf-8" />
+    <link type="text/css" rel="stylesheet" href="../../dhtmlgoodies_calendar/dhtmlgoodies_calendar/dhtmlgoodies_calendar.css?random=20051112" media="screen"><link>
+	<script type="text/javascript" src="../../dhtmlgoodies_calendar/dhtmlgoodies_calendar/dhtmlgoodies_calendar.js?random=20060118"></script>
+    <link type="text/css" href="../../jqueryui/css/ui-lightness/jquery-ui-1.8.2.custom.css" rel="stylesheet" />    
+    <script type="text/javascript" src="../../jqueryui/js/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="../../jqueryui/js/jquery-ui-1.8.2.custom.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="act.css"></link>   
+
+</head>
+<script type="text/JavaScript">
+$(document).ready(function(){	
+	$("#datepicker").datepicker({
+		showOn: 'button',
+		buttonImage: './images/calendar.gif',
+		buttonImageOnly: true,
+		changeMonth: true,
+		changeYear: true,
+		dateFormat: 'yy-mm-dd'
+	});
+});
+</script>
+<body>
+
+<fieldset><legend><B>รายละเอียด</B></legend>
+<table width="100%">
+<tr>
+    <td><b>เลขที่ NT:</b></td>
+    <td><?php echo $NT_ID; ?></td>
+	<td><b>เลขที่สัญญา:</b></td>
+	<td><?php echo $contractID; ?></td>
+</tr>
+<tr>
+    <?php
+		$query_s = pg_query("SELECT \"arrayfirst_unpaid\"[1] as \"pay_s\",\"arrayfirst_unpaid\"[2] as \"date_s\"  
+			from \"thcap_pdf_nt\" where \"NT_ID\"='$NT_ID'");	
+			$res = pg_fetch_array($query_s);
+			$pay_s = $res["pay_s"];
+			$date_s = $res["date_s"];
+		
+		$query_e = pg_query("SELECT \"arrayend_unpaid\"[1] as \"pay_e\",\"arrayend_unpaid\"[2] as \"date_e\"  
+			from \"thcap_pdf_nt\" where \"NT_ID\"='$NT_ID'");	
+			$res = pg_fetch_array($query_e);
+			$pay_e = $res["pay_e"];
+			$date_e = $res["date_e"];
+	?>
+	<td><b>งวดที่เริ่มค้าง:</b></td>
+    <td><?php echo "งวดที่ ".$pay_s." ประจำวันที่  ".$date_s; ?></td>
+	<td><b>ถึง:</b></td>
+	<td><?php echo "งวดที่ ".$pay_e." ประจำวันที่  ".$date_e; ?></td>
+</tr>
+<tr>
+	<td><b>รายละเอียด:</b></td>
+    <?php 
+		$query_no = pg_query("SELECT generate_subscripts(\"arrayunpaid_detailall\",1) as \"no\"  from \"thcap_pdf_nt\" where \"NT_ID\"='$NT_ID'");
+		while($res_no = pg_fetch_array($query_no))
+		{
+			$no = $res_no["no"];
+			$query_list = pg_query("SELECT \"arrayunpaid_detailall\"['$no'][1] as \"name\",\"arrayunpaid_detailall\"['$no'][2] as \"valuee\"  
+			from \"thcap_pdf_nt\" where \"NT_ID\"='$NT_ID'");			
+			$res = pg_fetch_array($query_list);
+			$detail_name = $res["name"];
+			$detail_value = $res["valuee"];?>
+			<tr>
+				<td></td>
+				<td><?php echo $no.". ".$detail_name;?></td>
+				<td><?php echo number_format($detail_value,2)."   บาท";?></td>				
+			</tr>
+<tr>
+	<?php	}
+	?>
+	
+
+</tr>
+
+<tr>
+    <td colspan="2" align="right"><b>รวมเป็น:</b></td>  
+	<td><b><?php echo number_format($unpaid_detailall_amt,2)."   บาท"; ?></b></td>
+	
+</tr>
+<tr>
+<?php
+$query_n = pg_query("SELECT \"arraypay_next\"[1] as \"pay_n\",\"arraypay_next\"[2] as \"date_n\"  
+			from \"thcap_pdf_nt\" where \"NT_ID\"='$NT_ID'");	
+			$res = pg_fetch_array($query_n);
+			$pay_n = $res["pay_n"];
+			$date_n = $res["date_n"];
+
+?>
+    <td><b>เรียกเก็บเพิ่มอีก 1 งวด ประจำงาด:</b></td>
+    <td><?php echo "งวดที่ ".$pay_n." ประจำวันที่  ".$date_n; ?></td>
+	<td><b>จำนวนเงิน:</b></td>
+	<td><?php echo number_format($amountpay_next,2); ?></td>
+</tr>
+<tr>
+    <td><b>ดังนั้นยอดรวมทั้งสิ้น :</b></td>
+    <td><?php echo number_format($amountpay_all,2); ?></td>
+	<td><b>บาท</b></td>
+</tr>
+<form name="frm" method="post" action="process_cancel.php">
+<tr>
+	<input type="text" id="NT_ID"  name="NT_ID" value='<?php echo $NT_ID;?>' hidden>
+    <td><b>วันที่ ยกเลิกการออก NT :</b></td>
+    <td><input type="text" id="datepicker" name="datepicker" value="<?php echo $datepicker; ?>" size="15" style="text-align:center"></td>
+	
+</tr>
+<tr>	
+    <td  valign="top"><b>หมายเหตุ :</b></td>
+    <td><textarea name="note" id="note" cols="40" rows="3"></textarea></td>
+	
+</tr>
+<tr>
+    <td colspan="4" align="center"><input type="submit" value="บันทึก"><input type="button" onclick="window.close();" value="ปิดหน้านี้"></td>
+</form>	
+</tr>
+</table>
+</fieldset> 
+
+</body>
+<?php } ?>
+</html>

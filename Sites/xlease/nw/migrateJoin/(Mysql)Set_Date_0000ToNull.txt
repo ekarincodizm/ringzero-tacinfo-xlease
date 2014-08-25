@@ -1,0 +1,26 @@
+UPDATE `ta_join_main` SET start_contract_date=NULL WHERE start_contract_date='0000-00-00';
+UPDATE `ta_join_main_bin` SET start_contract_date=NULL WHERE start_contract_date='0000-00-00';
+UPDATE `ta_join_main` SET start_pay_date=NULL WHERE start_pay_date='0000-00-00';
+UPDATE `ta_join_main_bin` SET start_pay_date=NULL WHERE start_pay_date='0000-00-00';
+
+ALTER TABLE `ta_join_payment` CHANGE `start_pay_date` `start_pay_date` DATE NULL DEFAULT NULL COMMENT 'วันที่เริ่มชำระเงิน';
+ALTER TABLE `ta_join_payment_bin` CHANGE `start_pay_date` `start_pay_date` DATE NULL DEFAULT NULL COMMENT 'วันที่เริ่มชำระเงิน';
+
+UPDATE `ta_join_payment` SET start_pay_date=NULL WHERE start_pay_date='0000-00-00';
+UPDATE `ta_join_payment` SET pay_date=NULL WHERE pay_date='0000-00-00';
+UPDATE `ta_join_payment` SET period_date=NULL WHERE period_date='0000-00-00';
+UPDATE `ta_join_payment` SET expire_date=NULL WHERE expire_date='0000-00-00';
+
+UPDATE `ta_join_payment` SET update_datetime =NULL WHERE update_datetime ='0000-00-00 00:00:00';
+
+UPDATE `ta_join_payment_bin` SET start_pay_date=NULL WHERE start_pay_date='0000-00-00';
+UPDATE `ta_join_payment_bin` SET pay_date=NULL WHERE pay_date='0000-00-00';
+UPDATE `ta_join_payment_bin` SET period_date=NULL WHERE period_date='0000-00-00';
+UPDATE `ta_join_payment_bin` SET expire_date=NULL WHERE expire_date='0000-00-00';
+UPDATE `ta_join_payment_bin` SET update_datetime =NULL WHERE update_datetime ='0000-00-00 00:00:00';
+
+
+UPDATE `ta_users` SET users_start=NULL WHERE users_start ='0000-00-00';
+UPDATE `ta_users` SET users_end=NULL WHERE users_end ='0000-00-00';
+UPDATE `ta_users` SET users_dob=NULL WHERE users_dob ='0000-00-00';
+

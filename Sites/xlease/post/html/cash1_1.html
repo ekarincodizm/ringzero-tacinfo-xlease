@@ -1,0 +1,317 @@
+<script type="text/javascript"> 
+
+  var profile_obj;
+  var typepay_obj;
+  var payment = [];
+
+  function toggle(item)
+  {
+    $("#detail" + item).toggle("slow");  
+  }
+  
+  function update_ui()
+  {   
+    if ( $("select#cb_typepay").val() == "1" )
+    {
+      $("#pay_detail").show("slow");
+      $("#e_amount").attr("disabled", true); 
+
+      //find profile
+      var period_option = "";
+      
+      for (i = 1 ; i<= profile_obj.asset[$("#cb_idno").val()].period ; i++)
+      {
+        period_option  = period_option + '<option value="' + i + '">' + i + '</option>';
+      }
+      
+      $("select#cb_period").html(period_option);
+      
+      update_amount_for_pmt();
+    }
+    else
+    {
+      $("#pay_detail").hide("slow");
+      $("#e_amount").val("");
+      $("#e_amount").removeAttr("disabled"); 
+    }   
+  }
+  
+  function update_amount_for_pmt()
+  {
+    var pmt = profile_obj.asset[$("#cb_idno").val()].pmt;
+    var vat = profile_obj.asset[$("#cb_idno").val()].vat;   
+      
+    $("#e_amount").val( parseFloat( $("select#cb_period").val() ) *  (pmt + vat));
+  }                                                                                                        
+  
+  function init(cusid)
+  {
+    $("#e_amount").bind('keypress', 
+                        function(e) 
+                        { 
+                          return ( e.which!=8 && e.which!=0 && e.which!=46 && (e.which<48 || e.which>57)) ? false : true ;
+                        } );
+
+    //load customer profile
+    profile = $.ajax
+              ({
+                type: "POST",
+                url: "api.php",
+                data: "cmd=load_cus&cusid=" + cusid ,
+                async: false
+              }).responseText;
+    
+    profile_obj = eval('(' + profile + ')');  
+    
+    $("#customer_name").html(profile_obj.cusid + " : " + profile_obj.cusname);
+    
+    for (var v in profile_obj.asset)
+    {
+      html = "<div class='bluebox'>"
+           + "  <table>"        
+           + "    <tr>"
+           + "      <td width='200'>สัญญาเลขที่&nbsp;" + profile_obj.asset[v].idno + "</td>"
+           + "      <td width='200'>สินทรัพย์ " + profile_obj.asset[v].asset_type + " " + profile_obj.asset[v].asset_name + "</td>"
+           + "      <td width='200'>ค่างวด (รวมภาษี) &nbsp;&nbsp;" + (profile_obj.asset[v].pmt + profile_obj.asset[v].vat) + "</td>"
+           + "      <td width='150'>เหลือ &nbsp;&nbsp;" + profile_obj.asset[v].period + "&nbsp;งวด</td>"
+           + "      <td width='30'>"
+           + "        <div id='tab" + profile_obj.asset[v].idno + "' class='btn_asc' onclick='toggle(\"" + profile_obj.asset[v].idno + "\")'>&nbsp;</div>"
+           + "      </td>"
+           + "    </tr>"
+           + "  </table>"
+           + "</div>" 
+           + "<div id='detail" + profile_obj.asset[v].idno + "' style='height:200px; overflow:auto;'></div>";
+
+      $("#contract").append(html);
+      $("#detail" + profile_obj.asset[v].idno).hide(); 
+      
+      $("#tab" + profile_obj.asset[v].idno).toggle
+      (
+        function () 
+        {
+          $(this).removeClass("btn_asc");      
+          $(this).addClass("btn_desc"); 
+        },
+        
+        function () 
+        {
+          $(this).removeClass("btn_desc");      
+          $(this).addClass("btn_asc"); 
+        }
+      )      
+    }
+    
+    //------------------------------------------------------------------------
+
+    var idno_option = "";
+    
+    //append to cb_idno
+    for (var v in profile_obj.asset) 
+    {
+      idno_option = idno_option + '<option value="' + profile_obj.asset[v].idno + '">' + profile_obj.asset[v].idno + '</option>';    
+    }
+    
+    $("select#cb_idno").html(idno_option);
+     
+    typepay = $.ajax
+             ({
+                type: "POST",
+                url: "api.php",
+                data: "cmd=list_typepay" ,
+                async: false
+             }).responseText;
+      
+    typepay_obj = eval('(' + typepay + ')'); 
+
+    var typepay_option = "";
+    
+    for (var v in typepay_obj)
+    {
+      typepay_option  = typepay_option + '<option value="' + typepay_obj[v].id + '">' + typepay_obj[v].name + '</option>';
+    } 
+    
+    $("select#cb_typepay").html(typepay_option);
+
+    //-----------------------------------------------------------------------
+    
+    update_ui();
+  
+    //-----------------------------------------------------------------------  
+
+    $("#cb_typepay").change(function() { update_ui(); });
+    $("#cb_period").change(function() { update_amount_for_pmt(); });
+  }
+  
+  function addItem()
+  {
+    if ( isNaN($("#e_amount").val()) | ($("#e_amount").val() == ""))
+    {
+      alert("ข้อมูลจำนวนเงินไม่ถูกต้อง");
+      
+      $("#e_amount").focus();
+    }
+    else
+    {       
+      var i = payment.length;
+      payment[i] = {idno : $("#cb_idno").val() , typepay: $("#cb_typepay").val() , amount : $("#e_amount").val()};
+
+  
+      $("#cb_typepay").val("200");
+      update_ui();
+      $("#e_amount").val("");
+      
+      update_table();
+    }
+  }
+  
+  function update_table()
+  {
+    $("#list > tbody").empty(); 
+    
+    var index = 1; 
+    var total = 0;   
+    
+    for (i = 0 ; i < payment.length ; i++)
+    {
+      if (payment[i] != "undefined")
+      {       
+        var typepayStr = typepay_obj[payment[i]["typepay"]].name;
+          
+        var amt = new Number(payment[i]["amount"]);
+        amtStr = amt.toFixed(2);
+        
+        total = total + amt;
+
+        html = "<tr>"     
+             + "  <th width=\"50\">" + index + "</th>" 
+             + "  <th width=\"150\">" + payment[i]["idno"] + "</th>"
+             + "  <th width=\"150\">" + typepayStr + "</th>" 
+             + "  <th width=\"150\">&nbsp;</th>"
+             + "  <th width=\"150\" align=\"right\">" + amtStr + "</th>"
+             + "  <th>&nbsp;</th>"
+             + "</tr>";
+             
+        $('#list > tbody').append(html); 
+      }   
+      
+      index = index + 1;  
+    }
+    
+    $("#total_text").html("รวม");  
+    $("#total_num").html(total.toFixed(2));
+  }
+  
+  function save()
+  {
+    $("#btn_post").("disabled",true);
+    $.post
+    (
+      "api.php", 
+      { 
+        cmd : "pay_cash1" , 
+        cusid : profile_obj.cusid, 
+        payment : JSON.stringify(payment) 
+      } ,
+      
+      function(data)
+      {
+        if (data == "1")
+        {
+          alert("บันทึกรายการเรียบร้อย");
+          location.href = "index.php";
+        }
+      }  
+    );
+    
+        
+  }
+  
+</script>
+
+<h1 id="caption">Post</h1> 
+
+<br><br>  
+
+<span class="text_bold">จ่ายเงินสด - ลูกค้า </span>
+<span class="text_blue_bold" id="customer_name"></span>
+
+<br><br>
+
+<div id="contract">
+
+</div>
+
+<br>
+
+<span class="text_bold">รายการ</span>
+
+<table id="list" class="tb" border="0" cellpadding="0" cellspacing="1" width="100%">
+  <thead> 
+    <tr> 
+      <th width="50">รายการ</th> 
+      <th width="150">สัญญาเลขที่</th>
+      <th width="150">รายการจ่ายเงิน</th> 
+      <th width="150">&nbsp;</th> 
+      <th width="150">จำนวนเงิน</th>
+      <th>&nbsp;</th>  
+    </tr> 
+  </thead> 
+  
+  <tbody> 
+  
+  </tbody>
+  
+  <tfoot>
+    <tr>
+      <th width="50"></th> 
+      
+      <th width="150">
+        <select id="cb_idno" name="cb_idno" size="1">
+        
+        </select>
+      </th>
+      
+      <th width="150">
+        <select id="cb_typepay" name="cb_typepay" size="1">  
+        
+        </select>                              
+      </th> 
+      
+      <th>
+        <div id="pay_detail">
+          จำนวนงวด
+          <select id="cb_period" name="cb_period" size="1">
+          
+          </select>
+        </div>        
+      </th>
+      
+      <th width="150" align="right">
+        <input id="e_amount" name="e_amount" type="text" />
+      </th>
+      
+      <th>
+        <button title="เพิ่มรายการ" onclick="addItem();" >เพิ่มรายการ</button>
+      </th>       
+    </tr>
+    
+    <tr>
+      <th colspan="6"><hr></th>    
+    </tr>  
+    
+    <tr>
+      <th colspan="4" align="right"><span id="total_text"></span></th>
+      <th align="right"><span id="total_num"></span></th>      
+      <th>&nbsp;</th>   
+    </tr> 
+    
+    <tr>
+      <th colspan="6"><hr></th>   
+    </tr>  
+    
+    <tr>
+      <th colspan="6"><button title="บันทึกรายการ" onclick="save();">บันทึกรายการ</button></th>   
+    </tr>      
+
+  </tfoot> 
+</table> 

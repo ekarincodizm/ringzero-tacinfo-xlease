@@ -1,0 +1,42 @@
+body {font-family:tahoma; color : #333333; font-size:12px;}
+H1 {font-family:tahoma; color : #333333; font-size:28px;}
+A { font-size:12px; text-decoration:none;}
+A:hover { color : #8B8B8B; font-size:12px; text-decoration:none;}
+A:visited { color : #333333; font-size:12px; text-decoration:none;} 
+input,select{font-family:tahoma; color : #333333; font-size:12px;}
+.header{
+	text-align:center;       
+}
+.wrapper{
+	width:700; float:center; padding:5px;
+}
+legend{
+    font-family: Tahoma;
+    font-size: 14px;    
+    color: #0000CC;
+}
+legend A{ color : #0000CC; font-size: 14px; text-decoration:none;}
+legend A:hover{ color : #0000CC; font-size: 14px; text-decoration:none;}
+legend A:visited{ color : #0000CC; font-size: 14px; text-decoration:none;}
+fieldset{
+    padding:3px;
+}
+.text_gray{
+    color:gray;
+}
+.text_comment{
+    color:red;
+	font-size: 11px;
+}
+.odd{
+	background-color:#EDF8FE;
+	font-size:11px
+}
+.even{
+	background-color:#D5EFFD;
+	font-size:11px
+}
+.ered{
+	background-color:#FFC0C0;
+	font-size:11px
+}

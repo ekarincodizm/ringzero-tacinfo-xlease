@@ -1,0 +1,85 @@
+<?php
+session_start();
+include("company.php");
+
+$comp = pg_escape_string($_POST['comp']);
+if(!empty($comp)){
+    foreach($company as $v){
+        if($v['code'] == $comp){
+            $_SESSION["session_company_code"] = $v['code'];
+            $_SESSION["session_company_name"] = $v['name'];
+            $_SESSION["session_company_thainame"] = $v['thainame'];
+            $_SESSION["session_company_server"] = $v['server'];
+            $_SESSION["session_company_dbname"] = $v['dbname'];
+            $_SESSION["session_company_dbuser"] = $v['dbuser'];
+            $_SESSION["session_company_dbpass"] = $v['dbpass'];
+			$_SESSION["session_company_asset_car"] = $v['asset_car'];
+			$_SESSION["session_company_asset_gas"] = $v['asset_gas'];
+		$_SESSION["session_company_nv"]=$v['NV'];
+			$_SESSION["session_company_jr"]=$v['JR'];
+			$_SESSION["session_company_tv"]=$v['TV'];
+						
+            break;
+        }
+    }
+    
+    if(empty($_SESSION["session_company_code"]) || empty($_SESSION["session_company_name"]) || empty($_SESSION["session_company_server"]) || empty($_SESSION["session_company_dbname"]) || empty($_SESSION["session_company_dbuser"]) || empty($_SESSION["session_company_dbpass"])){
+        echo "ข้อมูลสำหรับการเชื่อมต่อไม่ถูกต้อง";
+        exit;
+    }
+}
+
+require_once("config/config.php");
+
+$username = pg_escape_string($_POST['username']);
+$password = pg_escape_string($_POST['password']);
+
+$result=pg_query("SELECT id_user,username,password,user_group,office_id,last_log,last_datepassword FROM fuser WHERE username='$username' AND password='$password' AND status_user='TRUE'");
+if($arr = pg_fetch_array($result)){
+    $av_officeid=$arr["office_id"];
+	session_register("av_officeid");
+	$_SESSION["av_officeid"]=$av_officeid;
+
+	$av_usergroup=$arr["user_group"];
+	session_register("av_usergroup");
+	$_SESSION["av_usergroup"]=$av_usergroup;
+
+	$av_iduser=$arr["id_user"];
+	session_register("av_iduser");
+	$_SESSION["av_iduser"]=$av_iduser;
+
+	$_SESSION['uid'] = $arr["id_user"];
+
+    $_SESSION['user_login'] = $username;
+    $_SESSION['lasttime_login'] = $arr["last_log"]; // ล็อคอินล่าสุด
+
+    $upd_sql="UPDATE fuser SET \"last_log\"=NOW() WHERE username='$username' AND password='$password';";
+    if($result=pg_query($upd_sql)){
+        
+        $stime = explode("-", date( "Y-m-d", strtotime( $arr['last_datepassword'])));
+        foreach ($stime as $value) { }
+        $timeing = GregorianToJD($stime[1], $stime[2], $stime[0])-GregorianToJD(date("m"), date("d"), date("Y"));
+        $timeing = abs($timeing);
+        
+        $stime2 = explode("-", date( "Y-m-d", strtotime( $arr['last_log'])));
+        foreach ($stime as $value) { }
+        $timeing2 = GregorianToJD($stime2[1], $stime2[2], $stime2[0])-GregorianToJD(date("m"), date("d"), date("Y"));
+        $timeing2 = abs($timeing2);
+        $_SESSION['lasttime_login_number'] = $timeing2; // จำนวนวัน
+        
+        if($timeing > 45){
+            header("Refresh: 0; url=change_pass.php?cmd=1");
+            exit();
+        }else{
+            header("Refresh: 0; url=list_menu.php");
+            exit();
+        }
+    }else{
+        header("Refresh: 0; url=index.php");
+        exit();
+    }
+}else{
+	header("Refresh: 0; url=index.php");
+	exit();
+}
+?>

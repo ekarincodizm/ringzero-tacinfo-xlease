@@ -1,0 +1,69 @@
+<?php 
+session_start();
+include("config/config.php");
+$cmd = pg_escape_string($_GET['cmd']);
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+<head>
+	<title>AV.LEASING</title>
+	<meta http-equiv="Content-Type" content="txt/html; charset=utf-8" />
+    <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+    <link type="text/css" rel="stylesheet" href="images/act.css"></link>
+</head>
+<body>
+
+<table width="500" border="0" cellspacing="0" cellpadding="0" align="center">
+    <tr>
+        <td>
+
+<div class="wrapper">
+
+<?php
+if($cmd != "1"){
+?>
+<div align="right"><input type="button" value="กลับหน้าหลัก" onclick="location.href='list_menu.php'"></div>
+<?php
+}
+?>
+
+<fieldset><legend><b>เปลี่ยนรหัสผ่าน</b></legend>
+
+<?php
+if($cmd == "1"){
+?>
+<div style="color:red; padding:10px; text-align: center;">เนื่องจากครบกำหนดระยะเวลา 45 วัน ท่านต้องเปลี่ยนรหัสผ่านใหม่</div>
+<?php
+}
+?>
+
+<FORM name="editpass"  method="post" action="change_pass_ok.php<?php if($cmd == 1){ echo "?cmd=1"; } ?>" onSubmit="return check()">
+<table width="100%" cellpadding="3" cellspacing="0">
+    <tr>
+        <td>รหัสผ่านเดิม</td>
+        <td><input type="password" id="old_pass" name="old_pass"></td>
+    </tr>
+    <tr>
+        <td>รหัสผ่านใหม่</td>
+        <td><input type="password" id="new_pass" name="new_pass"></td>
+    </tr>
+    <tr>
+        <td>ยืนยัน รหัสผ่านใหม่</td>
+        <td><input type="password" id="cnew_pass" name="cnew_pass"></td>
+    </tr>
+    <tr>
+        <td colspan="2" align="center"><input type="submit" name="ok" value="  บันทึก  "></td>
+    </tr>
+</table>
+</FORM>
+
+
+</fieldset>
+</div>
+
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>
