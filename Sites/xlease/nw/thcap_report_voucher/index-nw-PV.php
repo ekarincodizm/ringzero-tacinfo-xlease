@@ -331,9 +331,14 @@ $s_cancel = "on"; // แสดงรายการที่ยกเลิก/�
 			 }else{
 			   $S_Cnd .= " Where ".$condition_c;
 			 }
-		} 
+		}
+		
+		// SQL Comand For Control Order Data
+		$qry_end = " order by a.\"doerStamp\" DESC, a.\"voucherID\" DESC ";
+		
 		// สร้าง SQL Comand เพื่อการใช้งาน
-		$qry.=$S_Cnd; 
+		$qry = $qry.$S_Cnd.$qry_end;
+		
 		?>
 		<div align="center">
 			<fieldset style="width:80%;">

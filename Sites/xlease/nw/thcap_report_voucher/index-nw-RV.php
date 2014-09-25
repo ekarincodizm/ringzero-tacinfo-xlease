@@ -321,7 +321,7 @@ $s_cancel = "on"; // แสดงรายการที่ยกเลิก/�
 			}  
 		} 	
 		// Part Of SQL Comand ส่วนการเรียงข้อมูล
-		$qry_end = " order by a.\"voucherID\" "; 
+		$qry_end = " order by a.\"doerStamp\" DESC, a.\"voucherID\" DESC ";
 		$qry = $qry.$qry_c1.$qry_c2.$qry_end; // Sql Comand สำหรับการสิืบค้นข้อมูล
 		$method = 0;
 		?>

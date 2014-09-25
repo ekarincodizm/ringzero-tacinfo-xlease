@@ -324,7 +324,8 @@ $s_cancel = "on"; // แสดงรายการที่ยกเลิก/�
 		} 
 		
 		// SQL Comand For Control Order Data
-		$qry_end = " order by a.\"voucherID\" ";
+		$qry_end = " order by a.\"doerStamp\" DESC, a.\"voucherID\" DESC ";
+		
 		// Create Complement SQL Comand For Query	
 		$qry = $qry.$Cnd1.$Cnd2.$qry_end;
 		
