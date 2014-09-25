@@ -141,6 +141,11 @@ while($result = pg_fetch_array($query_main))
 	$conDate = $result["conDate"]; // วันที่ทำสัญญา
 	$conStartDate = $result["conStartDate"]; // วันที่รับเงินที่ขอกู้
 	$conEndDate = $result["conEndDate"]; // วันที่สิ้นสุดการกู้ที่ระบุไว้ในสัญญา
+	$case_owners_id = $result["case_owners_id"]; // รหัสพนักงาน เจ้าของเคส
+	
+	// หาชื่อเจ้าของเคส
+	$qry_case_owners_name = pg_query("select \"fullname\" from \"Vfuser\" where \"id_user\" = '$case_owners_id' ");
+	$case_owners_name = pg_fetch_result($qry_case_owners_name,0);
 	
 	$conFinAmtExtVat = $result["conFinAmtExtVat"]; // ยอดจัด/ยอดลงทุน (ก่อนภาษี)
 	
@@ -424,6 +429,29 @@ if($menu =="check")
 ?>
 <td align="right"><font color="#FF5555"><b>บริษัท : </b></font></td>
 	<td><?php echo $conCompany; ?></td>
+	<?php	
+	if($menu =="check") 
+	{ 	
+		$chk="chk".$count;
+		$check="<input type=\"checkbox\" name=\"$chk\" id=\"$chk\">ตรวจสอบ"; 
+		echo "<td align=\"right\">$check</td>";
+	}	
+	?>
+</tr>
+
+<?php $count+=1;
+if($menu =="check") 
+	{
+		if($count%2==0){
+		echo "<tr>";
+		}else { 
+		echo "<tr bgcolor=\"#99FF99\" >";}
+	}else{
+		echo "<tr>";
+	}
+?>
+<td align="right"><font color="#FF5555"><b>เจ้าของเคส : </b></font></td>
+	<td><?php echo $case_owners_name; ?></td>
 	<?php	
 	if($menu =="check") 
 	{ 	

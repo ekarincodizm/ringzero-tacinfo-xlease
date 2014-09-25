@@ -536,7 +536,7 @@ function popU(U,N,T){
 						// ============================================================================================
 						// จำนวนวันที่ค้าง			
 						// ============================================================================================
-						$sql1 = pg_query("SELECT \"thcap_get_all_backdays\"('$contractID','$vfocusdate',1)");
+						$sql1 = pg_query("SELECT \"thcap_get_all_backdays_db\"('$contractID','$vfocusdate',1)");
 						list($thcap_backDueNumDays) = pg_fetch_array($sql1);
 						if($thcap_backDueNumDays == ""){ $thcap_backDueNumDays = "-"; }
 						

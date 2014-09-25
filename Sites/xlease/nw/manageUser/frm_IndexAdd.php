@@ -15,9 +15,9 @@ else
  $file_namepic="logo_thaiace.jpg";
 }
 $nowdate=nowDate();
-$method=$_GET["method"];
+$method = pg_escape_string($_GET["method"]);
 if($method=="edit"){
-	$id_user=$_GET["id_user"];
+	$id_user = pg_escape_string($_GET["id_user"]);
 	$query=pg_query("select *,a.id_user as id_user2 from \"fuser\" a 
 					left join \"fuser_detail\" b on a.\"id_user\"=b.\"id_user\"
 					where a.\"id_user\"='$id_user'");
@@ -52,7 +52,7 @@ if($method=="edit"){
 		$dep_id=$result["user_group"];
 		$fdep_id=$result["user_dep"];
 		$email=$result["email"];
-		$section_ID_old=$result["section_ID"];
+		$empid = $result["empid"]; // รหัสพนักงาน แบบกำหนดเอง
 		
 		$work_status=$result["work_status"]; //ครั้งที่เข้ามาทำงานล่าสุด
 		$resign_date=$result["resign_date"]; //วันที่ลาออกถ้าเป็น null คือยังทำงานอยู่
@@ -80,7 +80,7 @@ if($u_pic == "noimage.jpg" || $u_pic==""){
 <style type="text/css">
 #warppage
 	{
-	width:800px;
+	width:900px;
 	margin-left:auto;
 	margin-right:auto;
 	
@@ -126,10 +126,7 @@ if(document.form1.u_idnum.value==""){
 	theMessage = theMessage + "\n -->  กรุณากรอกเลขที่บัตรประชาชน";
 }
 if(document.form1.dep_id.value==""){
-	theMessage = theMessage + "\n -->  กรุณาเลือก กลุ่มผู้ใช้";
-}
-if(document.form1.section_ID.value==""){
-	theMessage = theMessage + "\n -->  กรุณาเลือก แผนก";
+	theMessage = theMessage + "\n -->  กรุณาระบุแผนก";
 }
 
 if (theMessage == noErrors) {
@@ -209,7 +206,7 @@ function check_salary(evt) {
 	evt = (evt) ? evt : window.event;
 	var charCode = (evt.which) ? evt.which : evt.keyCode;
 	if (charCode > 31 && (charCode < 46 || charCode == 47 || charCode > 57)) {
-		alert("กรุณากรอกเป็นตัวเลขเท่าันั้น!!");
+		alert("กรุณากรอกเป็นตัวเลขเท่านั้น!!");
 		document.form1.u_salary.focus();
 		return false;
 	}
@@ -220,7 +217,7 @@ function check_num(evt) {
 	evt = (evt) ? evt : window.event;
 	var charCode = (evt.which) ? evt.which : evt.keyCode;
 	if ((charCode < 8 || charCode > 8) && (charCode < 45 || charCode > 45) && (charCode < 48 || charCode > 57) ) {
-		alert("กรุณากรอกเป็นตัวเลขเท่าันั้น!!");
+		alert("กรุณากรอกเป็นตัวเลขเท่านั้น!!");
 		document.form1.u_idnum.focus();
 		return false;
 	}
@@ -231,7 +228,7 @@ function check_num_tel(evt) {
 	evt = (evt) ? evt : window.event;
 	var charCode = (evt.which) ? evt.which : evt.keyCode;
 	if ((charCode < 8 || charCode > 8) && (charCode < 45 || charCode > 45) && (charCode < 48 || charCode > 57) ) {
-		alert("กรุณากรอกเป็นตัวเลขเท่าันั้น!!");
+		alert("กรุณากรอกเป็นตัวเลขเท่านั้น!!");
 		document.form1.u_idnum.focus();
 		return false;
 	}
@@ -243,7 +240,7 @@ function check_num_tel_direct(evt) {
 	evt = (evt) ? evt : window.event;
 	var charCode = (evt.which) ? evt.which : evt.keyCode;
 	if ((charCode < 8 || charCode > 8) && (charCode < 45 || charCode > 45) && (charCode < 48 || charCode > 57) ) {
-		alert("กรุณากรอกเป็นตัวเลขเท่าันั้น!!");
+		alert("กรุณากรอกเป็นตัวเลขเท่านั้น!!");
 		document.form1.u_direct.focus();
 		return false;
 	}
@@ -253,13 +250,13 @@ function check_num_tel_direct(evt) {
 </head>
 
 <body>
-<div style="width:800px; height:auto; margin-left:auto; margin-right:auto;">
-	<div class="style2" id="super_head" style="padding-left:10px; height:90px; width:800px;">
-		<span class="style2" style="padding-left:10px; height:60px; width:800px; ">
+<div style="width:900px; height:auto; margin-left:auto; margin-right:auto;">
+	<div class="style2" id="super_head" style="padding-left:10px; height:90px; width:900px;">
+		<span class="style2" style="padding-left:10px; height:60px; width:900px; ">
 		<div style="width:90px; float:left;"><img src="../../images/<?php echo $file_namepic; ?>" width="80" height="80" /></div>
 		<div style="padding-top:20px;"><span><?php echo $_SESSION["session_company_name"]; ?></span><br /><?php echo $_SESSION["session_company_thainame"]; ?></div>
 	</div>
-	<div id="warppage" style="width:800px; height:auto;">
+	<div id="warppage" style="width:900px; height:auto;">
 		<div id="headerpage" style="height:10px; text-align:center"></div>
 		<div class="style1" id="menu" style="height:30px; padding-left:10px; padding-top:10px; padding-right:10px;"><?php if($method=="edit"){ echo "แก้ไข";}else{ echo "เพิ่ม";}?>พนักงาน<hr/></div>
 		<div style="height:auto; padding-left:10px; padding-right:10px;"><br />
@@ -271,9 +268,9 @@ function check_num_tel_direct(evt) {
 				<td>คำนำหน้า :</td>
 				<td><input type="text" name="title" value="<?php echo $title?>" size="10"></td>
 				<td>ชื่อ :</td>
-				<td><input type="text" name="fname" value="<?php echo $fname?>"></td>
+				<td align="left"><input type="text" name="fname" value="<?php echo $fname?>"> <font color="red"><b>*</b></font></td>
 				<td>นามสกุล :</td>
-				<td align="left"><input type="text" name="lname" value="<?php echo $lname?>"></td>
+				<td align="left"><input type="text" name="lname" value="<?php echo $lname?>"> <font color="red"><b>*</b></font></td>
 				<td>ชื่อเล่น :</td>
 				<td align="left"><input type="text" name="nickname" value="<?php echo $nickname?>"></td>
 			</tr>
@@ -282,7 +279,7 @@ function check_num_tel_direct(evt) {
 				<td>Title :</td>
 				<td><input type="text" name="title_eng" id="title_eng" value="<?php echo $title_eng?>" size="10"></td>
 				<td>Name :</td>
-				<td><input type="text" name="fname_eng" value="<?php echo $fname_eng?>"></td>
+				<td align="left"><input type="text" name="fname_eng" value="<?php echo $fname_eng?>"></td>
 				<td>Surname :</td>
 				<td colspan="3" align="left"><input type="text" name="lname_eng" value="<?php echo $lname_eng?>"></td>
 			</tr>
@@ -299,7 +296,7 @@ function check_num_tel_direct(evt) {
 						</tr>
 						<?php
 							if($method!="edit"){
-								/*$qrylastid=pg_query("select id_user from fuser");
+								$qrylastid=pg_query("select id_user from fuser");
 								$numrow=pg_num_rows($qrylastid);
 						 
 								$idplus=$numrow+1;
@@ -313,27 +310,28 @@ function check_num_tel_direct(evt) {
 								}
 								$id_user=insertZero($idplus , 3);
 								$seed = $_SESSION["session_company_seed"];
-								$v_pass = md5(md5($_POST['v_pass']).$seed);*/
-								
-								$id_user = "ระบบจะสร้างให้อัตโนมัติ";
+								$v_pass = md5(md5($_POST['v_pass']).$seed);
 							}
 							
 						?>
 						<tr>
 							<td align="right" class="weightfont">รหัสพนักงาน</td>
 							<td width="10">:</td>
-							<td><input type="text" name="id_user" value="<?php echo $id_user; ?>" readonly></td>
+							<td>
+								<input type="text" name="empid" value="<?php echo $empid;?>">
+								<input type="hidden" name="id_user" value="<?php echo $id_user;?>">
+							</td>
 							<td align="right" class="weightfont">Username</td>
 							<td width="10">:</td>
-							<td><input type="text" name="username" value="<?php echo $username?>"></td>
+							<td><input type="text" name="username" value="<?php echo $username?>"> <font color="red"><b>*</b></font></td>
 						</tr>
 						<tr>
 							<td align="right" class="weightfont">วันเกิด</td>
 							<td width="10">:</td>
-							<td><input type="text" name="u_birthday" id="u_birthday" value="<?php echo $u_birthday?>" size="15"></td>
+							<td><input type="text" name="u_birthday" id="u_birthday" value="<?php echo $u_birthday?>" size="15"> <font color="red"><b>*</b></font></td>
 							<td align="right" class="weightfont">เลขบัตรประชาชน</td>
 							<td width="10">:</td>
-							<td><input type="text" name="u_idnum" value="<?php echo $u_idnum?>" onkeypress="return check_num(event);"></td>
+							<td><input type="text" name="u_idnum" value="<?php echo $u_idnum?>" onkeypress="return check_num(event);"> <font color="red"><b>*</b></font></td>
 						</tr>
 						<tr>
 							<td align="right" class="weightfont"></td>
@@ -350,59 +348,39 @@ function check_num_tel_direct(evt) {
 						</tr>
 						
 						<tr>
-							<td align="right" class="weightfont">กลุ่มผู้ใช้</td>
+							<td align="right" class="weightfont">แผนก</td>
 							<td width="10">:</td>
-							<td colspan="4">
+							<td>
 								<select name="dep_id" id="dep_id">
 									<option value="">---เลือก---</option>
 									<?php
 									$qry_gpuser=pg_query("select * from department");
 									while($resg=pg_fetch_array($qry_gpuser))
-									{
+									 {
 									?>
-										<option value="<?php echo $resg["dep_id"]; ?>" <?php if($dep_id==$resg["dep_id"]){ echo "selected"; }?>><?php echo $resg["dep_name"]; ?></option>
+									  <option value="<?php echo $resg["dep_id"]; ?>" <?php if($dep_id==$resg["dep_id"]){ echo "selected"; }?>><?php echo $resg["dep_name"]; ?></option>
 									<?php
-									}
+									 }
 									?>  
-								</select>
+								</select> <font color="red"><b>*</b></font>
 							</td>
-						</tr>
-						
-						<tr>
-							<td align="right" class="weightfont">แผนก</td>
+							<td align="right" class="weightfont">ฝ่าย</td>
 							<td width="10">:</td>
-							<td colspan="4">
-								<select name="section_ID" id="section_ID">
-									<option value="">---เลือก---</option>
+							<td>
+								<select name="fdep_id" id="fdep_id">
+									<option value="" >---เลือก---</option>
 									<?php
-									$qry_f_section = pg_query("select * from \"f_section\" order by \"organizeID\", \"fdep_id\", \"dep_id\" ");
-									while($res_f_section = pg_fetch_array($qry_f_section))
-									{
-										$section_ID = $res_f_section["section_ID"]; // รหัสกลุ่ม
-										$organizeID = $res_f_section["organizeID"]; // รหัสบริษัท
-										$dep_id = $res_f_section["dep_id"]; // รหัสแผนก
-										$fdep_id = $res_f_section["fdep_id"]; // รหัสฝ่าย
-										
-										// หาชื่อบริษัท
-										$qry_organize_name = pg_query("select \"organize_name\" from \"nw_organize\" where \"organizeID\" = '$organizeID' ");
-										$organize_name = pg_fetch_result($qry_organize_name,0);
-										
-										// หาชื่อแผนก
-										$qry_dep_name = pg_query("select \"dep_name\" from \"department\" where \"dep_id\" = '$dep_id' ");
-										$dep_name = pg_fetch_result($qry_dep_name,0);
-										
-										// หาชื่อฝ่าย
-										$qry_fdep_name = pg_query("select \"fdep_name\" from \"f_department\" where \"fdep_id\" = '$fdep_id' ");
-										$fdep_name = pg_fetch_result($qry_fdep_name,0);
+									$qry_dep=pg_query("select * from f_department where fstatus='TRUE' order by fdep_id");
+									while($resd=pg_fetch_array($qry_dep))
+									 {
 									?>
-										<option value="<?php echo $section_ID; ?>" <?php if($section_ID==$section_ID_old){ echo "selected"; }?>><?php echo "$organize_name / ฝ่าย$fdep_name / แผนก$dep_name"; ?></option>
+									  <option value="<?php echo $resd["fdep_id"]; ?>" <?php if($fdep_id==$resd["fdep_id"]){ echo "selected"; }?>><?php echo $resd["fdep_name"]; ?></option>
 									<?php
-									}
+									 }
 									?>  
 								</select>
 							</td>
 						</tr>
-						
 						<tr>
 							<td align="right" class="weightfont">ตำแหน่ง</td>
 							<td width="10">:</td>
@@ -447,6 +425,7 @@ function check_num_tel_direct(evt) {
 								}else{
 									echo "<input type=\"checkbox\" name=\"statuswork\" id=\"statuswork2\" value=\"1\">";
 									echo "รับพนักงานกลับเข้าทำงานใหม่";
+									echo "<div>วันที่ลาออก <input type=\"text\" name=\"resign_date\" id=\"resign_date\" size=\"15\" value=\"$resign_date\"> (ระบุเป็น ค.ศ.-เดือน-วัน เช่น $nowdate)</div>";
 								}
 								?>
 							</td>

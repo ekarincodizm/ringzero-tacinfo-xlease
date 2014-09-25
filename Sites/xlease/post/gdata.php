@@ -1,7 +1,7 @@
 <?php
 include("../config/config.php"); 
 
-$term = $_GET['term'];
+$term = pg_escape_string($_GET['term']);
 
 //ตรวจสอบว่าค่าที่ส่งมาเป็นตัวเลขหรือไม่
 // if(is_numeric($term) ) {
@@ -11,7 +11,7 @@ $term = $_GET['term'];
 // }
 
 $sql_select=pg_query("SELECT a.\"IDNO\",a.\"asset_type\",a.\"full_name\",a.\"C_CARNUM\",a.\"TranIDRef1\",a.\"TranIDRef2\",a.\"C_REGIS\",
-a.\"car_regis\",a.\"P_ACCLOSE\",b.\"P_CLDATE\",b.\"P_STDATE\",b.asset_id 
+a.\"car_regis\",a.\"P_ACCLOSE\",b.\"P_CLDATE\",b.\"P_STDATE\",b.asset_id, b.\"PayType\"
 FROM \"VContact\" a join \"Fp\" b on a.\"IDNO\" = b.\"IDNO\"
 WHERE (a.\"IDNO\" like '%$term%') OR (a.\"C_REGIS\" like '%$term%') OR (a.\"car_regis\" like '%$term%') OR (a.\"C_CARNUM\" like '%$term%') 
 OR (a.\"full_name\" like '%$term%') OR (a.\"TranIDRef1\" like '%$term%') OR (a.\"TranIDRef2\" like '%$term%') 
@@ -29,6 +29,7 @@ while($res_cn=pg_fetch_array($sql_select)){
 	$P_ACCLOSE = trim($res_cn["P_ACCLOSE"]);
 	$P_CLDATE = trim($res_cn["P_CLDATE"]);
 	$P_STDATE = trim($res_cn["P_STDATE"]);
+	$PayType = trim($res_cn["PayType"]);
     $asset_id = trim($res_cn["asset_id"]);
     if($asset_type == 1){
         $regis = trim($res_cn["C_REGIS"]);
@@ -42,7 +43,10 @@ while($res_cn=pg_fetch_array($sql_select)){
 		$SumDueNo = $res_fr["SumDueNo"]; //จำนวนงวดที่ค้างชำระ
 	}
 	
-	if($P_ACCLOSE=='t' AND ($P_CLDATE != $P_STDATE)){
+	if($PayType == "CC"){
+		$txtclose="<b>(สัญญานี้ยกเลิกแล้ว)</b>";
+		$color='#FF00FF';
+	}else if($P_ACCLOSE=='t' AND ($P_CLDATE != $P_STDATE)){
 		$txtclose="<b>(ปิดบัญชีแล้ว)</b>";
 		$color='#D6D6D6';
 	}else if($P_ACCLOSE=='t' AND ($P_CLDATE == $P_STDATE)){

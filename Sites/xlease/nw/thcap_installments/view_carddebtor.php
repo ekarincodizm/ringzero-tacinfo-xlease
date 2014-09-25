@@ -97,9 +97,13 @@ while($result=pg_fetch_array($sql_head))
 	$conStartDate = $result["conStartDate"];
 	$conRepeatDueDay = $result["conRepeatDueDay"];
 	$conLoanAmt = $result["conLoanAmt"];
-	$conTerm = $result["conTerm"];
+	//$conTerm = $result["conTerm"];
 	$conMinPay = $result["conMinPay"];
 }
+
+// หาจำนวนงวดใหม่ โดยใช้ view account."thcap_mg_payTerm"
+$qry_conTerm = pg_query("select count(\"ptNum\") from account.\"thcap_mg_payTerm\" where \"contractID\" = '$contractID' ");
+$conTerm = pg_fetch_result($qry_conTerm,0);
 ?>
 
 <center>

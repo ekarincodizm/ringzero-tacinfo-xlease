@@ -5,8 +5,10 @@ $nowDate = nowDate(); //ดึงข้อมูลวันจาก server
 
 $rowCustomer = pg_escape_string($_POST["rowCustomer"]); // จำนวนลูกค้า
 $annuities = pg_escape_string($_POST["annuities"]); // ติดตามค่างวด
-$focusDate = pg_escape_string($_POST["focusDate"]); // วันที่เลือก
+$PRP = pg_escape_string($_POST["PRP"]); // ค่าประกันภัย+พรบ.
+$miterTax = pg_escape_string($_POST["miterTax"]); // ค่าภาษี+ตรวจมิเตอร์
 $charges = pg_escape_string($_POST["charges"]); // ติดตามค่าใช้จ่ายอื่นๆ
+$focusDate = pg_escape_string($_POST["focusDate"]); // วันที่เลือก
 $note = pg_escape_string($_POST["note"]); // หมายเหตุ
 $btn_report = pg_escape_string($_POST["btn_report"]); // ถ้ามีการคลิกค้นหา จะเป็น yes
 
@@ -18,6 +20,8 @@ if($rowCustomer == ""){$rowCustomer = 1;} // เริ่มต้นต้อ�
 
 if($annuities == "on"){$annuities_check = "checked";}else{$annuities_check = "";}
 if($charges == "on"){$charges_check = "checked";}else{$charges_check = "";}
+if($PRP == "on"){$PRP_check = "checked";}else{$PRP_check = "";}
+if($miterTax == "on"){$miterTax_check = "checked";}else{$miterTax_check = "";}
 
 $textCusArray = pg_escape_string($_POST["CustomerName1"]);
 
@@ -149,7 +153,7 @@ if($rowCustomer > 1)
 		{
 			$('#panel').empty();
 			$('#panel').html('<img src="../../images/progress.gif" border="0" width="32" height="32" alt="กำลังค้นหา...">');
-			$("#panel").load("report_gui.php?CusID_array="+'<?php echo $CusID_array; ?>'+"&focusDate="+'<?php echo $focusDate; ?>'+"&annuities="+'<?php echo $annuities_check; ?>'+"&charges="+'<?php echo $charges_check; ?>'+"&note="+'<?php echo $noteSent; ?>');
+			$("#panel").load("report_gui.php?CusID_array="+'<?php echo $CusID_array; ?>'+"&focusDate="+'<?php echo $focusDate; ?>'+"&annuities="+'<?php echo $annuities_check; ?>'+"&charges="+'<?php echo $charges_check; ?>'+"&PRP="+'<?php echo $PRP_check; ?>'+"&miterTax="+'<?php echo $miterTax_check; ?>'+"&note="+'<?php echo $noteSent; ?>');
 		}
 	</script>
 	
@@ -182,15 +186,23 @@ if($rowCustomer > 1)
 						<table>
 							<tr>
 								<td align="right"><input type="checkbox" name="annuities" id="annuities" <?php echo $annuities_check; ?>></td>
-								<td align="left">
-									ติดตามค่างวด
-									: ถึงวันที่
-									<input type="textbox" name="focusDate" id="focusDate" size="15" value="<?php echo $focusDate; ?>" style="text-align:center;">
-								</td>
+								<td align="left">ค่างวด</td>
+							</tr>
+							<tr>
+								<td align="right"><input type="checkbox" name="PRP" id="PRP" <?php echo $PRP_check; ?>></td>
+								<td align="left">ค่าประกันภัย+พรบ.</td>
+							</tr>
+							<tr>
+								<td align="right"><input type="checkbox" name="miterTax" id="miterTax" <?php echo $miterTax_check; ?>></td>
+								<td align="left">ค่าภาษี+ตรวจมิเตอร์</td>
 							</tr>
 							<tr>
 								<td align="right"><input type="checkbox" name="charges" id="charges" <?php echo $charges_check; ?>></td>
-								<td align="left">ติดตามค่าใช้จ่ายอื่นๆ</td>
+								<td align="left">ค่าใช้จ่ายอื่นๆ</td>
+							</tr>
+							<tr>
+								<td align="right">ถึงวันที่ : </td>
+								<td align="left"><input type="textbox" name="focusDate" id="focusDate" size="15" value="<?php echo $focusDate; ?>" style="text-align:center;"></td>
 							</tr>
 							<tr>
 								<td align="right">หมายเหตุ</td>

@@ -22,17 +22,19 @@ $objPHPExcel->getActiveSheet()->getStyle('A1')->getFont()->setBold(true)->setNam
 
 
 $objPHPExcel->getActiveSheet()->SetCellValue('A2', 'ชื่อ -สกุล');
-$objPHPExcel->getActiveSheet()->SetCellValue('B2', 'เบอร์ภายใน');
-$objPHPExcel->getActiveSheet()->SetCellValue('C2', 'เบอร์ตรง');
-$objPHPExcel->getActiveSheet()->SetCellValue('D2', 'มือถือ');
-$objPHPExcel->getActiveSheet()->SetCellValue('E2', 'E-mail');
+$objPHPExcel->getActiveSheet()->SetCellValue('B2', 'ชื่อเล่น');
+$objPHPExcel->getActiveSheet()->SetCellValue('C2', 'เบอร์ภายใน');
+$objPHPExcel->getActiveSheet()->SetCellValue('D2', 'เบอร์ตรง');
+$objPHPExcel->getActiveSheet()->SetCellValue('E2', 'มือถือ');
+$objPHPExcel->getActiveSheet()->SetCellValue('F2', 'E-mail');
 
 
 $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(30);
 $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(15);
 $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(15);
 $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(15);
-$objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(30);
+$objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(15);
+$objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth(30);
 
 
 $objPHPExcel->getActiveSheet()->getStyle('A2')->getFont()->setBold(true)->setName('Angsana New')->setSize(14);
@@ -40,15 +42,16 @@ $objPHPExcel->getActiveSheet()->getStyle('B2')->getFont()->setBold(true)->setNam
 $objPHPExcel->getActiveSheet()->getStyle('C2')->getFont()->setBold(true)->setName('Angsana New')->setSize(14);
 $objPHPExcel->getActiveSheet()->getStyle('D2')->getFont()->setBold(true)->setName('Angsana New')->setSize(14);
 $objPHPExcel->getActiveSheet()->getStyle('E2')->getFont()->setBold(true)->setName('Angsana New')->setSize(14);
+$objPHPExcel->getActiveSheet()->getStyle('F2')->getFont()->setBold(true)->setName('Angsana New')->setSize(14);
 
 	if($find=="0"){
-		$qry_gpuser=pg_query("select \"dep_id\",\"dep_name\" from department where  \"dep_id\" <> 'AD' order by \"dep_id\"");//แผนกในระบบทั้งหมด		
+		$qry_gpuser=pg_query("select \"dep_id\",\"dep_name\",\"dep_tel\",\"dep_email\" from department where  \"dep_id\" <> 'AD' order by \"dep_id\"");//แผนกในระบบทั้งหมด		
 	}
 	else if($find=="1"){
-		$qry_gpuser=pg_query("select \"dep_id\",\"dep_name\" from department where \"dep_id\" ='$dep_name' and \"dep_id\" <> 'AD' order by \"dep_id\"");//แผนกที่เลือก		
+		$qry_gpuser=pg_query("select \"dep_id\",\"dep_name\",\"dep_tel\",\"dep_email\" from department where \"dep_id\" ='$dep_name' and \"dep_id\" <> 'AD' order by \"dep_id\"");//แผนกที่เลือก		
 	}
 	else if($find=="2"){
-		$qry_gpuser=pg_query("select a.\"dep_id\",a.\"dep_name\" from department a left join \"Vfuser\" b on a.dep_id=b.user_group where a.\"dep_id\" <> 'AD' and b.id_user='$data_find'");
+		$qry_gpuser=pg_query("select a.\"dep_id\",a.\"dep_name\",a.\"dep_tel\",a.\"dep_email\" from department a left join \"Vfuser\" b on a.dep_id=b.user_group where a.\"dep_id\" <> 'AD' and b.id_user='$data_find'");
 		$condition="a.id_user='$data_find'";
 	
 	}
@@ -57,6 +60,12 @@ $objPHPExcel->getActiveSheet()->getStyle('E2')->getFont()->setBold(true)->setNam
 	{		
 		$dep_id=$res_type["dep_id"];
 		$dep_name=$res_type["dep_name"];
+		$dep_tel=$res_type["dep_tel"];
+		$dep_email=$res_type["dep_email"];
+		
+		if($dep_tel != ""){$dep_tel_text = "(เบอร์กลาง #$dep_tel";}else{$dep_tel_text = "(เบอร์กลาง ยังไม่ระบุ";}
+		if($dep_email != ""){$dep_email_text = "E-mail $dep_email)";}else{$dep_email_text = "E-mail ยังไม่ระบุ)";}
+		
 		if($find !='2'){
 			$condition="a.\"user_group\"='$dep_id'";
 		}
@@ -68,8 +77,8 @@ $objPHPExcel->getActiveSheet()->getStyle('E2')->getFont()->setBold(true)->setNam
 		
 		if($type_show=="E"){	
 			$j++;		
-			$objPHPExcel->getActiveSheet()->SetCellValue('C'.$j, $dep_name);
-			$objPHPExcel->getActiveSheet()->getStyle('A'.$j.':'.'E'.$j)->getFill()
+			$objPHPExcel->getActiveSheet()->SetCellValue('B'.$j, $dep_name.$dep_tel_text.' : '.$dep_email_text);
+			$objPHPExcel->getActiveSheet()->getStyle('A'.$j.':'.'F'.$j)->getFill()
 					->applyFromArray( array('type' => PHPExcel_Style_Fill::FILL_SOLID,
 						'startcolor' => array('rgb' => "CCCCCC" )));
 		}
@@ -85,13 +94,14 @@ $objPHPExcel->getActiveSheet()->getStyle('E2')->getFont()->setBold(true)->setNam
 			$u_tel=$res_group["u_tel"];
 			$u_email=$res_group["u_email"];	
 			$nickname=$res_group["nickname"];
-			if($nickname !=""){ $fullname .=' ('.$nickname.')';}
-			$objPHPExcel->getActiveSheet()->SetCellValue('A'.$j, $fullname);
-			$objPHPExcel->getActiveSheet()->SetCellValue('B'.$j, $u_extens);
-			$objPHPExcel->getActiveSheet()->SetCellValue('C'.$j, $u_direct);
-			$objPHPExcel->getActiveSheet()->SetCellValue('D'.$j, $u_tel);
 			
-			$objPHPExcel->getActiveSheet()->SetCellValue('E'.$j, $u_email);	
+			
+			$objPHPExcel->getActiveSheet()->SetCellValue('A'.$j, $fullname);
+			$objPHPExcel->getActiveSheet()->SetCellValue('B'.$j, $nickname);
+			$objPHPExcel->getActiveSheet()->SetCellValue('C'.$j, $u_extens);
+			$objPHPExcel->getActiveSheet()->SetCellValue('D'.$j, $u_direct);
+			$objPHPExcel->getActiveSheet()->SetCellValue('E'.$j, $u_tel);
+			$objPHPExcel->getActiveSheet()->SetCellValue('F'.$j, $u_email);	
 		}
 	}	
 

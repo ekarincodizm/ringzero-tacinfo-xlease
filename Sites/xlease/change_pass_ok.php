@@ -59,9 +59,9 @@ if($password_status == 2)
 	}else{
 		$status++;
 	}
-	
+	/*
 	// ต่อ base TA
-	$conn_string = "host=". $_SESSION["session_company_server"] ." port=5432 dbname=devtaauto010 user=postgres password=". $_SESSION["session_company_dbpass"] ."";
+	$conn_string = "host=". $_SESSION["session_company_server"] ." port=5432 dbname=dbtaauto001 user=postgres password=". $_SESSION["session_company_dbpass"] ."";
 	$db_connect = pg_connect($conn_string) or die("Can't Connect !");
 	
 	// แก้ไขของ TA
@@ -69,7 +69,7 @@ if($password_status == 2)
 	if($result_ta=pg_query($upd_sql_ta)){
 	}else{
 		$status++;
-	}
+	}*/
 	
 	// กลับมาต่อ base หลักเหมือนเดิม
 	$conn_string = "host=". $_SESSION["session_company_server"] ." port=5432 dbname=". $_SESSION["session_company_dbname"] ." user=". $_SESSION["session_company_dbuser"] ." password=". $_SESSION["session_company_dbpass"] ."";
@@ -95,9 +95,10 @@ else
 	}else{
 		$status++;
 	}
-	
+
+	/*
 	// ต่อ base TA
-	$conn_string = "host=". $_SESSION["session_company_server"] ." port=5432 dbname=devtaauto010 user=postgres password=". $_SESSION["session_company_dbpass"] ."";
+	$conn_string = "host=". $_SESSION["session_company_server"] ." port=5432 dbname=dbtaauto001 user=postgres password=". $_SESSION["session_company_dbpass"] ."";
 	$db_connect = pg_connect($conn_string) or die("Can't Connect !");
 	
 	// แก้ไขของ TA
@@ -105,7 +106,7 @@ else
 	if($result=pg_query($upd_sql_ta)){
 	}else{
 		$status++;
-	}
+	}*/
 	
 	// กลับมาต่อ base หลักเหมือนเดิม
 	$conn_string = "host=". $_SESSION["session_company_server"] ." port=5432 dbname=". $_SESSION["session_company_dbname"] ." user=". $_SESSION["session_company_dbuser"] ." password=". $_SESSION["session_company_dbpass"] ."";

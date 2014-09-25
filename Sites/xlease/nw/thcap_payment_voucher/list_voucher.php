@@ -76,8 +76,12 @@ include("../../config/config.php");
 		   $S_Cnd .= " Where ".$condition_c;
 		 }
 	} 
+	
 	// สร้าง SQL Comand เพื่อการใช้งาน
-	$qry.=$S_Cnd; 
+	$qry.=$S_Cnd;
+	
+	// การเรียงข้อมูล
+	$qry .= " ORDER BY a.\"voucherDate\", a.\"voucherTime\", a.\"voucherID\" ";
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html>

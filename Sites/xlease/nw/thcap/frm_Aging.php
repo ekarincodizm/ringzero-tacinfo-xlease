@@ -146,9 +146,10 @@ function popU(U,N,T){
 			<select name="typeshow" id="typeshow">
 				<option value="month_level" <?php if($typeshow=='month_level'){ echo "selected"; } ?>>ช่วงเดือน (จัดชั้นลูกหนี้)</option>
 				<option value="month_audit" <?php if($typeshow=='month_audit'){ echo "selected"; } ?>>ช่วงเดือน (ความสามารถในการชำระ)</option>
+				<option value="month_audit_distribute_restructure" <?php if($typeshow=='month_audit_distribute_restructure'){ echo "selected"; } ?>>ช่วงเดือน (ความสามารถในการชำระ) [กระจายปรับโครงสร้างหนี้]</option>
 				<option value="month_audit_eq_level" <?php if($typeshow=='month_audit_eq_level'){ echo "selected"; } ?>>ช่วงเดือน (ความสามารถในการชำระ) [ตัดช่วงแบบจัดชั้น]</option>
 				<option value="day" <?php if($typeshow=='day'){ echo "selected"; } ?>>ช่วงวันที่</option>
-				<option value="month" <?php if($typeshow=='month'){ echo "selected"; } ?>>ช่วงเดือน (2012)</option>
+				<option value="month" <?php if($typeshow=='month'){ echo "selected"; } ?>>ช่วงเดือน (ใช้เฉพาะปี 2012)</option>
 			</select>
 			</div>
 			<div style="padding:10px;" id="typeday">
@@ -175,6 +176,8 @@ if($val==1){
 		include "frm_Aging_month.php";
 	}else if($typeshow=='month_audit'){
 		include "frm_Aging_month_audit.php";
+	}else if($typeshow=='month_audit_distribute_restructure'){
+		include "frm_Aging_month_audit_distribute_restructure.php";
 	}else if($typeshow=='month_audit_eq_level'){
 		include "frm_Aging_month_audit_eq_level.php";
 	}else if($typeshow=='month_level'){

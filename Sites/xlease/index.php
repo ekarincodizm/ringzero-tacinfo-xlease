@@ -161,6 +161,16 @@ foreach($company as $v){
     </TD>
 </TR>
 <TR>
+	<TD><b>Branch</b></TD>
+	<TD>
+		<select name="branch" id="branch">
+			<option value="headoffice">สำนักงานใหญ่</option>
+			<option value="korat">โคราช</option>
+			<option value="suksawat">สุขสวัสดิ์</option>
+		</select>
+	</TD>
+</TR>
+<TR>
     <TD>&nbsp;</TD>
     <TD><label><input type="checkbox" name="chkbxremember" id="chkbxremember" value="1" <?php if(isset($_COOKIE['xleaseUsername'])&&$_COOKIE['xleaseUsername']!=""){ echo "checked=\"checked\""; } ?> /> จดจำฉัน</label></TD>
 </TR>

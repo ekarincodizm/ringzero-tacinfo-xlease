@@ -42,7 +42,9 @@ $showPic = pg_fetch_result($sql_showPic,0);
 	}
 ?>	
 	<legend><B>ข้อมูลสัญญา</B></legend>
+
 	<div align="center">
+	<?php  include "Data_Warn_Contract.php";  ?><!-- เพิ่มขึ้นมาตาม #7060 -->
 		<div id="panel1" align="left" style="margin-top:10px">
 <?php
 $nowday = nowDate();
@@ -64,8 +66,25 @@ list($lease_fine) = $rs_get_lease_fine;
 
 	$vfocusdate = nowDate();
 	
-	$sql_head1=pg_query("select a.\"conLoanIniRate\", a.\"conLoanMaxRate\", a.\"conDate\", a.\"conStartDate\", a.\"conRepeatDueDay\", a.\"conTerm\", a.\"conMinPay\", a.\"conIntCurRate\", a.\"conFirstDue\",
-						b.\"conFacFee\", b.\"conFinAmtExtVat\" from public.\"thcap_lease_contract\" a, \"thcap_contract\" b where a.\"contractID\" = b.\"contractID\" and a.\"contractID\" = '$contractID' ");
+	$sql_head1=pg_query("SELECT
+							a.\"conLoanIniRate\",
+							a.\"conLoanMaxRate\",
+							a.\"conDate\",
+							a.\"conStartDate\",
+							a.\"conRepeatDueDay\",
+							a.\"conTerm\",
+							a.\"conMinPay\",
+							a.\"conIntCurRate\",
+							a.\"conFirstDue\",
+							b.\"conFacFee\",
+							b.\"conFinAmtExtVat\",
+							b.\"case_owners_id\"
+						FROM
+							\"thcap_lease_contract\" a,
+							\"thcap_contract\" b
+						WHERE
+							a.\"contractID\" = b.\"contractID\" AND
+							a.\"contractID\" = '$contractID' ");
 	$rowhead=pg_num_rows($sql_head1);
 	$i = 1;
 	while($result=pg_fetch_array($sql_head1))
@@ -81,6 +100,11 @@ list($lease_fine) = $rs_get_lease_fine;
 		$conIntCurRate = $result["conIntCurRate"]; // อัตราดอกเบี้ยปัจจุบัน
 		$conFacFee = $result["conFacFee"]; // ค่าธรรมเนียมในการจัดการตั๋วสัญญาใช้เงิน
 		$conFirstDue = $result["conFirstDue"]; // วันที่ครบกำหนดชำระงวดแรก
+		$case_owners_id = $result["case_owners_id"]; // รหัสพนักงานเจ้าของเคส
+		
+		// ชื่อพนักงานเจ้าของเคส
+		$qry_case_owners_name = pg_query("select \"fullname\" from \"Vfuser\" where \"id_user\" = '$case_owners_id' ");
+		$case_owners_name = pg_fetch_result($qry_case_owners_name,0);
 	}
 	
 	$qry_add1=pg_query("select \"thcap_address\" from \"vthcap_ContactCus_detail\"
@@ -213,18 +237,18 @@ list($lease_fine) = $rs_get_lease_fine;
 ?>
 	<center>
     <table>
-	<?php if($dateclose != ""){ 
-	$img=redirect($_SERVER['PHP_SELF'],'nw/thcap/images/onebit_38.png');
-	?>
-	<tr bgcolor="#EEAEEE">
+	<!-- เริ่มยกเลิกการใช้งานตาม Req 7060 <?php if($dateclose != ""){   
+	// $img=redirect($_SERVER['PHP_SELF'],'nw/thcap/images/onebit_38.png');
+	//?>
+	<!--<tr bgcolor="#EEAEEE">
 		<td colspan="12">
 			<div style="width:280px">
 				<div style="float:left"><img src="<?php echo $img; ?>" width="20px" height="20px"/></div>
 				<div style="float:right;padding:3px 0px 0px"><b><span id="datecloseacc" style="font-size:14px;"></span></b></div>
 			</div><div style="clear:both;"></div> <!-- หาวันที่ปิดบัญชี -->
-		</td>
-	</tr>	
-	<?php } ?>	
+	<!--</td>-->
+	<!-- </tr> -->	
+	<!--<?php } ?> สิ้นสุดการใช้งานตาม Req 7060-->	
 	<tr> <!--แสดง ประเภทสัญญาย่อย  ถ้าไม่มี path รูปภาพจะแสดงเป็นข้อความ -->
 		<td colspan="3"><?php echo $imgtexttype;?>
 		</td>
@@ -236,6 +260,10 @@ list($lease_fine) = $rs_get_lease_fine;
 	<tr>
 		<td align="right" bgcolor="#79BCFF"><b>เลขที่สัญญา</b></td>
 		<td bgcolor="#D5EFFD">:</td><td bgcolor="#D5EFFD" colspan="10"><?php echo $contractID; ?>&nbsp&nbsp&nbsp&nbsp&nbsp<?php echo $limitlink; ?></td>
+	</tr>
+	<tr>
+		<td align="right" bgcolor="#79BCFF"><b>เจ้าของเคส</b></td>
+		<td bgcolor="#D5EFFD">:</td><td bgcolor="#D5EFFD" colspan="10"><?php echo $case_owners_name; ?></td>
 	</tr>
 	<tr>
 		

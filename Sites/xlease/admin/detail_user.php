@@ -3,6 +3,11 @@ session_start();
 $_SESSION["av_iduser"];
 $idno=pg_escape_string($_POST["idno_names"]);
 include("../config/config.php");
+?>
+
+<meta http-equiv="Content-Type" content="txt/html; charset=utf-8" />
+
+<?php
 if( empty($_SESSION["av_iduser"]) ){
     header("Location:../index.php");
     exit;

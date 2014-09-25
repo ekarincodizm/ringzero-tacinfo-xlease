@@ -304,7 +304,7 @@ while($result=pg_fetch_array($qry))
 	if($i == 1){$day = core_time_datediff($conStartDate, $receiveDate[$i]);}
 	else{$day = core_time_datediff($receiveDate[$i-1], $receiveDate[$i]);}
 	
-	if($nub == 25)
+	if($nub == 23)
 	{
 		$nub = 1;
 		$cline = 46;
@@ -581,7 +581,7 @@ while($result=pg_fetch_array($qry))
 	if($row_other > 0)
 	{
 	
-		if($nub == 25)
+		if($nub == 23)
 			{
 				$nub = 1;
 				$cline = 46;
@@ -799,7 +799,7 @@ while($result=pg_fetch_array($qry))
 				}
 			}
 			
-			if($nub == 25)
+			if($nub == 23)
 			{
 				$nub = 1;
 				$cline = 46;
@@ -1013,7 +1013,7 @@ while($result=pg_fetch_array($qry))
 	if($signDate != "")
 	{
 	
-		if($nub == 25)
+		if($nub == 23)
 		{
 			$nub = 1;
 			$cline = 46;
@@ -1265,7 +1265,7 @@ while($result=pg_fetch_array($qry))
 		$buss_name=iconv('UTF-8','windows-874',"_________________________________________________________________________________________________________________________");
 		$pdf->MultiCell(200,4,$buss_name,0,'C',0);*/
 
-		if($nub == 25)
+		if($nub == 23)
 		{
 			$nub = 1;
 			$cline = 46;
@@ -1409,7 +1409,7 @@ while($result=pg_fetch_array($qry))
 		$pdf->SetXY(5,$cline+1);
 		$buss_name=iconv('UTF-8','windows-874',"_________________________________________________________________________________________________________________________");
 		$pdf->MultiCell(200,4,$buss_name,0,'C',0);*/
-		if($nub == 25)
+		if($nub == 23)
 		{
 			$nub = 1;
 			$cline = 46;
@@ -1559,7 +1559,7 @@ while($result=pg_fetch_array($qry))
 		
 		//-----
 		$nub+=1;
-		if($nub == 25)
+		if($nub == 23)
 		{
 			$nub = 1;
 			$cline = 46;
@@ -1707,7 +1707,7 @@ while($result=pg_fetch_array($qry))
 		
 		//-----
 		$nub+=1;
-		if($nub == 25)
+		if($nub == 23)
 		{
 			$nub = 1;
 			$cline = 46;
@@ -1855,7 +1855,7 @@ while($result=pg_fetch_array($qry))
 		
 		//-----
 		$nub+=1;
-		if($nub == 25)
+		if($nub == 23)
 		{
 			$nub = 1;
 			$cline = 46;
@@ -2003,7 +2003,7 @@ while($result=pg_fetch_array($qry))
 		
 		//-----
 		$nub+=1;
-		if($nub == 25)
+		if($nub == 23)
 		{
 			$nub = 1;
 			$cline = 46;
@@ -2151,7 +2151,7 @@ while($result=pg_fetch_array($qry))
 		
 		//-----
 		$nub+=1;
-		if($nub == 25)
+		if($nub == 23)
 		{
 			$nub = 1;
 			$cline = 46;
@@ -2301,7 +2301,7 @@ while($result=pg_fetch_array($qry))
 		if($cloce_fine > 0.00)
 		{
 			$nub+=1;
-			if($nub == 25)
+			if($nub == 23)
 			{
 				$nub = 1;
 				$cline = 46;
@@ -2486,7 +2486,7 @@ while($result=pg_fetch_array($qry))
 			
 		$cline += 5;
 		$nub+=1;
-		if($nub == 25)
+		if($nub == 23)
 		{
 			$nub = 1;
 			$cline = 46;
@@ -2654,7 +2654,7 @@ while($result=pg_fetch_array($qry))
 	
 	$cline += 5;
 	$nub+=1;
-	if($nub == 25)
+	if($nub == 23)
 		{
 			$nub = 1;
 			$cline = 46;

@@ -86,9 +86,9 @@ if( $("#typepayment"+ id).val() == mySplitResult[z] ){ //ตรวจสอบ�
 			ck_else =1;
         $("#amt"+ id).attr("readonly", "readonly");
 $("#amt" + id).val("");
-        windowOpen('../nw/join_cal/join_cal.php?idno=<?php echo $_GET["m_idno"]; ?>&inputName=amt'+ id + '&pay_date=<?php echo $_GET["trd"]  ?>&change_pay_type=1');
+        windowOpen('../nw/join_cal/join_cal.php?idno=<?php echo pg_escape_string($_GET["m_idno"]); ?>&inputName=amt'+ id + '&pay_date=<?php echo pg_escape_string($_GET["trd"]);  ?>&change_pay_type=1');
            
-           $("#type_detail"+ id).load("../postpay/api.php?cmd=load_join1&id="+ id+'&idno=<?php echo $_GET["m_idno"]; ?>&inputName=amt'+ id + '&pay_date=<?php echo $_GET["trd"]  ?>&change_pay_type=1', function(){
+           $("#type_detail"+ id).load("../postpay/api.php?cmd=load_join1&id="+ id+'&idno=<?php echo pg_escape_string($_GET["m_idno"]); ?>&inputName=amt'+ id + '&pay_date=<?php echo pg_escape_string($_GET["trd"]);  ?>&change_pay_type=1', function(){
             $("#type_detail"+ id).show();
             
 
@@ -115,10 +115,10 @@ for(z = 0; z < mySplitResult.length; z++){
 			ck_else =1;
         $("#amt"+ id).attr("readonly", "readonly");
 $("#amt" + id).val("");
-        windowOpen('../nw/join_cal/join_cal.php?idno=<?php echo $_GET["m_idno"]; ?>&inputName=amt'+ id + '&pay_date=<?php echo $_GET["trd"]  ?>&change_pay_type=0');
+        windowOpen('../nw/join_cal/join_cal.php?idno=<?php echo pg_escape_string($_GET["m_idno"]); ?>&inputName=amt'+ id + '&pay_date=<?php echo pg_escape_string($_GET["trd"]); ?>&change_pay_type=0');
                
 				
-				 $("#type_detail"+ id).load("../postpay/api.php?cmd=load_join1&id="+ id+'&idno=<?php echo $_GET["m_idno"]; ?>&inputName=amt'+ id + '&pay_date=<?php echo $_GET["trd"]  ?>&change_pay_type=0', function(){
+				 $("#type_detail"+ id).load("../postpay/api.php?cmd=load_join1&id="+ id+'&idno=<?php echo pg_escape_string($_GET["m_idno"]); ?>&inputName=amt'+ id + '&pay_date=<?php echo pg_escape_string($_GET["trd"]); ?>&change_pay_type=0', function(){
             $("#type_detail"+ id).show();
             
 			
@@ -142,6 +142,11 @@ if(ck_else ==0){
       $("#amt"+ id).removeAttr("readonly");   
 	  $("#type_detail"+ id).hide();
 	}
+}
+
+function lockSubmit()
+{
+	document.getElementById("submit").disabled = true;
 }
 
 </script>
@@ -177,9 +182,9 @@ if(ck_else ==0){
 <body style="background-color:#ffffff; margin-top:0px;">
 
 <?php
-$chk_sid = $_GET['sid'];
-$chk_trd = $_GET['trd'];
-$chk_plog = $_GET['plog'];
+$chk_sid = pg_escape_string($_GET['sid']);
+$chk_trd = pg_escape_string($_GET['trd']);
+$chk_plog = pg_escape_string($_GET['plog']);
 
 $qry_tr=pg_query("select * from \"TranPay\" WHERE id_tranpay='$chk_sid' AND \"PostID\"='$chk_plog' AND tr_date='$chk_trd' ");
 if($res_tr=pg_fetch_array($qry_tr)){
@@ -232,7 +237,7 @@ if( $chk_post_on_asa_sys == "t" ){
     </tr>
 	 <?php
 	 // chk detail Transpay--//
-	 $qry_dtltrnpay=pg_query("select * from \"DetailTranpay\" WHERE \"PostID\"='$_GET[plog]' ");
+	 $qry_dtltrnpay=pg_query("select * from \"DetailTranpay\" WHERE \"PostID\"='".pg_escape_string($_GET[plog])."' ");
 	 
 	
 	 
@@ -258,7 +263,7 @@ if( $chk_post_on_asa_sys == "t" ){
 		<?php
 		$qry_tp=pg_query("select A.*,B.* from \"DetailTranpay\" A
 		                  LEFT OUTER JOIN \"TypePay\" B on B.\"TypeID\"=A.\"TypePay\" 
-						  WHERE (A.\"PostID\"='$_GET[plog]') ");
+						  WHERE (A.\"PostID\"='".pg_escape_string($_GET[plog])."') ");
 		while($res_ty=pg_fetch_array($qry_tp))
 		{
 		
@@ -299,12 +304,12 @@ if( $chk_post_on_asa_sys == "t" ){
 	 
 	 
 	 //----------------------//
-	 $rr1=$_GET["r1"]; 
-	 $rr2=$_GET["r2"];
-	 $trdate=$_GET["trd"];
-	 $amtpost=$_GET["amt"];
+	 $rr1 = pg_escape_string($_GET["r1"]); 
+	 $rr2 = pg_escape_string($_GET["r2"]);
+	 $trdate = pg_escape_string($_GET["trd"]);
+	 $amtpost = pg_escape_string($_GET["amt"]);
 	 
-	 $p_idno=$_GET["m_idno"];
+	 $p_idno = pg_escape_string($_GET["m_idno"]);
 	 
 	 $qry_c=pg_query("select * from \"Fp\" where(\"TranIDRef1\"='$rr1')AND(\"TranIDRef2\"='$rr2') AND (\"IDNO\"='$p_idno')");
 	 $numr=pg_num_rows($qry_c);
@@ -406,7 +411,7 @@ if( $chk_post_on_asa_sys == "t" ){
     
 	<form method="post" action="process_transfer.php" name="frm_ps">
 	<input type="hidden" name="amts" id="amts" value="<?php echo $amtpost; ?>" />
-	<input type="hidden"  name="h_plog" value="<?php echo $_GET["plog"]; ?>" />
+	<input type="hidden"  name="h_plog" value="<?php echo pg_escape_string($_GET["plog"]); ?>" />
 	<table width="769" border="0" style="background-color:#CCCCCC;" cellpadding="1" cellspacing="1">
     <tr style="background-color:#DDE6B7">
     <td colspan="3">ชำระค่างวด ยอดค่างวด(รวม VAT) <input name="fr_pay" id="fr_pay" type="text" value="<?php echo $p_month; ?>"  />
@@ -436,14 +441,14 @@ if( $chk_post_on_asa_sys == "t" ){
 	 </tr>
 	 <tr style="background-color:#DDE6B7">
 	  <td>
-	  <input type="hidden" name="id_tpay" value="<?php echo $_GET["sid"]; ?>"  />
+	  <input type="hidden" name="id_tpay" value="<?php echo pg_escape_string($_GET["sid"]); ?>"  />
 	   <input type="hidden" name="s_amt" value="<?php echo $amtpost; ?>" />
 	  <input type="hidden" name="ref1" value="<?php echo $rr1; ?>" />
 	  <input type="hidden" name="ref2" value="<?php echo $rr2; ?>" />
 	  <input type="hidden" name="p_idno" id="p_idno" value="<?php echo $idno; ?>" />
 	  <input type="button" name="btnAdd" onclick="javascript:addFile();" value="เพิ่มค่าใช้จ่ายอื่น ๆ" /></td>
 	  <td>&nbsp;</td>
-	  <td><input name="submit" type="submit" value="NEXT" /></td>
+	  <td><input name="submit" id="submit" type="submit" value="NEXT" onClick="lockSubmit();" /></td>
 	  </tr>
 	 </table>	
 	</form>

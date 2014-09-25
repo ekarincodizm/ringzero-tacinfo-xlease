@@ -109,24 +109,25 @@ function popU(U,N,T) {
 <br>
 <table width="90%" border cellSpacing="1" cellPadding="3" align="center" bgcolor="#F0F0F0" class="sort-table">	
 	<tr bgcolor="#FFFFFF">
-		<td  align="left" colspan="5" style="font-weight:bold;">ตารางแสดง เบอร์โทรศัพท์และ E-mail ของพนักงาน</td>
+		<td  align="left" colspan="6" style="font-weight:bold;">ตารางแสดง เบอร์โทรศัพท์และ E-mail ของพนักงาน</td>
 	</tr>			
 	<tr style="font-weight:bold;" valign="middle" bgcolor="#9AC0CD">
-		<th align="center" id="t1" >ชื่อ - สกุล</a></th>
-		<th align="center" id="t2" >เบอร์ภายใน</a></th>
-		<th align="center" id="t3" >เบอร์ตรง</a></th>
-		<th align="center" id="t4" >มือถือ</a></th>
-		<th align="center" id="t5" >E-mail</a></th>
+		<th align="center" id="t1">ชื่อ - สกุล</th>
+		<th align="center" id="t2">ชื่อเล่น</th>
+		<th align="center" id="t3">เบอร์ภายใน</th>
+		<th align="center" id="t4">เบอร์ตรง</th>
+		<th align="center" id="t5">มือถือ</th>
+		<th align="center" id="t6">E-mail</th>
 	</tr>	
 	<?php
 	if($find=='0'){
-		$qry_gpuser=pg_query("select \"dep_id\",\"dep_name\" from department where \"dep_id\" <>'AD' order by \"dep_id\"");//แผนกในระบบทั้งหมด ยกเว้น AD	
+		$qry_gpuser=pg_query("select \"dep_id\",\"dep_name\",\"dep_tel\",\"dep_email\" from department where \"dep_id\" <>'AD' order by \"dep_id\"");//แผนกในระบบทั้งหมด ยกเว้น AD	
 	}
 	else if($find=='1'){
-		$qry_gpuser=pg_query("select \"dep_id\",\"dep_name\" from department where \"dep_id\" ='$department_find' and \"dep_id\" <>'AD' order by \"dep_id\"");//แผนกที่เลือก		
+		$qry_gpuser=pg_query("select \"dep_id\",\"dep_name\",\"dep_tel\",\"dep_email\" from department where \"dep_id\" ='$department_find' and \"dep_id\" <>'AD' order by \"dep_id\"");//แผนกที่เลือก		
 	}
 	else if($find=='2'){
-		$qry_gpuser=pg_query("select a.\"dep_id\",a.\"dep_name\" from department a 
+		$qry_gpuser=pg_query("select a.\"dep_id\",a.\"dep_name\",a.\"dep_tel\",a.\"dep_email\" from department a 
 		left join \"Vfuser\" b on a.dep_id=b.user_group where b.id_user='$str_empId' and a.\"dep_id\" <>'AD'");
 		$condition="a.id_user='$str_empId'";	
 	}
@@ -138,8 +139,14 @@ function popU(U,N,T) {
 			$condition="a.\"user_group\"='$dep_id'";
 		}
 		$dep_name=$res_type["dep_name"];
+		$dep_tel=$res_type["dep_tel"]; // เบอร์กลาง ของแผนก
+		$dep_email=$res_type["dep_email"]; // อีเมล์กลาง ของแผนก
+		
+		if($dep_tel != ""){$dep_tel_text = "(เบอร์กลาง #$dep_tel";}else{$dep_tel_text = "(เบอร์กลาง ยังไม่ระบุ";}
+		if($dep_email != ""){$dep_email_text = "E-mail <a href=\"mailto:$dep_email\"><U>$dep_email<U></a>)";}else{$dep_email_text = "E-mail ยังไม่ระบุ)";}
+		
 		echo "<tr bgcolor=\"#AFEEEE\">";
-		echo "<td align=\"center\" colspan=5><b>$dep_name<b></td></tr>";
+		echo "<td align=\"center\" colspan=6><b>$dep_name</b> $dep_tel_text : $dep_email_text</td></tr>";
 		
 		$query=pg_query("select a.fullname,b.u_extens,b.u_direct,b.u_tel,b.u_email,b.nickname from \"Vfuser\" a 
 			left join \"fuser_detail\" b on a.\"id_user\"=b.\"id_user\"			
@@ -154,10 +161,7 @@ function popU(U,N,T) {
 			if(($u_direct !="")and($u_direct !="-")){$u_direct ='#'.$u_direct;}
 			$u_tel=$res_group["u_tel"];
 			$u_email=$res_group["u_email"];	
-			$nickname=$res_group["nickname"];			
-
-
-			if($nickname !=""){ $fullname .=' ('.$nickname.')';}
+			$nickname=$res_group["nickname"];
 			
 			if($i%2==0){
 				echo "<tr class=\"odd\" align=center>";
@@ -167,7 +171,8 @@ function popU(U,N,T) {
 				$color="#FFE8E8";
 			}
 			echo " 				
-				<td align=\"left\" width=300 >$fullname</td>
+				<td align=\"left\">$fullname</td>
+				<td align=\"center\">$nickname</td>
 				<td align=\"center\">$u_extens</td>
 				<td align=\"center\">$u_direct</td>
 				<td align=\"center\">$u_tel</td>

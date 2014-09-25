@@ -129,9 +129,24 @@ list($C_REGISnew,$idnonow,$C_StartDate)=$rescarnow;
 
 
 
-if($idnonow!=$idno and $res_VContact["car_regis"]==""){
-	$C_REGISnew="<font color=red> (<span onclick=\"javascript:popU('frm_viewcuspayment.php?idno_names=$idnonow','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=800,height=600')\" style=\"cursor:pointer\"><u>$idnonow</u></span> / $C_REGISnew)</font>";
-}else{
+if($idnonow!=$idno and $res_VContact["car_regis"]=="")
+{
+	// ตรวจสอบก่อนว่า สัญญาที่จะลิ้งไป ยกเลิกสัญญา หรือยัง
+	$qry_chk_cancel = pg_query("select \"PayType\" from \"Fp\" where \"IDNO\" = '$idnonow' ");
+	$PayType_CC = pg_fetch_result($qry_chk_cancel,0);
+	if($PayType_CC == "CC") // ถ้าสัญญาถัดไปถูกยกเลิกแล้ว
+	{
+		$textCancel = "<b>สัญญานี้ถูกยกเลิกแล้ว</b>";
+	}
+	else // ถ้าสัญญาถัดไปยังไม่ถูกยกเลิก
+	{
+		$textCancel = "";
+	}
+	
+	$C_REGISnew="<font color=red> (<span onclick=\"javascript:popU('frm_viewcuspayment.php?idno_names=$idnonow','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=800,height=600')\" style=\"cursor:pointer\"><u>$idnonow</u></span> / $C_REGISnew $textCancel)</font>";
+}
+else
+{
 	$C_REGISnew="";
 }
 
@@ -743,7 +758,9 @@ if($num_fr > 0){
 	echo '<img src="picflashnv_02.gif" border="0" width="120" height="50">';
 }
 
-if($chkpaytype=="CC" and $s_ACCLOSE=='t' and $s_StopVat=='t' and $f_date==$f_cldate and $f_date==$f_stopvatdate){
+//if($chkpaytype=="CC" and $s_ACCLOSE=='t' and $s_StopVat=='t' and $f_date==$f_cldate and $f_date==$f_stopvatdate){
+// สัญญาที่ถูกยกเลิก เปลี่ยนจากการตรวจสอบหลายฟิลด์ เป็นตรวจสอบจาก "Fp"."PayType" = 'CC' เพียงฟิลด์เดียวจบ
+if($chkpaytype=="CC"){
 	echo '<img src="picflashnv_03.gif" border="0" width="120" height="50">';
 }
 

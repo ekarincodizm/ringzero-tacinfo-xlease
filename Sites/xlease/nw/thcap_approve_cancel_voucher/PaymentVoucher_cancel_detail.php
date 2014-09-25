@@ -3,9 +3,9 @@ include("../../config/config.php");
 
 $user_id = $_SESSION["av_iduser"];
 
-// ตรวจสอบสิทธิ์ ว่าสามารถใช้งานเมนู "(THCAP) อนุมัติยกเลิกใบสำคัญรายวันทั่วไป" ได้หรือไม่
-$qry_canUseMenuAP80 = pg_query("select ta_get_usermenu_rights('AP80','$user_id')");
-$canUseMenuAP80 = pg_result($qry_canUseMenuAP80,0);
+// ตรวจสอบสิทธิ์ ว่าสามารถใช้งานเมนู "(THCAP) อนุมัติยกเลิกใบสำคัญจ่าย" ได้หรือไม่
+$qry_canUseMenuAP81 = pg_query("select ta_get_usermenu_rights('AP81','$user_id')");
+$canUseMenuAP81 = pg_result($qry_canUseMenuAP81,0);
 
 $autoID = pg_escape_string($_GET['autoID']);
 
@@ -265,7 +265,7 @@ if($query_list = pg_query($qry))
 		</td>
 	</tr>
 	<?php
-	if($canUseMenuAP80 == 1)
+	if($canUseMenuAP81 == 1)
 	{
 	?>
 		<tr>
@@ -288,7 +288,7 @@ if($query_list = pg_query($qry))
 	<tr>
 		<td align="center" colspan="2">
 			<?php
-			if($canUseMenuAP80 == 1)
+			if($canUseMenuAP81 == 1)
 			{
 			?>
 				<input type="button" value="อนุมัติ" onclick="appv('1');"/>

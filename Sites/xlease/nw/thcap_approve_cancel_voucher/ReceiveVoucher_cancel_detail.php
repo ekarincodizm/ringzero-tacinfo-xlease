@@ -3,6 +3,10 @@ include("../../config/config.php");
 
 $user_id = $_SESSION["av_iduser"];
 
+// ตรวจสอบสิทธิ์ ว่าสามารถใช้งานเมนู "(THCAP) อนุมัติยกเลิกใบสำคัญรับ" ได้หรือไม่
+$qry_canUseMenuAP87 = pg_query("select ta_get_usermenu_rights('AP87','$user_id')");
+$canUseMenuAP87 = pg_result($qry_canUseMenuAP87,0);
+
 $autoID = pg_escape_string($_GET['autoID']);
 
 $qry_voucherID = pg_query("select \"voucherID\", \"doerRemark\", \"doerName\", \"doerStamp\"
@@ -258,7 +262,11 @@ if($query_list = pg_query($qry))
 			</div>
 		</td>
 	</tr>
-	<tr>
+	<?php
+	if($canUseMenuAP87 == 1)
+	{
+	?>
+		<tr>
 			<td>
 				<div style="margin-top:20px;">
 					<table>
@@ -271,13 +279,21 @@ if($query_list = pg_query($qry))
 					</table>
 				</div>
 			</td>
-		</tr>	
+		</tr>
+	<?php
+	}
+	?>
 	<tr>
 		<td align="center" colspan="2">
-			
+			<?php
+			if($canUseMenuAP87 == 1)
+			{
+			?>
 				<input type="button" value="อนุมัติ" onclick="appv('1');"/>
 				<input type="button" value="ไม่อนุมัติ" onclick="appv('0');"/>
-			
+			<?php
+			}
+			?>
 			<input type="button" name="close" value="  ปิด   "onclick="window.close();">
 		</td>
 	</tr>

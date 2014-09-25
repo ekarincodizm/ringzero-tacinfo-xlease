@@ -1,6 +1,27 @@
 <?php
 require_once("config/config.php"); 
+require_once("nw/function/checknull.php"); 
+
 $iduser = $_SESSION['uid'];
+$branch_login_id = $_SESSION['branch_login']; // รหัสสาชา
+
+// หาชื่อสาขา
+if($branch_login_id == "headoffice")
+{
+	$branch_login_name = "สำนักงานใหญ่";
+}
+elseif($branch_login_id == "korat")
+{
+	$branch_login_name = "โคราช";
+}
+elseif($branch_login_id == "suksawat")
+{
+	$branch_login_name = "สุขสวัสดิ์";
+}
+else
+{
+	$branch_login_name = "-";
+}
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -360,10 +381,12 @@ function searchLoad() // ค้นหาเมนู
 	$login_date_time = nowDateTime(); //ดึงข้อมูลวันเวลาจาก server
 	$ip_login = $_SERVER['REMOTE_ADDR'];
 	
+	$branch_login_id_checknull = checknull($branch_login_id); // เช็คค่าว่างของรหัสสาขา
+	
 	pg_query("BEGIN WORK");
 	$status = 0;
 	
-	$qry_ins="insert into public.\"nw_log_access\"(\"username\",\"login_datetime\",\"IP_Address\") values ('$user_login','$login_date_time','$ip_login')";
+	$qry_ins="insert into public.\"nw_log_access\"(\"username\",\"login_datetime\",\"IP_Address\",\"login_branch\") values ('$user_login','$login_date_time','$ip_login',$branch_login_id_checknull)";
 	if($resultS=pg_query($qry_ins)){
 	}else{
 		$status++;
@@ -383,17 +406,51 @@ function searchLoad() // ค้นหาเมนู
 	$qry_ta = pg_query("select \"isUserTA\" from \"fuser\" where \"id_user\" = '$iduser' ");
 	$ta = pg_fetch_result($qry_ta,0);
 
-    echo "<div style=\"float:left\">เข้าสู่ระบบโดย <b>$_SESSION[user_login]</b><br />เข้าสู่ระบบครั้งล่าสุดเมื่อ <b>". date( "d/m/Y H:i:s", strtotime( $_SESSION['lasttime_login']) ) . "</b><br />ไอพีของท่าน  <b>". $_SERVER['REMOTE_ADDR'] . "</b></div>";
+    echo "<div style=\"float:left\">เข้าสู่ระบบโดย <b>$_SESSION[user_login]</b><br />เข้าสู่ระบบครั้งล่าสุดเมื่อ <b>". date( "d/m/Y H:i:s", strtotime( $_SESSION['lasttime_login']) ) . "</b><br />ไอพีของท่าน  <b>". $_SERVER['REMOTE_ADDR'] . "</b><br />สาขา  <b>$branch_login_name</b></div>";
 	
 	if($ta == "1")
 	{
-		echo "<div style=\"float:right\"><a style=\"cursor:pointer;\" onclick=\"popU('show_tel_email/frm_show_tel_email.php','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=1250');\"><font color=\"#33CC66\"><b>เบอร์โทรศัพท์และ E-mail พนักงาน</b></font></a> |<a style=\"cursor:pointer;\" onclick=\"popU('https://172.16.2.116:8181/LDAPService/login.html','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=1250');\"><font color=\"#0000FF\"><b>เข้าสูระบบ LDAP</b></font></a> |
-		<a href=\"../../taautosales/index.php?passlog=1\"><font color=\"#0000FF\"><b>เข้าสู่ระบบ TA</b></font></a> | <a href=\"change_pass.php\"><font color=\"#ff0000\"><b>เปลี่ยนรหัสผ่าน</b></font></a> | <a HREF=\"logout.php\"><font color=\"#ff0000\"><b>ออกจากระบบ</b></font></a></div>";
+		echo "<div style=\"float:right\">
+			<a style=\"cursor:pointer;\" 		onclick=\"popU('show_tel_email/frm_show_tel_email.php','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=1250');\">
+				<font color=\"#33CC66\"><b>เบอร์โทรศัพท์และ E-mail พนักงาน</b></font>
+			</a> |
+			<a style=\"cursor:pointer;\" onclick=\"popU('https://172.16.2.116:8181/LDAPService/login.html','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=1250');\">
+				<font color=\"#0000FF\"><b>เข้าสูระบบ LDAP</b></font>
+			</a> |
+			<a href=\"../../taautosales/index.php?passlog=1\">
+				<font color=\"#0000FF\">
+					<b>เข้าสู่ระบบ TA</b>
+				</font>
+			</a>|
+			<a href=\"change_pass.php\">
+				<font color=\"#ff0000\">
+					<b>เปลี่ยนรหัสผ่าน</b>
+				</font>
+			</a> | 
+			<a HREF=\"logout.php\">
+				<font color=\"#ff0000\">
+					<b>ออกจากระบบ</b>
+				</font>
+			</a>
+			</div>";
 	}
 	else
 	{
-		echo "<div style=\"float:right\"><a style=\"cursor:pointer;\" onclick=\"popU('show_tel_email/frm_show_tel_email.php','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=1250');\"><font color=\"#33CC66\"><b>เบอร์โทรศัพท์และ E-mail พนักงาน</b></font></a> |<a style=\"cursor:pointer;\" onclick=\"popU('https://172.16.2.116:8181/LDAPService/login.html','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=1250');\"><font color=\"#0000FF\"><b>เข้าสูระบบ LDAP</b></font></a> | <a href=\"https://172.16.2.116:8181/LDAPService/login.html\"><font color=\"#0000FF\"><b>เข้าสูระบบ LDAP</b></font></a> |
-		<a href=\"change_pass.php\"><font color=\"#ff0000\"><b>เปลี่ยนรหัสผ่าน</b></font></a> | <a HREF=\"logout.php\"><font color=\"#ff0000\"><b>ออกจากระบบ</b></font></a></div>";
+		echo "<div style=\"float:right\">
+			<a style=\"cursor:pointer;\" onclick=\"popU('show_tel_email/frm_show_tel_email.php','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=1250');\">
+				<font color=\"#33CC66\"><b>เบอร์โทรศัพท์และ E-mail พนักงาน</b></font>
+			</a> |
+			<a style=\"cursor:pointer;\" onclick=\"popU('https://172.16.2.116:8181/LDAPService/login.html','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=1250');\">
+				<font color=\"#0000FF\"><b>เข้าสูระบบ LDAP</b></font>
+			</a> | 
+			<a href=\"change_pass.php\">
+				<font color=\"#ff0000\"><b>เปลี่ยนรหัสผ่าน</b></font>
+			</a> | 
+			<a HREF=\"logout.php\"><font color=\"#ff0000\">
+				<b>ออกจากระบบ</b>
+			</font>
+			</a>
+			</div>";
 	}
     
 	echo "<div style=\"clear:both\"></div>";

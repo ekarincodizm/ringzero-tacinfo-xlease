@@ -41,10 +41,11 @@ $status = 0;
 
 $seed = $_SESSION["session_company_seed"];
 
-$username = pg_escape_string($_POST['username']);
+$username = pg_escape_string($_POST['username']); // username
 $passSend = pg_escape_string($_POST['password']); // pass ในการเช็คค่าเปลี่ยนบริษัท
-$password = md5(md5($_POST['password']).$seed);
-$remember = pg_escape_string($_POST['chkbxremember']);
+$password = md5(md5($passSend).$seed); // เข้ารหัส password
+$branch = pg_escape_string($_POST['branch']); // สาขา
+$remember = pg_escape_string($_POST['chkbxremember']); // จดจำฉัน
 
 $result_chk_pwd = pg_query("SELECT * FROM \"fuser\" WHERE \"username\" = '$username' and \"password\" = '$password' and \"password_status\" = '2' ");
 $num_chk_pwd = pg_num_rows($result_chk_pwd);
@@ -85,6 +86,7 @@ if($num_user == 0){
 
 			$_SESSION['user_login'] = $username;
 			$_SESSION['pass_login'] = $passSend;
+			$_SESSION['branch_login'] = $branch; // สาขาที่ login
 			$_SESSION['lasttime_login'] = $arr["last_log"]; // ล็อคอินล่าสุด
 			
 			//เก็บคุุกกี้ถ้ามีการเลือก"จดจำฉัน"

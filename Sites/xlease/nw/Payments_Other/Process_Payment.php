@@ -10,7 +10,7 @@ $logs_any_time = nowDateTime();
 <meta http-equiv="Content-Type" content="txt/html; charset=utf-8" />
 
 <?php
-if($sql_check_user = pg_query("select * from \"Vfuser\" where \"id_user\" = '$id_user'")); else $status++;
+if($sql_check_user = pg_query("select \"username\",\"fullname\" from \"Vfuser\" where \"id_user\" = '$id_user'")); else $status++;
 while($res_uesr = pg_fetch_array($sql_check_user))
 {
 	$username = $res_uesr["username"]; //username ของคนที่ทำรายการ
@@ -81,7 +81,7 @@ $receiveDate = pg_escape_string($_POST["receiveDatePost"])." ".$timeStamp; // �
 $contractID = pg_escape_string($_POST["ConID3"]);
 $byChannel = pg_escape_string($_POST["byChannelPost"]);
 list($byChannelPost,$istranpay)=explode(",",$byChannel);
-$chk = pg_escape_string($_POST["chk"]); // รายการค่าอื่นๆที่เลือก
+$chk = $_POST["chk"]; // รายการค่าอื่นๆที่เลือก
 //$debtIDchk = $_POST["debtIDchk"];
 $interestRatePost = pg_escape_string($_POST["interestRatePost"]); // ภาษีหัก ณ ที่จ่าย ใช่หรือไม่ ถ้าใช่จะเป็น on (ของค่าอื่นๆ)
 $interestRatePost_Payment = pg_escape_string($_POST["interestRatePost_Payment"]); // ภาษีหัก ณ ที่จ่าย ใช่หรือไม่ ถ้าใช่จะเป็น on (ของค่างวด)
@@ -203,7 +203,7 @@ if($interestRatePost_Payment == "on"){
 }
 
 
-//PPPPPPPPPPPPPPPPPPPP เบี้ยปรับ
+//  เบี้ยปรับ
 $payPenalty = pg_escape_string($_POST["payPenalty"]); // รับชำระเบี้ยปรับด้วยหรือไม่
 $amtPenalty = pg_escape_string($_POST["amtPenalty"]); // จำนวนเบี้ยปรับ
 
@@ -212,7 +212,7 @@ if($payPenalty == "on" && $amtPenalty > 0.00) // ถ้ามีการชำ�
 	$fpayrefvalue = $receiveDate; // กำหนดเลขที่อ้างอิงเป็นวันเวลาที่จ่าย
 	
 	// เช็คก่อนว่า เลขที่อ้างอิงดังกล่าว ของเลขที่สัญญานั้นๆ มีแล้วหรือยัง
-	$qry_con_refvalue = pg_query("select * from \"thcap_temp_otherpay_debt\" where \"contractID\" = '$contractID' and \"typePayRefValue\" = '$fpayrefvalue' ");
+	$qry_con_refvalue = pg_query("select \"debtID\" from \"thcap_temp_otherpay_debt\" where \"contractID\" = '$contractID' and \"typePayRefValue\" = '$fpayrefvalue' ");
 	$row_con_refvalue = pg_num_rows($qry_con_refvalue);
 	if($row_con_refvalue == 0)
 	{
@@ -228,7 +228,7 @@ if($payPenalty == "on" && $amtPenalty > 0.00) // ถ้ามีการชำ�
 				$rv = "0".$rv;
 			}
 			$use_fpayrefvalue = $use_fpayrefvalue.".$rv";
-			$qry_con_refvalueNew = pg_query("select * from \"thcap_temp_otherpay_debt\" where \"contractID\" = '$contractID' and \"typePayRefValue\" = '$use_fpayrefvalue' ");
+			$qry_con_refvalueNew = pg_query("select \"debtID\" from \"thcap_temp_otherpay_debt\" where \"contractID\" = '$contractID' and \"typePayRefValue\" = '$use_fpayrefvalue' ");
 			$row_con_refvalueNew = pg_num_rows($qry_con_refvalueNew);
 		}while($row_con_refvalueNew > 0);
 	}
@@ -312,7 +312,7 @@ if($appent == "on" || $payAdviser == "on")
 			}
 			
 			// ตรวจสอบหนี้ตัวนี้ก่อนว่า มีการขอยกเว้นหนี้อยู่หรือไม่
-			$qry_discount = pg_query("select * from account.\"thcap_dncn\" where \"subjectStatus\" = '2' and \"dcNoteStatus\" = '8' and \"debtID\" = '$debtIDHP[$i]' ");
+			$qry_discount = pg_query("select \"dcNoteID\" from account.\"thcap_dncn\" where \"subjectStatus\" = '2' and \"dcNoteStatus\" = '8' and \"debtID\" = '$debtIDHP[$i]' ");
 			$row_discount = pg_num_rows($qry_discount);
 			if($row_discount > 0)
 			{ // ถ้ามีรายการดังกล่าวขอส่วนลดอยู่
@@ -355,7 +355,7 @@ if($appent == "on" || $payAdviser == "on")
 				}
 				
 				// ตรวจสอบหนี้ตัวนี้ก่อนว่า มีการขอยกเว้นหนี้อยู่หรือไม่
-				$qry_discount = pg_query("select * from account.\"thcap_dncn\" where \"subjectStatus\" = '2' and \"dcNoteStatus\" = '8' and \"debtID\" = '$debtIDHP[$i]' ");
+				$qry_discount = pg_query("select \"dcNoteID\" from account.\"thcap_dncn\" where \"subjectStatus\" = '2' and \"dcNoteStatus\" = '8' and \"debtID\" = '$debtIDHP[$i]' ");
 				$row_discount = pg_num_rows($qry_discount);
 				if($row_discount > 0)
 				{ // ถ้ามีรายการดังกล่าวขอส่วนลดอยู่
@@ -472,7 +472,7 @@ if($chk != "" && $chk[0] != "") // ถ้ามีการทำรายกา
 		}
 		
 		// ตรวจสอบหนี้ตัวนี้ก่อนว่า มีการขอยกเว้นหนี้อยู่หรือไม่
-		$qry_discount = pg_query("select * from account.\"thcap_dncn\" where \"subjectStatus\" = '2' and \"dcNoteStatus\" = '8' and \"debtID\" = '$debtIDchk[1]' ");
+		$qry_discount = pg_query("select \"dcNoteID\" from account.\"thcap_dncn\" where \"subjectStatus\" = '2' and \"dcNoteStatus\" = '8' and \"debtID\" = '$debtIDchk[1]' ");
 		$row_discount = pg_num_rows($qry_discount);
 		if($row_discount > 0)
 		{ // ถ้ามีรายการดังกล่าวขอส่วนลดอยู่
@@ -694,10 +694,10 @@ $ChannelAmt = $money_Guarantee + $money_Deposit + $amtPenalty;
 					$byChannelDetails="เช็ค $chkchq ".number_format($ChannelAmt,2).' บาท';
 				}else{
 					//ตรวจสอบว่ามา Bill Payment หรือไม่
-					$qrychkbill=pg_query("select * from finance.thcap_receive_transfer where \"cnID\"='BILL' and \"revTranID\"=$contractID3");
+					$qrychkbill=pg_query("select \"revTranID\" from finance.thcap_receive_transfer where \"cnID\"='BILL' and \"revTranID\"=$contractID3");
 					$numchkbill=pg_num_rows($qrychkbill);
 					if($numchkbill>0){
-						$byChannelDetails= "ใบนำฝากชำระ (Bill Payment $bankname)".number_format($ChannelAmt,2).' บาท';
+						$byChannelDetails= "ใบนำฝากชำระ (Bill Payment $bankname) ".number_format($ChannelAmt,2).' บาท';
 					}else{
 						//กรณีเป็นเงินโอน
 						$byChannelDetails="เงินโอนผ่านธนาคาร $bankname ".number_format($ChannelAmt,2).' บาท';
@@ -718,10 +718,10 @@ $ChannelAmt = $money_Guarantee + $money_Deposit + $amtPenalty;
 		}else{
 			if($contractID3!="null" OR $contractID3!=""){
 				//ตรวจสอบว่ามา Bill Payment หรือไม่
-				$qrychkbill=pg_query("select * from finance.thcap_receive_transfer where \"cnID\"='BILL' and \"revTranID\"=$contractID3");
+				$qrychkbill=pg_query("select \"revTranID\" from finance.thcap_receive_transfer where \"cnID\"='BILL' and \"revTranID\"=$contractID3");
 				$numchkbill=pg_num_rows($qrychkbill);
 				if($numchkbill>0){
-					$byChannelDetails= "ใบนำฝากชำระ (Bill Payment $bankname)".number_format($ChannelAmt,2).' บาท';
+					$byChannelDetails= "ใบนำฝากชำระ (Bill Payment $bankname) ".number_format($ChannelAmt,2).' บาท';
 				}else{
 					$byChannelDetails= "$bankname ".number_format($ChannelAmt,2).' บาท ';
 				}
@@ -818,7 +818,7 @@ if($status == 0)
 	list($vatreceipt)=pg_fetch_array($qryvat);
 	
 	// ให้ตรวจสอบก่อนว่าเคยส่งจดหมายไปแล้วหรือยัง
-	$qry_sentVat = pg_query("select * from \"vthcap_letter\" where \"detailRef\" = '$vatreceipt' ");
+	$qry_sentVat = pg_query("select \"contractID\" from \"vthcap_letter\" where \"detailRef\" = '$vatreceipt' ");
 	$sentVat = pg_num_rows($qry_sentVat);
 	
 	if($chk != "" && $chk[0] != "")
@@ -846,7 +846,7 @@ if($status == 0)
 		list($vatreceipt2)=pg_fetch_array($qryvat2);
 		
 		// ให้ตรวจสอบก่อนว่าเคยส่งจดหมายไปแล้วหรือยัง
-		$qry_sentVat2 = pg_query("select * from \"vthcap_letter\" where \"detailRef\" = '$vatreceipt2' ");
+		$qry_sentVat2 = pg_query("select \"contractID\" from \"vthcap_letter\" where \"detailRef\" = '$vatreceipt2' ");
 		$sentVat2 = pg_num_rows($qry_sentVat2);
 	
 		if($chk_con_type == "HIRE_PURCHASE") // ถ้าเป็นสัญญา HIRE_PURCHASE ต้องหาเลขที่ใบกำกับใหม่ เนื่องจากไม่มีตัวเชื่อมเหมือนสัญญาประเภทอื่น
@@ -854,7 +854,7 @@ if($status == 0)
 			$vatreceipt2 = $newreceipt2; // ถ้าเป็น HIRE_PURCHASE ให้ส่งเลขที่ใบเสร็จไปก่อน แล้วไฟล์ใบกำกับภาษีจะหาเองว่าต้องมีใบกำกับภาษีของงวดอะไรบ้าง
 			
 			// งวดที่ชำระ
-			$qry_taxinvoice = pg_query("select * from \"thcap_temp_receipt_otherpay\" where \"receiptID\" = '$vatreceipt2' ");
+			$qry_taxinvoice = pg_query("select \"debtID\",\"typePayRefValue\" from \"thcap_temp_receipt_otherpay\" where \"receiptID\" = '$vatreceipt2' ");
 			
 			while($res_taxinvoice = pg_fetch_array($qry_taxinvoice))
 			{
@@ -884,7 +884,7 @@ if($status == 0)
 				$vatreceiptTrue = pg_fetch_result($qry_allTax,0);
 				
 				// ให้ตรวจสอบก่อนว่าเคยส่งจดหมายไปแล้วหรือยัง
-				$qry_sentVat2 = pg_query("select * from \"vthcap_letter\" where \"detailRef\" = '$vatreceiptTrue' ");
+				$qry_sentVat2 = pg_query("select \"contractID\" from \"vthcap_letter\" where \"detailRef\" = '$vatreceiptTrue' ");
 				$sentVat2 = pg_num_rows($qry_sentVat2);
 			}
 			elseif($row_allTax > 1)
@@ -895,7 +895,7 @@ if($status == 0)
 					$vatreceiptTrue = $rec_allTax["taxinvoiceID"];
 					
 					// ให้ตรวจสอบก่อนว่าเคยส่งจดหมายไปแล้วหรือยัง
-					$qry_sentVat2 = pg_query("select * from \"vthcap_letter\" where \"detailRef\" = '$vatreceiptTrue' ");
+					$qry_sentVat2 = pg_query("select \"contractID\" from \"vthcap_letter\" where \"detailRef\" = '$vatreceiptTrue' ");
 					$chkSent = pg_num_rows($qry_sentVat2);
 					
 					if($chkSent != 0)

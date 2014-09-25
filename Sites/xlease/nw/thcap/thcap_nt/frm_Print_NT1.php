@@ -72,17 +72,31 @@ function popWindow(wName){
 			<fieldset><legend><b>ผู้ที่เกี่ยวข้องในสัญญา</b></legend>
 				<table width="500" border="0" cellspacing="1" cellpadding="1" align="center" bgcolor="#CDB7B5">
 				<?php
-				$qrycus=pg_query("SELECT \"NTID1\",thcap_fullname,relation FROM \"thcap_NT1_temp\" a
-				LEFT JOIN \"thcap_NT1\" b on a.\"NT_tempID\"=b.\"NT_tempID\"
-				LEFT JOIN \"vthcap_ContactCus_detail\" c on b.\"CusID\"=c.\"CusID\"
-				WHERE a.\"NT_1_Status\"='1' and a.\"contractID\"='$contractID' order by a.\"CusState\",\"NTID1\"");
+				$qrycus=pg_query("SELECT
+									a.\"NTID1\",
+									b.\"FullName\",
+									a.\"CusState\"
+								FROM
+									\"thcap_NT1\" a
+								LEFT JOIN
+									\"thcap_ContactCus\" b ON a.\"CusID\" = b.\"CusID\" AND a.\"contractID\" = b.\"contractID\"
+								WHERE
+									a.\"contractID\" = 'PL-BK01-5700002'
+								ORDER BY
+									a.\"CusState\", a.\"NTID1\" ");
 				$numcus=pg_num_rows($qrycus);
 				$i=1;
 				while($rescus=pg_fetch_array($qrycus)){
 					$NTID1=$rescus['NTID1'];
-					$cusname=$rescus['thcap_fullname'];
-					$relation=$rescus['relation'];
+					$cusname=$rescus['FullName'];
+					$CusState=$rescus['CusState'];
 					$print="";
+					
+					if($CusState == "0"){$relation = "ผู้กู้หลัก";}
+					elseif($CusState == "1"){$relation = "ผู้กู้ร่วม";}
+					elseif($CusState == "2"){$relation = "ผู้กู้ค้ำประกัน";}
+					else{$relation = "";}
+					
 					//กรณีให้มีปุ่ม "พิมพ์" แค่ปุ่มเดียว
 					// if($i==1){ 
 						// $print="<td rowspan=\"$numcus\" align=\"center\"><button style=\"width:150px;height:50px;\" onclick=\"javascript:popU('pdf_nt1_loan.php?contractID=$contractID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1100,height=800')\" style=\"cursor: pointer;\">พิมพ์ <img src=\"../images/icon_pdf.gif\" width=\"16\" height=\"16\"></button></td>";

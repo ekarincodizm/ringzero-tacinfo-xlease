@@ -19,7 +19,7 @@ if($contractID != "") // ถ้ามีการส่งค่ามา  // he
 	$contractType = pg_result($qry_contractType,0);
 	
 	if($credit_type=="HIRE_PURCHASE" || $credit_type=="LEASING" || $credit_type=="GUARANTEED_INVESTMENT" || $credit_type=="FACTORING")
-	{
+	{   
 		if($contractType == "FI")
 		{
 			require_once("Data_contract_detail_FI.php");
@@ -30,11 +30,11 @@ if($contractID != "") // ถ้ามีการส่งค่ามา  // he
 		}
 	}
 	elseif($credit_type=="SALE_ON_CONSIGNMENT")
-	{
+	{  
 		require_once("Data_contract_detail_sale_on_consignment.php");
 	}
 	else
-	{
+	{  
 		require_once("Data_contract_detail_installment.php");
 	}
 }

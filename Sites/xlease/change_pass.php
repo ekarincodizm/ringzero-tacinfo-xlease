@@ -78,10 +78,9 @@ function chk_pass_method(){
 	if(v_old_pass ==''){
 		 theMessage = theMessage + "\n -->  กรุณาป้อน รหัสผ่านเดิม";
 	}
-	if((v_new_pass.length < 6) ||(v_cnew_pass.length < 6)||(v_new_pass.length > 10) ||(v_cnew_pass.length > 10)){
+	if((v_new_pass.length < 6) ||(v_cnew_pass.length < 6)){
 		 theMessage = theMessage + "\n -->  กรุณาป้อนรหัส ใหม่เนื่องจาก จำนวนตัวอักขระต้องมี  6-10 ตัว";
 	}
-	
 	
 	if(document.getElementById('iduser').value=='1'){
 		 theMessage = theMessage + "\n -->  กรุณาป้อนรหัส ใหม่เนื่องจาก รหัสผ่าน เหมือนกับรหัสผ่านเดิม";
@@ -157,7 +156,7 @@ User ที่มีชื่อเป็นผู้ทำรายการจ
     </tr>
     <tr>
         <td><font color="black">รหัสผ่านใหม่</font></td>
-        <td align="left"><input type="password" id="new_pass" name="new_pass" maxlength="10" onkeyup="safe_level(1);chk_oldpasswordinsys();">
+        <td align="left"><input type="password" id="new_pass" name="new_pass" onkeyup="safe_level(1);chk_oldpasswordinsys();">
 		<a onclick="javascript:popU('change_pass/frm_guidance.php','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=700')" style="cursor:pointer;"><font color="#0000FF"><u>[คำแนะนำ]</u></font></a>
 		
 		</td>
@@ -165,7 +164,7 @@ User ที่มีชื่อเป็นผู้ทำรายการจ
     </tr>
     <tr>
         <td><font color="black">ยืนยัน รหัสผ่านใหม่</font></td>
-        <td align="left"><input type="password" id="cnew_pass" name="cnew_pass" maxlength="10" ></td>
+        <td align="left"><input type="password" id="cnew_pass" name="cnew_pass" ></td>
 		<td></td>
     </tr>
     <tr>

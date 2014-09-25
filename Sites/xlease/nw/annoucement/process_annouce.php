@@ -2,7 +2,9 @@
 session_start();
 include("../../config/config.php");
 include('class.upload.php');
-
+?>
+ <meta http-equiv="Content-Type" content="txt/html; charset=utf-8" />
+<?php
 $annAuthor=$_SESSION["av_iduser"];
 if( empty($_SESSION["av_iduser"]) ){
     header("Location:../../index.php");
@@ -18,7 +20,7 @@ $annContent=$_POST["annContent"];
 $statusImportance=$_POST["statusImportance"];
 $add_date=nowDateTime(); //ดึงข้อมูลวันเวลาจาก server
 
-$typeann = $_POST['typeann'];
+$typeann = pg_escape_string($_POST['typeann']);
 if($statusImportance=="TRUE"){
 	$statusim="TRUE";
 }else{
@@ -51,8 +53,8 @@ if($method == "add"){
 	}
 
 	// set variables
-	$dir_dest = (isset($_GET['dir']) ? $_GET['dir'] : 'upload');
-	$dir_pics = (isset($_GET['pics']) ? $_GET['pics'] : $dir_dest);
+	$dir_dest = (isset($_GET['dir']) ? pg_escape_string($_GET['dir']) : 'upload');
+	$dir_pics = (isset($_GET['pics']) ? pg_escape_string($_GET['pics']) : $dir_dest);
 	
 	$files = array();
     foreach ($_FILES['my_field'] as $k => $l) {

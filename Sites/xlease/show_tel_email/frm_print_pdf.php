@@ -56,20 +56,24 @@ if($find !=""){
 }
 
 if($find=="0"){
-		$qry_gpuser=pg_query("select \"dep_id\",\"dep_name\" from department where  \"dep_id\" <> 'AD' order by \"dep_id\"");//แผนกในระบบทั้งหมด		
+		$qry_gpuser=pg_query("select \"dep_id\",\"dep_name\",\"dep_tel\",\"dep_email\" from department where  \"dep_id\" <> 'AD' order by \"dep_id\"");//แผนกในระบบทั้งหมด		
 }
 else if($find=="1"){
-	$qry_gpuser=pg_query("select \"dep_id\",\"dep_name\" from department where \"dep_id\" ='$dep_name' and \"dep_id\" <> 'AD' order by \"dep_id\"");//แผนกที่เลือก		
+	$qry_gpuser=pg_query("select \"dep_id\",\"dep_name\",\"dep_tel\",\"dep_email\" from department where \"dep_id\" ='$dep_name' and \"dep_id\" <> 'AD' order by \"dep_id\"");//แผนกที่เลือก		
 }
 else if($find=="2"){
-	$qry_gpuser=pg_query("select a.\"dep_id\",a.\"dep_name\" from department a left join \"Vfuser\" b on a.dep_id=b.user_group where a.\"dep_id\" <> 'AD' and b.id_user='$data_find'");
+	$qry_gpuser=pg_query("select a.\"dep_id\",a.\"dep_name\",a.\"dep_tel\",a.\"dep_email\" from department a left join \"Vfuser\" b on a.dep_id=b.user_group where a.\"dep_id\" <> 'AD' and b.id_user='$data_find'");
 	$condition="a.id_user='$data_find'";
 	
 }
 	$pdf->SetFont('AngsanaNew','B',10); 
 	$pdf->SetXY(5,20);
 	$is_acid=iconv('UTF-8','windows-874',"ชื่อ - สกุล" );
-	$pdf->MultiCell(97,8,$is_acid,1,'C',0);  
+	$pdf->MultiCell(77,8,$is_acid,1,'C',0);
+	 
+	$pdf->SetXY(82,20);
+	$is_acid=iconv('UTF-8','windows-874',"ชื่อเล่น" );
+	$pdf->MultiCell(20,8,$is_acid,1,'C',0); 
 	  
 	$pdf->SetXY(102,20);
 	$is_acid=iconv('UTF-8','windows-874',"เบอร์ภายใน" );
@@ -92,13 +96,20 @@ else if($find=="2"){
 	{	
 		$dep_id=$res_type["dep_id"];
 		$dep_name=$res_type["dep_name"];
+		$dep_tel=$res_type["dep_tel"]; // เบอร์กลาง ของแผนก
+		$dep_email=$res_type["dep_email"]; // อีเมล์กลาง ของแผนก
+		
+		if($dep_tel != ""){$dep_tel_text = "(เบอร์กลาง #$dep_tel";}else{$dep_tel_text = "(เบอร์กลาง ยังไม่ระบุ";}
+		if($dep_email != ""){$dep_email_text = "E-mail $dep_email)";}else{$dep_email_text = "E-mail ยังไม่ระบุ)";}
+		
 		//ชื่อแผนก
 		$pdf->SetFont('AngsanaNew','B',10);			
 		$pdf->SetFillColor(182,182,182);		
 		$pdf->SetXY(5,$cline);				
-		$is_acid=iconv('UTF-8','windows-874',$dep_name );
+		$is_acid=iconv('UTF-8','windows-874',"$dep_name $dep_tel_text : $dep_email_text" );
 		$pdf->Cell(200,5,$is_acid,0,1,'C',true); 
-		$cline=$cline+5;
+		
+		$cline+=5;
 		
 		if($find !='2'){
 			$condition="a.\"user_group\"='$dep_id'";
@@ -107,6 +118,38 @@ else if($find=="2"){
 		$query=pg_query("select a.fullname,b.u_extens,b.u_direct,b.u_tel,b.u_email,b.nickname from \"Vfuser\" a 
 		left join \"fuser_detail\" b on a.\"id_user\"=b.\"id_user\"			
 		where $condition and a.resign_date is null");
+		
+		if($cline >= 270)
+		{
+			$nub = 0;
+			$cline = 28;
+			$pdf->AddPage();
+			$pdf->SetFont('AngsanaNew','B',10); 
+			
+			$pdf->SetXY(5,20);
+			$is_acid=iconv('UTF-8','windows-874',"ชื่อ - สกุล" );
+			$pdf->MultiCell(77,8,$is_acid,1,'C',0);  
+			
+			$pdf->SetXY(82,20);
+			$is_acid=iconv('UTF-8','windows-874',"ชื่อเล่น" );
+			$pdf->MultiCell(20,8,$is_acid,1,'C',0);
+
+			$pdf->SetXY(102,20);
+			$is_acid=iconv('UTF-8','windows-874',"เบอร์ภายใน" );
+			$pdf->MultiCell(15,8,$is_acid,1,'C',0); 
+
+			$pdf->SetXY(117,20);
+			$is_acid=iconv('UTF-8','windows-874',"เบอร์ตรง" );
+			$pdf->MultiCell(15,8,$is_acid,1,'C',0); 
+
+			$pdf->SetXY(132,20);
+			$is_acid=iconv('UTF-8','windows-874',"มือถือ" );
+			$pdf->MultiCell(20,8,$is_acid,1,'C',0); 
+
+			$pdf->SetXY(152,20);
+			$is_acid=iconv('UTF-8','windows-874',"E-mail" );
+			$pdf->MultiCell(53,8,$is_acid,1,'C',0);
+		}
 		
 		while($res_group=pg_fetch_array($query))
 		{ 	
@@ -119,12 +162,8 @@ else if($find=="2"){
 				$u_tel=$res_group["u_tel"];
 				$u_email=$res_group["u_email"];	
 				$nickname=$res_group["nickname"];
-				if($nickname !=""){ $fullname .=' ('.$nickname.')';}
-				
-				
-				
     
-				if($nub+5 >= 51){
+				if($cline >= 270){
 					$nub = 0;
 					$cline = 28;
 					$pdf->AddPage();
@@ -132,7 +171,11 @@ else if($find=="2"){
 					
 					$pdf->SetXY(5,20);
 					$is_acid=iconv('UTF-8','windows-874',"ชื่อ - สกุล" );
-					$pdf->MultiCell(97,8,$is_acid,1,'C',0);  
+					$pdf->MultiCell(77,8,$is_acid,1,'C',0);  
+					
+					$pdf->SetXY(82,20);
+					$is_acid=iconv('UTF-8','windows-874',"ชื่อเล่น" );
+					$pdf->MultiCell(20,8,$is_acid,1,'C',0);
 	  
 					$pdf->SetXY(102,20);
 					$is_acid=iconv('UTF-8','windows-874',"เบอร์ภายใน" );
@@ -148,15 +191,18 @@ else if($find=="2"){
 
 					$pdf->SetXY(152,20);
 					$is_acid=iconv('UTF-8','windows-874',"E-mail" );
-					$pdf->MultiCell(53,8,$is_acid,1,'C',0); 
-        
+					$pdf->MultiCell(53,8,$is_acid,1,'C',0);
 				}
 			
 		
 			$pdf->SetFont('AngsanaNew','',10); 
 			$pdf->SetXY(5,$cline);
 			$is_acid=iconv('UTF-8','windows-874',$fullname);
-			$pdf->MultiCell(97,5,$is_acid,1,'L',0);  
+			$pdf->MultiCell(77,5,$is_acid,1,'L',0);  
+			
+			$pdf->SetXY(82,$cline);
+			$is_acid=iconv('UTF-8','windows-874',$nickname);
+			$pdf->MultiCell(20,5,$is_acid,1,'C',0);
 	  
 			$pdf->SetXY(102,$cline);
 			$is_acid=iconv('UTF-8','windows-874',$u_extens);

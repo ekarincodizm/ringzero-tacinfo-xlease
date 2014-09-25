@@ -70,10 +70,10 @@ $contractID=pg_escape_string($_GET["contractID"]); // เลขที่สั�
 
 if($contractID == "") // ถ้าไม่มีการส่งเลขที่สัญญามา ต้องหาเอง
 {
-	$qry_conid_spa = pg_query("select * from \"thcap_v_receipt_details\" WHERE \"receiptID\" = '$receiptID'");
+	$qry_conid_spa = pg_query("select \"receiptID\" from \"thcap_v_receipt_details\" WHERE \"receiptID\" = '$receiptID'");
 	$numchk1=pg_num_rows($qry_conid_spa);
 	if($numchk1==0){ //แสดงว่าใบเสร็จถูกยกเลิกแล้ว 
-		$qry_conid_spa = pg_query("select * from \"thcap_v_receipt_details_cancel\" WHERE \"receiptID\" = '$receiptID'");
+		$qry_conid_spa = pg_query("select \"contractID\" from \"thcap_v_receipt_details_cancel\" WHERE \"receiptID\" = '$receiptID'");
 	}
 	
 	if($resultspa = pg_fetch_array($qry_conid_spa)){	
@@ -132,7 +132,7 @@ if($p_ja!="1"){
 	$pdf->Image("images/12.png",60,100,100);  //barcode
 }
 //ค้นหาข้อมูลใบเสร็จ
-$qry_conid=pg_query("select * from \"thcap_temp_receipt_channel\" where \"receiptID\" = '$receiptID' and \"byChannel\" <> '999' ");
+$qry_conid=pg_query("select \"receiptID\" from \"thcap_temp_receipt_channel\" where \"receiptID\" = '$receiptID' and \"byChannel\" <> '999' ");
 if($result=pg_fetch_array($qry_conid))
 {	
 	$receiveDate=trim($result["receiveDate"]); // วันที่รับชำระ
@@ -140,7 +140,7 @@ if($result=pg_fetch_array($qry_conid))
 	
 }
 	
-$qry_conidWHT=pg_query("select * from \"thcap_temp_receipt_channel\" where \"receiptID\" = '$receiptID' and \"byChannel\" = '999' ");
+$qry_conidWHT=pg_query("select \"ChannelAmt\" from \"thcap_temp_receipt_channel\" where \"receiptID\" = '$receiptID' and \"byChannel\" = '999' ");
 $numrowWht = pg_num_rows($qry_conidWHT);
 if($numrowWht == 1)
 {
@@ -155,10 +155,10 @@ else
 	$WHT = 0; // ถ้าไม่มี WHT
 }
 
-$qry_next=pg_query("select * from \"thcap_v_receipt_details\" where \"receiptID\" = '$receiptID' ");
+$qry_next=pg_query("select \"nextDueAmt\",\"nextDueDate\",\"userFullname\",\"cusFullname\",\"cusCoFullname\",\"addrFull\",\"addrSend\",\"typeReceive\",\"typeDetail\" from \"thcap_v_receipt_details\" where \"receiptID\" = '$receiptID' ");
 $numchk2=pg_num_rows($qry_next);
 if($numchk2==0){ //แสดงว่าใบเสร็จถูกยกเลิกแล้ว 
-	$qry_next=pg_query("select * from \"thcap_v_receipt_details_cancel\" where \"receiptID\" = '$receiptID' ");
+	$qry_next=pg_query("select \"nextDueAmt\",\"nextDueDate\",\"userFullname\",\"cusFullname\",\"cusCoFullname\",\"addrFull\",\"addrSend\",\"typeReceive\",\"typeDetail\" from \"thcap_v_receipt_details_cancel\" where \"receiptID\" = '$receiptID' ");
 }
 
 if($result_next=pg_fetch_array($qry_next))
@@ -242,10 +242,10 @@ if($typepdf == 1 && $chk_con_type=='JOINT_VENTURE')
 else
 {
 	//thcap_v_receipt_otherpay จะเรียกจาก view ไม่ได้เนื่องจากใน view ไม่มีค่าบางค่า
-	$qry_table=pg_query("select * from \"thcap_v_receipt_otherpay\" where \"receiptID\" = '$receiptID' order by \"typePayID\", \"typePayRefValue\" ");
+	$qry_table=pg_query("select \"typePayID\", \"tpDesc\", \"tpFullDesc\", \"typePayRefValue\", \"debtID\",\"netAmt\",\"vatAmt\",\"debtAmt\",\"whtAmt\" from \"thcap_v_receipt_otherpay\" where \"receiptID\" = '$receiptID' order by \"typePayID\", \"typePayRefValue\" ");
 	$numchk3=pg_num_rows($qry_table);
 	if($numchk3==0){ //แสดงว่าใบเสร็จถูกยกเลิกแล้ว 
-		$qry_table=pg_query("select * from \"thcap_v_receipt_otherpay_cancel\" where \"receiptID\" = '$receiptID' order by \"typePayID\", \"typePayRefValue\" ");
+		$qry_table=pg_query("select \"typePayID\", \"tpDesc\", \"tpFullDesc\", \"typePayRefValue\", \"debtID\",\"netAmt\",\"vatAmt\",\"debtAmt\",\"whtAmt\" from \"thcap_v_receipt_otherpay_cancel\" where \"receiptID\" = '$receiptID' order by \"typePayID\", \"typePayRefValue\" ");
 	}
 }
 
@@ -325,10 +325,10 @@ if($typepdf == 1 && ($chk_con_type=='LOAN' || $chk_con_type=='JOINT_VENTURE' || 
 		
 		// if($row_selectShow > 0)
 		// { // ถ้าเป็นนิติบุคคล
-			$qry_detail = pg_query("select * from public.\"thcap_temp_int_201201\" where \"receiptID\"='$receiptID' ");
+			$qry_detail = pg_query("select \"receivePriciple\",\"receiveInterest\" from public.\"thcap_temp_int_201201\" where \"receiptID\"='$receiptID' ");
 			$numchk4=pg_num_rows($qry_detail);
 			if($numchk4==0){ //แสดงว่าใบเสร็จถูกยกเลิกแล้ว 
-				$qry_detail = pg_query("select * from public.\"thcap_temp_cancel_int\" where \"receiptID\"='$receiptID' ");
+				$qry_detail = pg_query("select \"receivePriciple\",\"receiveInterest\" from public.\"thcap_temp_cancel_int\" where \"receiptID\"='$receiptID' ");
 			}
 			while($resdetail = pg_fetch_array($qry_detail))
 			{
@@ -340,7 +340,7 @@ if($typepdf == 1 && ($chk_con_type=='LOAN' || $chk_con_type=='JOINT_VENTURE' || 
 			$qryPrinciple = pg_query("select account.\"thcap_mg_getPrincipleType\"('$contractID')");
 			$resPrinciple = pg_fetch_array($qryPrinciple);
 			list($PrincipleID) = $resPrinciple;
-			$qry_PrincipleID = pg_query("select * from account.\"thcap_typePay\" where \"tpID\"='$PrincipleID' ");
+			$qry_PrincipleID = pg_query("select \"tpDesc\" from account.\"thcap_typePay\" where \"tpID\"='$PrincipleID' ");
 			while($resPrincipleID = pg_fetch_array($qry_PrincipleID))
 			{
 				$txtPriciple = $resPrincipleID["tpDesc"]; // ข้อความของการหักเงินต้น
@@ -350,7 +350,7 @@ if($typepdf == 1 && ($chk_con_type=='LOAN' || $chk_con_type=='JOINT_VENTURE' || 
 			$qryInterest = pg_query("select account.\"thcap_mg_getInterestType\"('$contractID')");
 			$resInterest = pg_fetch_array($qryInterest);
 			list($InterestID) = $resInterest;
-			$qry_InterestID = pg_query("select * from account.\"thcap_typePay\" where \"tpID\"='$InterestID' ");
+			$qry_InterestID = pg_query("select \"tpDesc\" from account.\"thcap_typePay\" where \"tpID\"='$InterestID' ");
 			while($resInterestID = pg_fetch_array($qry_InterestID))
 			{
 				$txtInterest = $resInterestID["tpDesc"]; // ข้อความของการหักดอกเบี้ย
@@ -459,7 +459,7 @@ $redoc = pg_fetch_result($sqldoc,0);
 if(!empty($redoc) || $redoc != "" )
 { // ถ้ามีเลขที่ใบกำกับภาษี
 	// ตรวจสอบก่อนว่า ใบกำกับภาษีดังกล่าวถูกยกเลิกไปแล้วหรือยัง
-	$qry_taxcancel = pg_query("SELECT * FROM thcap_temp_taxinvoice_otherpay_cancel where \"taxinvoiceID\" = '$redoc'");
+	$qry_taxcancel = pg_query("SELECT \"taxinvoiceID\" FROM thcap_temp_taxinvoice_otherpay_cancel where \"taxinvoiceID\" = '$redoc'");
 	$rows_taxcancel = pg_num_rows($qry_taxcancel);
 	IF($rows_taxcancel > 0)
 	{

@@ -12,8 +12,8 @@ if( empty($_SESSION["av_iduser"]) ){
     header("Location:../../index.php");
     exit;
 }
-$currentdate=date("Y-m-d");
-$add_date=nowDateTime(); //ดึงข้อมูลวันเวลาจาก server
+$currentdate = nowDate(); // วันที่ปัจจุบัน
+$add_date = nowDateTime(); //ดึงข้อมูลวันเวลาจาก server
 $method = pg_escape_string($_POST["method"]);
 $id_user = pg_escape_string($_POST["id_user"]);
 $title = pg_escape_string($_POST["title"]);
@@ -35,7 +35,7 @@ $u_pic = pg_escape_string($_POST["u_pic"]);
 $u_pic2 = pg_escape_string($_POST["u_pic2"]);
 $u_pos = pg_escape_string($_POST["u_pos"]);
 $u_salary = pg_escape_string($_POST["u_salary"]);
-$u_salary=str_replace(",","",$u_salary); 
+$u_salary = str_replace(",","",$u_salary); 
 if($u_salary==""){
 	$u_salary=0;
 }
@@ -48,24 +48,13 @@ $startwork = pg_escape_string($_POST["startwork"]);
 if($startwork==""){
 	$startwork="1900-01-01";
 }
+$dep_id = pg_escape_string($_POST["dep_id"]);
+$fdep_id = pg_escape_string($_POST["fdep_id"]);
+$empid = pg_escape_string($_POST["empid"]); // รหัสพนักงาน แบบกำหนดเอง
 
-$dep_id = pg_escape_string($_POST["dep_id"]); // รหัสแผนก
-
-$section_ID = pg_escape_string($_POST["section_ID"]); // section แผนก
-
-// หา รหัสบริษัท รหัสแผนก รหัสฝ่าย
-if($section_ID != "")
-{
-	$qry_f_section = pg_query("select \"organizeID\", \"dep_id\", \"fdep_id\" from \"f_section\" where \"section_ID\" = '$section_ID' ");
-	$organizeID = pg_fetch_result($qry_f_section,0); // รหัสบริษัท
-	//$dep_id = pg_fetch_result($qry_f_section,1); // รหัสแผนก
-	$fdep_id = pg_fetch_result($qry_f_section,2); // รหัสฝ่าย
-}
-
-$section_ID = checknull($section_ID);
-if($organizeID == ""){$organizeID = "1";}
-$dep_id = checknull($dep_id);
-$fdep_id = checknull($fdep_id);
+//----- ตรวจสอบค่าว่าง
+	$empid_checknull = checknull($empid);
+//----- จบการตรวจสอบค่าว่าง
 
 pg_query("BEGIN WORK");
 $status = 0;
@@ -95,109 +84,144 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form1")){
 if($method == "add"){
 	$qry_uname=pg_query("select * from fuser where username='$username' ");
 	$nur_name=pg_num_rows($qry_uname);
-	if($nur_name > 0){
+	if($nur_name > 0)
+	{
 		echo "<center><h2>ชื่อ username ซ้ำ</h2></center>";
 		$status++;
-	}else{
-		$qrylastid=pg_query("select id_user from fuser");
-		$numrow=pg_num_rows($qrylastid);
- 
-		$idplus=$numrow+1;
- 
-		function insertZero($inputValue , $digit ){
-			$str = "" . $inputValue;
-			while (strlen($str) < $digit){
-				$str = "0" . $str;
+	}
+	else
+	{
+		if($empid != "") // ถ้ามีค่า รหัสพนักงาน ที่กำหนดเอง จะตรวจสอบว่ามีอยู่แล้วหรือไม่
+		{
+			$qry_chk_empid = pg_query("select * from fuser where empid = '$empid' ");
+			$row_empid = pg_num_rows($qry_chk_empid);
+			if($row_empid > 0){
+				echo "<center><h2>รหัสพนักงาน ซ้ำ</h2></center>";
+				$status++;
 			}
-			return $str;
-        }
-		$id_plus=insertZero($idplus , 3);
-		$seed = $_SESSION["session_company_seed"];
-		$v_pass = md5(md5($_POST['v_pass']).$seed);
-		
-		$in_sql="insert into fuser(id_user,username,office_id,user_group,status_user,title,fname,lname,user_dep,email,\"section_ID\")values('$id_plus','$username','$organizeID',$dep_id,'TRUE','$title','$fname','$lname',$fdep_id,'$u_email',$section_ID)";
-		if($resultins=pg_query($in_sql)){
-		}else{
-			$status++;
 		}
 		
-		$in_sql2="insert into fuser_detail(id_user,title_eng,fname_eng,lname_eng,nickname,u_birthday,u_status,u_sex,u_idnum,u_pic,
-					u_pos,u_salary,u_tel,u_extens,u_email,startwork,user_keylast,keydatelast,u_direct)values
-					('$id_plus','$title_eng','$fname_eng','$lname_eng','$nickname','$u_birthday','$u_status',
-					'$u_sex','$u_idnum','$image_name','$u_pos','$u_salary','$u_tel','$u_extens','$u_email','$startwork','$user_key','$currentdate','$u_direct')";
-		if($resultins2=pg_query($in_sql2)){
-		}else{
-			$status++;
+		if($status == 0) // ถ้ายังไม่มีอะไรผิดพลาด ให้ทำงานต่อไป
+		{
+			$qrylastid=pg_query("select id_user from fuser");
+			$numrow=pg_num_rows($qrylastid);
+	 
+			$idplus=$numrow+1;
+	 
+			function insertZero($inputValue , $digit ){
+				$str = "" . $inputValue;
+				while (strlen($str) < $digit){
+					$str = "0" . $str;
+				}
+				return $str;
+			}
+			$id_plus=insertZero($idplus , 3);
+			$seed = $_SESSION["session_company_seed"];
+			$v_pass = md5(md5($_POST['v_pass']).$seed);
+			
+			$in_sql="insert into fuser(id_user,username,office_id,user_group,status_user,title,fname,lname,user_dep,email,empid)values('$id_plus','$username','1','$dep_id','TRUE','$title','$fname','$lname','$fdep_id','$u_email',$empid_checknull)";
+			if($resultins=pg_query($in_sql)){
+			}else{
+				$status++;
+				echo $in_sql;
+			}
+			
+			$in_sql2="insert into fuser_detail(id_user,title_eng,fname_eng,lname_eng,nickname,u_birthday,u_status,u_sex,u_idnum,u_pic,
+						u_pos,u_salary,u_tel,u_extens,u_email,startwork,user_keylast,keydatelast,u_direct)values
+						('$id_plus','$title_eng','$fname_eng','$lname_eng','$nickname','$u_birthday','$u_status',
+						'$u_sex','$u_idnum','$image_name','$u_pos','$u_salary','$u_tel','$u_extens','$u_email','$startwork','$user_key','$currentdate','$u_direct')";
+			if($resultins2=pg_query($in_sql2)){
+			}else{
+				$status++;
+			}
 		}
-		
-		
 	}
 	//ACTIONLOG
 		$sqlaction = pg_query("INSERT INTO action_log(id_user, action_desc, action_time) VALUES ('$user_key', '(ALL) เพิ่มประวัติพนักงาน', '$add_date')");
 	//ACTIONLOG---
 }else if($method=="edit"){	
-	$statuswork=$_POST["statuswork"];
-	$work_status=$_POST["work_status"];
-
-	if($statuswork=="0"){ //กรณีลาออก
-		$work_status=$work_status; //ครั้งที่ทำงานเท่าเดิมไม่ต้องบวกเพิ่ม
-		$resign_date1=$_POST["resign_date"];
-		$resign_date="'".$resign_date1."'"; //กำหนดวันที่ลาออก
-		if ($resign_date!=""){
-		$sqlupstatus = pg_query("UPDATE fuser SET status_user ='FALSE' WHERE id_user = '$id_user'");	
-			}
-
-	}else if($statuswork=="1"){ //กรณีรับใหม่
-		$work_status=$work_status+1; //เพิ่มครั้งที่ทำงาน
-		$resign_date="null"; //เคลียร์วันที่ลาออก
-		
-		if ($resign_date="null"){
-		$sqlupstatus = pg_query("UPDATE fuser SET status_user ='TRUE' WHERE id_user = '$id_user'");	
-			}
-		
-	}else{ //กรณีแก้ไขข้อมูลปกติ
-		$work_status=$work_status; //ครั้งที่ทำงานปัจจุับัน
-		$resign_date="null"; //วันที่ลาออกไม่มี
-	}
+	$statuswork = pg_escape_string($_POST["statuswork"]);
+	$work_status = pg_escape_string($_POST["work_status"]);
 	
-		$upfuser="update \"fuser\" set 
-				\"username\"='$username',
-				\"office_id\"='$organizeID',
-				\"user_group\"=$dep_id,
-				\"title\"='$title',
-				\"fname\"='$fname',
-				\"lname\"='$lname',
-				\"user_dep\"=$fdep_id,
-				\"email\"='$u_email',
-				\"section_ID\"=$section_ID
-				where \"id_user\"='$id_user'";
+	if($empid != "") // ถ้ามีค่า รหัสพนักงาน ที่กำหนดเอง จะตรวจสอบว่าซ้ำกับคนอื่นหรือไม่
+	{
+		$qry_chk_empid = pg_query("select * from fuser where empid = '$empid' and id_user <> '$id_user' ");
+		$row_empid = pg_num_rows($qry_chk_empid);
+		if($row_empid > 0){
+			echo "<center><h2>รหัสพนักงาน ซ้ำ</h2></center>";
+			$status++;
+		}
+	}
+
+	if($status == 0) // ถ้ายังไม่มีอะไรผิดพลาด
+	{
+		if($statuswork=="0")
+		{ //กรณีลาออก
+			$work_status=$work_status; //ครั้งที่ทำงานเท่าเดิมไม่ต้องบวกเพิ่ม
+			$resign_date1 = pg_escape_string($_POST["resign_date"]);
+			$resign_date="'".$resign_date1."'"; //กำหนดวันที่ลาออก
+			if ($resign_date!="")
+			{
+				$sqlupstatus = pg_query("UPDATE fuser SET status_user ='FALSE' WHERE id_user = '$id_user'");	
+			}
+		}
+		else if($statuswork=="1")
+		{ //กรณีรับใหม่
+			$work_status=$work_status+1; //เพิ่มครั้งที่ทำงาน
+			$resign_date="null"; //เคลียร์วันที่ลาออก
+			
+			if ($resign_date="null"){
+			$sqlupstatus = pg_query("UPDATE fuser SET status_user ='TRUE' WHERE id_user = '$id_user'");	
+				}
+			
+		}
+		else
+		{ //กรณีแก้ไขข้อมูลปกติ
+			$work_status=$work_status; //ครั้งที่ทำงานปัจจุับัน
+			$resign_date = pg_escape_string($_POST["resign_date"]); //วันที่ลาออก
+			$resign_date = checknull($resign_date);
+		}
+		
+		$upfuser="update
+					\"fuser\"
+				set 
+					\"username\" = '$username',
+					\"user_group\" = '$dep_id',
+					\"title\" = '$title',
+					\"fname\" = '$fname',
+					\"lname\" = '$lname',
+					\"user_dep\" = '$fdep_id',
+					\"email\" = '$u_email',
+					\"empid\" = $empid_checknull
+				where
+					\"id_user\" = '$id_user'";
 		if($res_up=pg_query($upfuser)){
 		}else{
 			$status++;
 		}
-
-	
-	//ตรวจสอบว่ามีการบันทึกข้อมูลในตารางนี้หรือยัง 
-	$querydetail=pg_query("select * from fuser_detail where id_user='$id_user'");
-	$num_detail=pg_num_rows($querydetail);
-	if($num_detail==0){ //ถ้ายัีงไม่มีการบันทึกให้ insert ข้อมูล
-		$in_sql2="insert into fuser_detail(id_user,title_eng,fname_eng,lname_eng,nickname,u_birthday,u_status,u_sex,u_idnum,u_pic,
-					u_pos,u_salary,u_tel,u_extens,u_email,startwork,user_keylast,keydatelast,work_status,resign_date,u_direct)values
-					('$id_user','$title_eng','$fname_eng','$lname_eng','$nickname','$u_birthday','$u_status',
-					'$u_sex','$u_idnum','$image_name','$u_pos','$u_salary','$u_tel','$u_extens','$u_email','$startwork','$user_key','$currentdate','$work_status',$resign_date,'$u_direct')";
-		if($resultins2=pg_query($in_sql2)){
-		}else{
-			$status++;
-		}
-	}else{ //กรณีมีการข้อมูลให้ update
-		if($image_name!=""){
-			@unlink("upload_images/$u_pic2");
-		}else{
-			$image_name=$u_pic2;
-		}
 		
-		//ตรวจสอบว่ามีการแก้ไขหรือไม่ ถ้ามีค่อย update
-		
+		//ตรวจสอบว่ามีการบันทึกข้อมูลในตารางนี้หรือยัง 
+		$querydetail=pg_query("select * from fuser_detail where id_user='$id_user'");
+		$num_detail=pg_num_rows($querydetail);
+		if($num_detail==0)
+		{ //ถ้ายัีงไม่มีการบันทึกให้ insert ข้อมูล
+			$in_sql2="insert into fuser_detail(id_user,title_eng,fname_eng,lname_eng,nickname,u_birthday,u_status,u_sex,u_idnum,u_pic,
+						u_pos,u_salary,u_tel,u_extens,u_email,startwork,user_keylast,keydatelast,work_status,resign_date,u_direct)values
+						('$id_user','$title_eng','$fname_eng','$lname_eng','$nickname','$u_birthday','$u_status',
+						'$u_sex','$u_idnum','$image_name','$u_pos','$u_salary','$u_tel','$u_extens','$u_email','$startwork','$user_key','$currentdate','$work_status',$resign_date,'$u_direct')";
+			if($resultins2=pg_query($in_sql2)){
+			}else{
+				$status++;
+			}
+		}
+		else
+		{ //กรณีมีการข้อมูลให้ update
+			if($image_name!=""){
+				@unlink("upload_images/$u_pic2");
+			}else{
+				$image_name=$u_pic2;
+			}
+			
 			$upfdetail="update \"fuser_detail\" set 
 				\"title_eng\"='$title_eng',
 				\"fname_eng\"='$fname_eng',
@@ -224,13 +248,12 @@ if($method == "add"){
 			}else{
 				$status++;
 			}
+		}
 			
+		//ACTIONLOG
+			$sqlaction = pg_query("INSERT INTO action_log(id_user, action_desc, action_time) VALUES ('$user_key', '(ALL) แก้ไขประวัติพนักงาน', '$add_date')");
+		//ACTIONLOG---
 	}
-	
-//ACTIONLOG
-		$sqlaction = pg_query("INSERT INTO action_log(id_user, action_desc, action_time) VALUES ('$user_key', '(ALL) แก้ไขประวัติพนักงาน', '$add_date')");
-//ACTIONLOG---
-
 }
 
 if($status == 0){
@@ -245,12 +268,12 @@ if($status == 0){
 	
 }else{
 	pg_query("ROLLBACK");
-	echo "<center><h2>แก้ไขข้อมูลผิดพลาด กรุณาลองใหม่อีกครั้ง!!</h2></center>";
+	echo "<center><h2>บันทึกข้อมูลผิดพลาด กรุณาลองใหม่อีกครั้ง!!</h2></center>";
 	if($method=="edit"){
 		//echo "<meta http-equiv='refresh' content='2; URL=frm_IndexAdd.php?id_user=$id_user&method=edit'>";
+		echo "<center><input type=\"button\" value=\"BACK\" onClick=\"window.location='frm_IndexAdd.php?id_user=$id_user&method=edit';\" /></center>";
 	}else{
 		//echo "<meta http-equiv='refresh' content='2; URL=frm_IndexAdd.php'>";
+		echo "<center><input type=\"button\" value=\"BACK\" onClick=\"window.location='frm_IndexAdd.php';\" /></center>";
 	}
 }
-
-

@@ -10,6 +10,8 @@ $asset_type = -1;
 $sedt_idno=trim(pg_escape_string($_REQUEST["idno_names"]));
 
 if($sedt_idno==""){$sedt_idno=trim(pg_escape_string($_REQUEST["idno_names2"]));}
+if($sedt_idno==""){$sedt_idno=trim(pg_escape_string($_GET["idno"]));}
+
 // ตัด String เฉพาะ IDNO ไปใช้ และ asset_id
 $edt_idno=substr($sedt_idno,0,11);
 $edt_assetid = substr($sedt_idno,-8);
@@ -21,9 +23,14 @@ if(substr($sedt_idno, 2,1) == "-" &&  substr($sedt_idno, 10,1) == "-")
 
 //$_SESSION["ses_idno"]=$edt_idno;
 
-if(empty($edt_idno)){
-    $edt_idnostr = pg_escape_string($_REQUEST["idno"]); //ค่า idno ที่ได้มาเบื้องต้นจะมีข้อความติดมาด้วย
-	if($edt_idnostr==""){$edt_idnostr=pg_escape_string($_REQUEST["idno2"]);}
+if(empty($edt_idno))
+{
+	/*$edt_idnostr = pg_escape_string($_REQUEST["idno"]); //ค่า idno ที่ได้มาเบื้องต้นจะมีข้อความติดมาด้วย
+	if($edt_idnostr=="" || $edt_idnostr=="กรอกข้อมูลอย่างน้อย 3 ตัวอักษรขึ้นไป..."){$edt_idnostr=pg_escape_string($_REQUEST["idno2"]);}*/
+	
+	if(isset($_POST["submit1"])){$edt_idnostr = pg_escape_string($_REQUEST["idno"]);} // ถ้าค้นหาแบบธรรมดา จากเมนู "แสดงตารางผ่อนชำระ"
+	elseif(isset($_POST["submit2"])){$edt_idnostr = pg_escape_string($_REQUEST["idno2"]);} // ถ้าค้นหาแบบละเอียดพร้อมแสดงแถบสี จากเมนู "แสดงตารางผ่อนชำระ"
+	
 	//นำ idno ที่ได้มาตัดเอาเฉพาะ idno
 	$edt_idno2=explode(":",$edt_idnostr);
 	$edt_idno=trim($edt_idno2[0]);
@@ -65,7 +72,7 @@ if($asset_type == 1 OR $asset_type == 2){
 }elseif($asset_type == 3){
     header("Location: ex_vcorpdetail.php?idno=$edt_idno");
 }else{
-    echo "asset_type error !";
+    echo "asset_type error ! $asset_type $edt_idno";
 }
 
 ?>

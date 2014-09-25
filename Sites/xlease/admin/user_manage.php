@@ -1,7 +1,12 @@
 <?php
 session_start();
 $_SESSION["av_iduser"];
-include("../config/config.php");
+include("../config/config.php"); 
+?>
+
+<meta http-equiv="Content-Type" content="txt/html; charset=utf-8" />
+
+<?php
 if( empty($_SESSION["av_iduser"]) ){
     header("Location:../index.php");
     exit;
@@ -60,7 +65,7 @@ else
  
  <div class="style5" style="width:auto;  padding-left:10px;">
   <?php
-  $qry_user=pg_query("select * from \"Vfuser\" order by user_group,status_user desc");
+  $qry_user=pg_query("select \"id_user\",\"username\",\"fullname\",\"user_group\",\"office_id\" from \"Vfuser\" order by user_group,status_user desc");
   
   
   ?>

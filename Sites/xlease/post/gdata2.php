@@ -1,7 +1,7 @@
 <?php
 include("../config/config.php"); 
 
-$term = $_GET['term'];
+$term = pg_escape_string($_GET['term']);
 
 //ตรวจสอบว่าค่าที่ส่งมาเป็นตัวเลขหรือไม่
 /*if(is_numeric($term) ) {

@@ -98,6 +98,11 @@ $(document).ready(function(){
 		
     });
 	
+	$("#case_owners").autocomplete({
+        source: "s_user.php",
+        minLength:2
+    });
+	
 	/*$("#main").autocomplete({
         source: "listcus_main.php",
         minLength:1
@@ -164,6 +169,10 @@ function validate()
 	
 	if (document.frm.contype.value=="") {
 	theMessage = theMessage + "\n -->  กรุณาเลือก ประเภทสินเชื่อ";
+	}
+	
+	if (document.frm.case_owners.value=="") {
+		theMessage = theMessage + "\n -->  กรุณาระบุ เจ้าของเคส";
 	}
 	
 	if (document.frm.conloanamt.value=="") {
@@ -1704,6 +1713,12 @@ function change_each_addr_to_contract() {
 			<option value="THCAP">---- THCAP  ----</option>
 		</select>-->
 		<input type="text" name="conCompany" value="<?php echo $conCompany; ?>" readonly style="background:#CCCCCC;">
+	</td>
+</tr>
+<tr>
+	<td align="right">เจ้าของเคส <font color="#FF0000"><b> * </b></font> : </td>
+	<td>
+		<input type="text" id="case_owners" name="case_owners" value="" size="50">
 	</td>
 </tr>
 <tr>

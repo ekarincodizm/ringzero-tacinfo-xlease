@@ -70,7 +70,8 @@ include("../../config/config.php");
 	} 
 	
     // SQL Comand For Control Order Data
-	$qry_end = " order by a.\"voucherID\" ";
+	$qry_end = " order by a.\"voucherDate\", a.\"voucherTime\", a.\"voucherID\" ";
+	
     // Create Complement SQL Comand For Query	
 	$qry = $qry.$Cnd1.$Cnd2.$qry_end;
 	

@@ -63,9 +63,11 @@ include("../../config/config.php");
 		    $qry_c2 .= " and (\"voucherPurpose\" = ".$s_purpose_idx." )";
 		  }
 		}  
-    } 	
+    }
+	
 	// Part Of SQL Comand ส่วนการเรียงข้อมูล
-	$qry_end = " order by a.\"voucherID\" "; 
+	$qry_end = " order by a.\"voucherDate\", a.\"voucherTime\", a.\"voucherID\" ";
+	
 	$qry = $qry.$qry_c1.$qry_c2.$qry_end; // Sql Comand สำหรับการสิืบค้นข้อมูล
 	$method = 0;
 ?>

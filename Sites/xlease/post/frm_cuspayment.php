@@ -38,7 +38,7 @@ $(document).ready(function(){
         minLength:3
     });
 	
-	    $("#idno").autocomplete({
+	$("#idno").autocomplete({
         source: "gdata2.php",
         minLength:3
     });
@@ -81,15 +81,15 @@ function remove_findtxt(num){
     <tr align="center">
      <td><b>IDNO,ชื่อ/สกุล,ทะเบียน,Ref1,Ref2</b>
         <input name="idno_names" type="hidden" id="idno_names" value="<?php echo $_POST['h_arti_id']; ?>" />
-        <input type="text" id="idno" name="idno" size="100" value="<?php echo $_POST['h_arti_id']; ?>" onblur="javascript:input_findtxt('t');" onclick="javascript:remove_findtxt('t');" tabindex="0">
+        <input type="text" id="idno" name="idno" size="150" value="<?php echo $_POST['h_arti_id']; ?>" onblur="javascript:input_findtxt('t');" onclick="javascript:remove_findtxt('t');" tabindex="0">
         <input type="submit" name="submit1" value="   ค้นหา   " tabindex="1">
       </td>
       </tr>
       <tr align="center">
       <td><b>ค้นหาแบบละเอียดพร้อมแสดงแถบสี </b>
         <input name="idno_names2" type="hidden" id="idno_names2" value="<?php echo $_POST['h_arti_id']; ?>" />
-        <input type="text" id="idno2" name="idno2" size="100" value="<?php echo $_POST['h_arti_id']; ?>" onblur="javascript:input_findtxt();" onclick="javascript:remove_findtxt();" tabindex="2">
-        <input type="submit" name="submit" value="   ค้นหา   " tabindex="3">
+        <input type="text" id="idno2" name="idno2" size="150" value="<?php echo $_POST['h_arti_id']; ?>" onblur="javascript:input_findtxt();" onclick="javascript:remove_findtxt();" tabindex="2">
+        <input type="submit" name="submit2" value="   ค้นหา   " tabindex="3">
       </td>
    </tr>
 </table>

@@ -1,6 +1,6 @@
 <?php
 include("../../../config/config.php");
-$contractID = $_GET["contractID"];
+$contractID = pg_escape_string($_GET["contractID"]);
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
@@ -110,6 +110,12 @@ function checkproctorid(){
 						<input type="text" name="proctor" id="proctor"size="40" onfocus="checkproctorid();" onblur="checkproctorid();" onkeypress="checkproctorid();"><font color="red"><b>*</b></font>
 					</td>
 				</tr>
+				<tr height="25">
+					<td>จำนวนวันที่ชำระภายใน  </td>
+					<td>
+						<input type="text" name="withInDay" id="withInDay" size="3" value="30"> วัน <font color="red"><b>*</b></font>
+					</td>
+				</tr>
 				</table>
 			</fieldset>
 			</div>
@@ -122,24 +128,52 @@ function checkproctorid(){
 					<td width="160">ค่างวด </td>
 					<td>
 					<?php
-					//หางวดเริ่มต้นและสิ้นสุดค้าง
-					$qrystartend=pg_query("SELECT min(\"ptNum\"),max(\"ptNum\")
-					FROM account.\"thcap_loan_payTerm_left\" 
-					WHERE \"contractID\"='$contractID' AND \"ptDate\"<=current_date and \"ptMinPayLeft\">0");
-					list($startnum,$endnum)=pg_fetch_array($qrystartend);
-					echo "<input type=\"hidden\" name=\"startnum\" id=\"startnum\" value=\"$startnum\" >";
-					echo "<input type=\"hidden\" name=\"endnum\" id=\"endnum\" value=\"$endnum\" >";
+					//หาว่าเป็นสัญญาประเภทใด
+					$qrytype=pg_query("select \"thcap_get_creditType\"('$contractID')");
+					list($contype)=pg_fetch_array($qrytype);
+					
+					if($contype=='LOAN' || $contype=='JOINT_VENTURE' || $contype=='PERSONAL_LOAN')
+					{
+						//หางวดเริ่มต้นและสิ้นสุดค้าง
+						$qrystartend=pg_query("SELECT min(\"ptNum\"),max(\"ptNum\")
+						FROM account.\"thcap_loan_payTerm_left\" 
+						WHERE \"contractID\"='$contractID' AND \"ptDate\"<=current_date and \"ptMinPayLeft\">0");
+						list($startnum,$endnum)=pg_fetch_array($qrystartend);
+						echo "<input type=\"hidden\" name=\"startnum\" id=\"startnum\" value=\"$startnum\" >";
+						echo "<input type=\"hidden\" name=\"endnum\" id=\"endnum\" value=\"$endnum\" >";
 
-					//หาค่างวดที่ต้องเรียกเก็บ
-					$qrypayment=pg_query("SELECT \"contractID\", sum(\"ptMinPayLeft\") as payleft
-					FROM account.\"thcap_loan_payTerm_left\"
-					WHERE \"ptDate\"<=current_date and \"contractID\"='$contractID' 
-					GROUP BY \"contractID\"");
-					if($respayment=pg_fetch_array($qrypayment)){
-						$payleft=$respayment["payleft"];
+						//หาค่างวดที่ต้องเรียกเก็บ
+						$qrypayment=pg_query("SELECT \"contractID\", sum(\"ptMinPayLeft\") as payleft
+						FROM account.\"thcap_loan_payTerm_left\"
+						WHERE \"ptDate\"<=current_date and \"contractID\"='$contractID' 
+						GROUP BY \"contractID\"");
+						if($respayment=pg_fetch_array($qrypayment)){
+							$payleft=$respayment["payleft"];
+						}
+						echo "<input type=\"hidden\" name=\"payleft\" id=\"payleft\" value=\"$payleft\" >";
+						echo "<input type=\"text\" value=".number_format($payleft,2)." readonly> (งวดที่ $startnum - งวดที่ $endnum)";
 					}
-					echo "<input type=\"hidden\" name=\"payleft\" id=\"payleft\" value=\"$payleft\" >";
-					echo "<input type=\"text\" value=".number_format($payleft,2)." readonly> (งวดที่ $startnum - งวดที่ $endnum)";
+					else
+					{
+						//หางวดเริ่มต้นและสิ้นสุดค้าง
+						$qrystartend=pg_query("SELECT min(\"typePayRefValue\"::integer), max(\"typePayRefValue\"::integer)
+						FROM \"thcap_temp_otherpay_debt\" 
+						WHERE \"contractID\"='$contractID' AND \"debtIsOther\" = '0' AND \"debtDueDate\" <= current_date AND \"typePayLeft\" > 0 ");
+						list($startnum,$endnum)=pg_fetch_array($qrystartend);
+						echo "<input type=\"hidden\" name=\"startnum\" id=\"startnum\" value=\"$startnum\" >";
+						echo "<input type=\"hidden\" name=\"endnum\" id=\"endnum\" value=\"$endnum\" >";
+
+						//หาค่างวดที่ต้องเรียกเก็บ
+						$qrypayment=pg_query("SELECT \"contractID\", sum(\"typePayLeft\") as payleft
+						FROM \"thcap_temp_otherpay_debt\"
+						WHERE \"contractID\"='$contractID' AND \"debtIsOther\" = '0' AND \"debtDueDate\" <= current_date AND \"typePayLeft\" > 0
+						GROUP BY \"contractID\"");
+						if($respayment=pg_fetch_array($qrypayment)){
+							$payleft=$respayment["payleft"];
+						}
+						echo "<input type=\"hidden\" name=\"payleft\" id=\"payleft\" value=\"$payleft\" >";
+						echo "<input type=\"text\" value=".number_format($payleft,2)." readonly> (งวดที่ $startnum - งวดที่ $endnum)";
+					}
 					?>
 					</td>
 				</tr>
@@ -152,9 +186,9 @@ function checkproctorid(){
 						list($typePayID)=pg_fetch_array($qrytypepay);
 						
 						//หาค่าติดตามที่ค้างชำระ
-						$qry_other = pg_query("select sum(\"typePayLeft\") from public.\"thcap_v_otherpay_debt_realother_current\" where \"contractID\"='$contractID' 
+						$qry_follow = pg_query("select sum(\"typePayLeft\") from public.\"thcap_v_otherpay_debt_realother_current\" where \"contractID\"='$contractID' 
 						and \"debtStatus\"='1' and \"typePayID\"='$typePayID' ");
-						list($paytag)=pg_fetch_array($qry_other);
+						list($paytag)=pg_fetch_array($qry_follow);
 
 						echo "<input type=\"hidden\" name=\"paytag\" id=\"paytag\" value=\"$paytag\" >";
 						echo "<input type=\"text\" value=".number_format($paytag,2)." readonly>";
@@ -165,12 +199,104 @@ function checkproctorid(){
 					<td>ค่าหนังสือเตือนโดยทนาย   </td>
 					<td>
 					<?php
-						$proctor_nt=1500;
+						//$proctor_nt=1500;
+						
+						//หาจำนวนเงิน ค่าหนังสือเตือน ที่จะตั้งหนี้ใหม่ครั้งนี้
+						$qrydebt_new = pg_query("SELECT thcap_get_config('nt1_rate',\"thcap_get_contractType\"('$contractID'))");
+						list($proctor_new) = pg_fetch_array($qrydebt_new);
+						
+						// หา ค่าหนังสือเตือนโดยทนาย เดิมที่ค้างอยู่
+						$qrydebt_old = pg_query("SELECT SUM(\"typePayLeft\")
+											FROM \"thcap_v_otherpay_debt_realother_current\"
+											WHERE \"contractID\" = '$contractID' AND \"typePayID\" like '%004' AND \"debtStatus\" = '1' ");
+						list($proctor_old) = pg_fetch_array($qrydebt_old);
+						
+						$proctor_nt = $proctor_new + $proctor_old;
+						
 						echo "<input type=\"hidden\" name=\"proctor_nt\" id=\"proctor_nt\" value=\"$proctor_nt\">";
 						echo "<input type=\"text\" value=".number_format($proctor_nt,2)." readonly>";
 					?>
 					</td>
 				</tr>
+				<?php
+					//----- หาหนี้อื่นๆ
+					
+					// function ที่ใช้หาเบี้ยปรับ
+					if($credit_type=="HIRE_PURCHASE" || $credit_type=="LEASING" || $credit_type=="GUARANTEED_INVESTMENT" || $credit_type=="FACTORING")
+					{
+						$function_get_fine = "thcap_get_lease_fine";
+					}
+					else
+					{
+						$function_get_fine = "thcap_get_loan_fine";
+					}
+					
+					$qry_other = pg_query("SELECT
+											\"typePayID\",
+											\"tpDesc\",
+											SUM(\"typePayLeft\") AS \"typePayLeft\"
+										FROM
+											(SELECT
+												a.\"typePayID\",
+												b.\"tpDesc\",
+												a.\"typePayLeft\"
+											FROM
+												\"thcap_v_otherpay_debt_realother_current\" a,
+												account.\"thcap_typePay\" b
+											WHERE
+												a.\"typePayID\" = b.\"tpID\" AND
+												a.\"contractID\" = '$contractID' AND
+												a.\"typePayID\" not like '%003' AND -- ไม่เอาค่าติดตามทวงถาม
+												a.\"typePayID\" not like '%004' AND -- ไม่เอาค่าหนังสือเตือนโดยทนาย
+												(a.\"debtDueDate\" IS NULL OR a.\"debtDueDate\" < current_date) AND
+												\"debtStatus\" = '1'
+
+											UNION
+
+											-- ค่าติดตามทวงถาม ล่วงหน้า 45 วัน
+											SELECT
+												\"tpID\" AS \"typePayID\",
+												\"tpDesc\",
+												\"$function_get_fine\"('$contractID', current_date + 45) AS \"typePayLeft\"
+											FROM
+												account.\"thcap_typePay\"
+											WHERE
+												\"tpConType\" = \"thcap_get_contractType\"('$contractID') AND
+												\"tpID\" LIKE '%500'
+											) AS \"tabletemp\"
+										GROUP BY 1, 2
+										HAVING SUM(\"typePayLeft\") > 0.00
+										ORDER BY 2 ");
+					$other = 0; // จำนวนหนี้อื่นๆ
+					while($res_other = pg_fetch_array($qry_other))
+					{
+						$other++;
+						
+						$typePayID = $res_other["typePayID"]; // รหัสค่าใช้จ่าย
+						$tpDesc = $res_other["tpDesc"]; // ชื่อค่าใช้จ่าย
+						$typePayLeft = $res_other["typePayLeft"]; // จำนวนเงินคงเหลือ
+						
+						if($other == 1)
+						{
+							$otherArray = "{".$typePayID.",".$typePayLeft."}";
+						}
+						else
+						{
+							$otherArray .= ",{".$typePayID.",".$typePayLeft."}";
+						}
+						
+						echo "<tr height=\"25\">";
+						echo "<td>$tpDesc   </td>";
+						echo "<td><input type=\"textbox\" value=".number_format($typePayLeft,2)." readOnly></td>";
+						echo "</tr>";
+					}
+					
+					// ถ้ามีหนี้อื่นๆ
+					if($other > 0)
+					{
+						echo "<input type=\"hidden\" name=\"otherPayDebt\" value=\"$otherArray\" />";
+					}
+				?>
 				</table>
 			</fieldset>
 			</div>
@@ -216,9 +342,9 @@ function checkproctorid(){
 			include("default_nt1_transaccount.php");
 			?> 
 			</div>
-			<div style="padding-top:5px;"><b>รายละเีอียดการติดต่อ : </b>
+			<div style="padding-top:5px;"><b>รายละเอียดการติดต่อ : </b>
 			<?php
-			$detailcontact="คุณจิตติมา 0-2744-2222 (2329) วันจันทร์ - เสาร์ เวลา 08.30-17.00 น.";
+			$detailcontact="โทร 0-2744-2325 วันจันทร์ - เสาร์ เวลา 08.30-17.00 น.";
 			echo "<input type=\"text\" name=\"detailcontact\" id=\"detailcontact\" value=\"$detailcontact\" size=\"100\" readonly>";
 			?> 
 			</div>

@@ -71,8 +71,6 @@ else{
 					while($res_fr=pg_fetch_array($qry_fr)){
 						list($contractID,$backduedate,$nubdate,$conNumNTDays,$backAmt,$LeftPrinciple,$nextDueDate,$nextDueAmt,$periods,$is_overdue,$NT_1_Status )=$res_fr;
 						
-						
-						
 						//หาว่าเป็นสัญญาประเภทใด
 						// $qrytype=pg_query("select \"thcap_get_creditType\"('$contractID')");
 						// list($contype)=pg_fetch_array($qrytype);
@@ -201,6 +199,13 @@ else{
 					}
 					for($j=0;$j<$a;$j++){
 						list($valchk,$contact)=explode("#",$y[$j]);
+						
+						// หาว่ามีรายการที่ออก NT ไปแล้ว แต่ยังไม่เสร็จสิ้นกระบวนหรือไม่
+						$qry_chk_NT_status = pg_query("select \"NT_status\", \"NT_ID\", \"NT_isprint\" from \"thcap_history_nt\" where \"contractID\" = '$contact' and \"NT_status\" = '1' order by \"NT_Date\" desc, \"NT_ID\" asc limit 1 ");
+						$NT_status = pg_fetch_result($qry_chk_NT_status,0); // สถานะ NT
+						$NT_ID = pg_fetch_result($qry_chk_NT_status,1); // เลขที่ NT
+						$NT_isprint = pg_fetch_result($qry_chk_NT_status,2); // พิมพ์ไปแล้วกี่ครั้ง
+						
 						/*
 						หลังจากได้ contractID แล้วก็ให้ทำตามขั้นตอนปกติคือการแสดงค่า แต่การแสดงค่านั้นต้องนำ contractID ที่ได้มาหาค่าอีกรอบ
 						เนื่องจากในตอนแรกนั้นเราไม่ได้ส่งค่าอื่นๆตามมาใน array ด้วย
@@ -307,12 +312,14 @@ else{
 							<td>$nextDueDate</td>
 							<td align=right width=100>".number_format($nextDueAmt,2)."</td>
 							";
-							if($is_overdue=='1'){ //กรณีค้างเกินที่กำหนด
+							if($is_overdue=='1')
+							{ //กรณีค้างเกินที่กำหนด
+							
 								//ตรวจสอบว่าเลขที่สัญญานี้รออนุมัติออก NT อยู่หรือไม่
 								/*$qrychk=pg_query("select \"NT_1_Status\" from \"thcap_NT1_temp\" where \"contractID\"='$contact' and \"active\"='TRUE'");
 								$numchk=pg_num_rows($qrychk);
 								list($NT_1_Status)=pg_fetch_array($qrychk);
-								*/
+								
 								if($NT_1_Status !=""){ //กรณีอยู่ในระหว่างดำเนินการ
 									if($NT_1_Status==2){ //แสดงว่ารออนุมัติอยู่
 										echo "<td width=110><font color=red>รออนุมัติ</font></td>";
@@ -325,9 +332,31 @@ else{
 											echo "<td><a onclick=\"javascript:popU('pdf_nt1_loan.php?contractID=$contact','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=740')\" style=\"cursor: pointer;\"><font color=red><u>ไม่อนุมัติ</u></font></a></td>";								
 										}
 									}
+								}*/
+								
+								// ตรวจสอบว่าเลขที่สัญญานี้รออนุมัติออก NT อยู่หรือไม่
+								$qrychk=pg_query("select \"NT_1_Status\" from \"thcap_NT1_temp\" where \"contractID\"='$contact' and \"NT_1_Status\"='2' ");
+								$numchk=pg_num_rows($qrychk);
+								
+								if($numchk > 0){ // กรณี เลขที่สัญญานี้รออนุมัติออก NT อยู่
+										echo "<td width=110><font color=red>รออนุมัติ</font></td>";
 								}else{ //แสดงว่ายังไม่มีการออก NT
-									if($contype=='LOAN' || $contype=='JOINT_VENTURE' || $contype=='PERSONAL_LOAN'){
-										echo "<td><a onclick=\"javascript:popU('apply_nt1_loan.php?contractID=$contact','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=740')\" style=\"cursor: pointer;\"><u>ออก NT</u></a></td>";
+									if($contype=='LOAN' || $contype=='JOINT_VENTURE'){
+										if($NT_status == "1")
+										{
+											if($NT_isprint > 0) // ถ้าเคยมีการพิมพ์แล้ว
+											{
+												echo "<td><a onclick=\"javascript:if(confirm('มีการออก NT เลขที่ $NT_ID ต้องการพิมพ์ซ้ำหรือไม่')){popU('pdf_nt1_loan.php?NTID1=$NT_ID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=740');}\" style=\"cursor:pointer; color:rgb(0,0,255);\"><u>ออก NT แล้ว</u></a></td>";
+											}
+											else // ถ้ายังไม่เคยมีการพิมพ์
+											{
+												echo "<td><a onclick=\"javascript:if(confirm('ออก NT เลขที่ $NT_ID')){popU('pdf_nt1_loan.php?NTID1=$NT_ID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=740');}\" style=\"cursor:pointer; color:rgb(0,0,255);\"><u>ออก NT แล้ว</u></a></td>";
+											}
+										}
+										else
+										{
+											echo "<td><a onclick=\"javascript:popU('apply_nt1_loan.php?contractID=$contact','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=740')\" style=\"cursor:pointer; color:rgb(255,0,0);\"><u>รอออก NT</u></a></td>";
+										}
 									}else{
 										
 										/*echo "<td><a onclick=\"javascript:popU('pdf_nt1_loan.php?contractID=$contact','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=740')\" style=\"cursor: pointer;\"><u>ออก NT</u></a></td>";	*/
@@ -335,22 +364,87 @@ else{
 										$result_chknextDueDate=pg_fetch_array($chknextDueDate);
 										list($nextDueDate)=$result_chknextDueDate;
 										if($nextDueDate==""){
-											echo "<td><a onclick=\"alert('กรุณาตรวจสอบข้อมูลอีกครั้ง สัญญานี้อาจถูกปิดไปแล้ว');\" style=\"cursor: pointer;\"><u>ออก NT</u></a></td>";
+											if($NT_status == "1")
+											{
+												echo "<td><a onclick=\"alert('กรุณาตรวจสอบข้อมูลอีกครั้ง สัญญานี้อาจถูกปิดไปแล้ว');\" style=\"cursor:pointer; color:rgb(0,0,255);\"><u>ออก NT แล้ว</u></a></td>";
+											}
+											else
+											{
+												echo "<td><a onclick=\"alert('กรุณาตรวจสอบข้อมูลอีกครั้ง สัญญานี้อาจถูกปิดไปแล้ว');\" style=\"cursor:pointer; color:rgb(255,0,0);\"><u>รอออก NT</u></a></td>";
+											}
 										}
 										else{
-										$typecontract=pg_query("select \"thcap_get_contractType\"('$contact')");
-										$result_typecontract=pg_fetch_array($typecontract);
-										list($type_contact)=$result_typecontract;	
-										if($type_contact=='FL'){
-											echo "<td><a onclick=\"javascript:popU('pdf_nt1_FL.php?contractID=$contact','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=740')\" style=\"cursor: pointer;\"><u>ออก NT</u></a></td>";
-										}
-										else if($type_contact=='HP'){
-											echo "<td><a onclick=\"javascript:popU('pdf_nt1_HP.php?contractID=$contact','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=740')\" style=\"cursor: pointer;\"><u>ออก NT</u></a></td>";
-										
-										}
-										else{
-											echo "<td><a onclick=\"javascript:popU('pdf_nt1_loan.php?contractID=$contact','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=740')\" style=\"cursor: pointer;\"><u>ออก NT</u></a></td>";
-										}
+											$typecontract=pg_query("select \"thcap_get_contractType\"('$contact')");
+											$result_typecontract=pg_fetch_array($typecontract);
+											list($type_contact)=$result_typecontract;	
+											if($type_contact=='FL'){
+												if($NT_status == "1")
+												{
+													if($NT_isprint > 0) // ถ้าเคยมีการพิมพ์แล้ว
+													{
+														echo "<td><a onclick=\"javascript:if(confirm('มีการออก NT เลขที่ $NT_ID ต้องการพิมพ์ซ้ำหรือไม่')){popU('pdf_reprint_nt1_FL.php?NT_ID=$NT_ID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=740');}\" style=\"cursor: pointer; color:rgb(0,0,255);\"><u>ออก NT แล้ว</u></a></td>";
+													}
+													else
+													{
+														echo "<td><a onclick=\"javascript:if(confirm('ออก NT เลขที่ $NT_ID')){popU('pdf_reprint_nt1_FL.php?NT_ID=$NT_ID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=740');}\" style=\"cursor: pointer; color:rgb(0,0,255);\"><u>ออก NT แล้ว</u></a></td>";
+													}
+												}
+												else
+												{
+													echo "<td><a onclick=\"javascript:if(confirm('ยืนยันการออก NT ของเลขที่สัญญา $contact')){popU('pdf_nt1_FL.php?contractID=$contact','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=740'); list_tab_menu('FL');}\" style=\"cursor:pointer; color:rgb(255,0,0);\"><u>รอออก NT</u></a></td>";
+												}
+											}
+											else if($type_contact=='HP'){
+												if($NT_status == "1")
+												{
+													if($NT_isprint > 0) // ถ้าเคยมีการพิมพ์แล้ว
+													{
+														echo "<td><a onclick=\"javascript:if(confirm('มีการออก NT เลขที่ $NT_ID ต้องการพิมพ์ซ้ำหรือไม่')){popU('pdf_reprint_nt1_HP.php?NT_ID=$NT_ID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=740');}\" style=\"cursor: pointer; color:rgb(0,0,255);\"><u>ออก NT แล้ว</u></a></td>";
+													}
+													else
+													{
+														echo "<td><a onclick=\"javascript:if(confirm('ออก NT เลขที่ $NT_ID')){popU('pdf_reprint_nt1_HP.php?NT_ID=$NT_ID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=740');}\" style=\"cursor: pointer; color:rgb(0,0,255);\"><u>ออก NT แล้ว</u></a></td>";
+													}
+												}
+												else
+												{
+													echo "<td><a onclick=\"javascript:if(confirm('ยืนยันการออก NT ของเลขที่สัญญา $contact')){popU('pdf_nt1_HP.php?contractID=$contact','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=740'); list_tab_menu('HP');}\" style=\"cursor: pointer; color:rgb(255,0,0);\"><u>รอออก NT</u></a></td>";
+												}
+											}
+											else if($type_contact=='PL'){
+												if($NT_status == "1")
+												{
+													if($NT_isprint > 0) // ถ้าเคยมีการพิมพ์แล้ว
+													{
+														echo "<td><a onclick=\"javascript:if(confirm('มีการออก NT เลขที่ $NT_ID ต้องการพิมพ์ซ้ำหรือไม่')){popU('pdf_reprint_nt1_PL.php?NT_ID=$NT_ID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=740');}\" style=\"cursor: pointer; color:rgb(0,0,255);\"><u>ออก NT แล้ว</u></a></td>";
+													}
+													else
+													{
+														echo "<td><a onclick=\"javascript:if(confirm('ออก NT เลขที่ $NT_ID')){popU('pdf_reprint_nt1_PL.php?NT_ID=$NT_ID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=740');}\" style=\"cursor: pointer; color:rgb(0,0,255);\"><u>ออก NT แล้ว</u></a></td>";
+													}
+												}
+												else
+												{
+													echo "<td><a onclick=\"javascript:if(confirm('ยืนยันการออก NT ของเลขที่สัญญา $contact')){popU('pdf_nt1_PL.php?contractID=$contact','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=740'); list_tab_menu('PL');}\" style=\"cursor: pointer; color:rgb(255,0,0);\"><u>รอออก NT</u></a></td>";
+												}
+											}
+											else{
+												if($NT_status == "1")
+												{
+													if($NT_isprint > 0) // ถ้าเคยมีการพิมพ์แล้ว
+													{
+														echo "<td><a onclick=\"javascript:if(confirm('มีการออก NT เลขที่ $NT_ID ต้องการพิมพ์ซ้ำหรือไม่')){popU('pdf_nt1_loan.php?NTID1=$NT_ID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=740');}\" style=\"cursor: pointer; color:rgb(0,0,255);\"><u>ออก NT แล้ว</u></a></td>";
+													}
+													else
+													{
+														echo "<td><a onclick=\"javascript:if(confirm('ออก NT เลขที่ $NT_ID')){popU('pdf_nt1_loan.php?NTID1=$NT_ID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=740');}\" style=\"cursor: pointer; color:rgb(0,0,255);\"><u>ออก NT แล้ว</u></a></td>";
+													}
+												}
+												else
+												{
+													echo "<td><a onclick=\"javascript:popU('apply_nt1_loan.php?contractID=$contact','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=740')\" style=\"cursor: pointer; color:rgb(255,0,0);\"><u>รอออก NT</u></a></td>";
+												}
+											}
 										}
 									}
 								}

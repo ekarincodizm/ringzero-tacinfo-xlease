@@ -27,7 +27,7 @@ include("../config/config.php");
     </tr>
     <tr>
          <td align="right">*</td>
-         <td colspan="2">ต้องมีความยาว 6-10 ตัวอักษร</td>	
+         <td colspan="2">ต้องมีความยาวมากกว่าหรือเท่ากับ 6 ตัวอักษร</td>	
     </tr>
 	    <tr>
          <td align="right">*</td>

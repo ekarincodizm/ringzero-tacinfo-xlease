@@ -68,9 +68,9 @@ function check_number(evt) {
 
 
 <?php
-$idno=trim($_POST["idno"]);
+$idno=trim(pg_escape_string($_POST["idno"]));
 if(empty($idno)){
-$idno=trim($_GET["idno"]);
+$idno=trim(pg_escape_string($_GET["idno"]));
 }
 $qry_fp=pg_query("select * from \"Fp\" where (\"IDNO\" ='$idno') ");
 $res_fp=pg_fetch_array($qry_fp);

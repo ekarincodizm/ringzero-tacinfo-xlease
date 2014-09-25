@@ -1,6 +1,7 @@
 <?php
 session_start();
 include("../config/config.php");
+set_time_limit(0); // ให้ใช้เวลาในการ run เท่าไหร่ก็ได้
 
 $add_date=nowDateTime(); //ดึงข้อมูลวันเวลาจาก server
 $user_id = $_SESSION["av_iduser"];

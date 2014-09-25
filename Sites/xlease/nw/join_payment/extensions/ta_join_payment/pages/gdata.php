@@ -10,7 +10,7 @@ header ("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT"); // always modifi
 header ("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
 header ("Pragma: no-cache"); // HTTP/1.0
  
-$q = $_GET["q"];
+$q = pg_escape_string($_GET["q"]);
 
 
 $sql_select=pg_query("SELECT m.id,v.\"IDNO\",m.cpro_name,v.\"C_REGIS\",v.\"full_name\",v.\"P_ACCLOSE\",m.cancel,m.car_license,m.idno as idno2 FROM public.\"VJoinMain\" m left join \"VJoin\" v on m.idno=v.\"IDNO\" 
@@ -20,7 +20,8 @@ ORDER BY v.\"IDNO\" desc LIMIT 20");
 while($res_cn=pg_fetch_array($sql_select)){
     $IDNO = trim($res_cn["IDNO"]);
     $id = trim($res_cn["id"]);
-    $full_name = trim($res_cn["full_name"]);
+    //$full_name = trim($res_cn["full_name"]);
+	$full_name = trim($res_cn["cpro_name"]);
     $car_license = trim($res_cn["C_REGIS"]);
 	$car_license = $res_cn["C_REGIS"];
 	$P_ACCLOSE = $res_cn["P_ACCLOSE"];
@@ -29,10 +30,10 @@ while($res_cn=pg_fetch_array($sql_select)){
 		
 		$car_license = trim($res_cn["car_license"]);
 		$IDNO = trim($res_cn["idno2"]);
-		if($cancel==1)$cc = " <font color=red>(ยกเลิกแล้ว-ถอดป้าย/เปลี่ยนสี)</font>" ;
-		else if($cancel==2)$cc = " <font color=red>(ยกเลิกแล้ว-รถยึด)</font>" ;
-		else if($cancel==3)$cc = " <font color=red>(ยกเลิกแล้ว-ขายคืน)</font>" ;
-		else if($cancel==4)$cc = " <font color=red>(ยกเลิกแล้ว-โอนสิทธิ์)</font>" ;
+		if($cancel==1){$cc = " <font color=red>(ยกเลิกแล้ว-ถอดป้าย/เปลี่ยนสี)</font>";}
+		else if($cancel==2){$cc = " <font color=red>(ยกเลิกแล้ว-รถยึด)</font>";}
+		else if($cancel==3){$cc = " <font color=red>(ยกเลิกแล้ว-ขายคืน)</font>";}
+		else if($cancel==4){$cc = " <font color=red>(ยกเลิกแล้ว-โอนสิทธิ์)</font>";}
 		
 		$full_name = trim($res_cn["cpro_name"]) ;
 		

@@ -529,51 +529,73 @@ if($cmd == "save"){
 	}
 
 }else if($cmd=="returnchq_bounced"){ //นำเช็คกลับไป "ยืนยันนำเช็คเข้าธนาคาร"  เด้ง
-	$revChqID=$_POST["revChqID"];	
+	$revChqID = pg_escape_string($_POST["revChqID"]);
 	
-	//update status ให้กลับมายืนยันนำเช็คเข้าเหมือนเดิม
-	$upmain="update finance.\"thcap_receive_cheque\" set \"revChqStatus\"='7' where \"revChqID\"='$revChqID'";
-	if($res=pg_query($upmain)){
-	}else{
+	// ตรวจสอบก่อนว่ามีการทำรายการไปก่อนหน้านี้แล้วหรือยัง
+	$qry_chk = pg_query("select \"revChqStatus\" from finance.\"thcap_receive_cheque\" where \"revChqID\"='$revChqID' ");
+	$chk_revChqStatus = pg_fetch_result($qry_chk,0);
+	if($chk_revChqStatus != "2")
+	{
+		// มีการทำรายการไปก่อนหน้านี้แล้ว
 		$status++;
+		$error_returnchq_bounced = "มีการทำรายการไปก่อนหน้านี้แล้ว";
 	}
-	
-	//update ข้อมูลกลับไปตอนที่ยังไม่ยืนยัน
-	$updatekeep="update finance.thcap_receive_cheque_keeper set \"replyByTakerID\"=null,
-		\"replyByTakerStamp\"=null,
-		\"bankRevDate\"=null,
-		\"bankRevResult\"=null
-		where \"revChqID\"='$revChqID'";
-	if($resupkeep=pg_query($updatekeep)){
-	}else{
-		$status++;
-	}
-	/*ลบ ข้อมูล ใน  finance.thcap_receive_cheque_keeper โดยจะหา เก็บ log ของ finance.thcap_receive_cheque_keeper 
-	แล้วจึงลบข้อมูลที่  finance.thcap_receive_cheque_keeper
-	*/
-	$qry_chqKeeperID = pg_query("select max(\"chqKeeperID\") as \"maxid_chqKeeperID\" from finance.\"thcap_receive_cheque_keeper\" where \"revChqID\"='$revChqID'" );
-	$maxid_chqKeeperID = pg_fetch_result($qry_chqKeeperID,0);
-	
-	$inskeep="INSERT INTO finance.thcap_receive_cheque_keeper_log(
-            \"revChqID\", \"keepFrom\", \"keeperID\", \"keeperStamp\", \"giveTakerID\", 
-            \"giveTakerStamp\", \"giveTakerDate\", \"replyByTakerID\", 
-            \"replyByTakerStamp\", \"bankRevDate\", \"bankRevResult\", \"getBankSlip\", 
-            \"giveCusConID\", \"giveCusDate\", \"receiptIDForReturn\", \"keepChqDate\", 
-            \"BID\",\"result\")
-			SELECT \"revChqID\", \"keepFrom\", \"keeperID\", \"keeperStamp\", \"giveTakerID\", 
-            \"giveTakerStamp\", \"giveTakerDate\", \"replyByTakerID\", 
-            \"replyByTakerStamp\", \"bankRevDate\", \"bankRevResult\", \"getBankSlip\", 
-            \"giveCusConID\", \"giveCusDate\", \"receiptIDForReturn\", \"keepChqDate\", 
-            \"BID\",\"result\" FROM finance.thcap_receive_cheque_keeper WHERE \"chqKeeperID\"='$maxid_chqKeeperID'";
-	if(pg_query($inskeep)){
-	}else{
-			$status++;			
-	}
-	
-	$del_data=" DELETE FROM finance.\"thcap_receive_cheque_keeper\"	WHERE \"chqKeeperID\" ='$maxid_chqKeeperID'";
-	if(pg_query($del_data)){
-	}else{
-		$status++;		
+	else
+	{
+		//update status ให้กลับมายืนยันนำเช็คเข้าเหมือนเดิม
+		$upmain="update finance.\"thcap_receive_cheque\" set \"revChqStatus\"='7' where \"revChqID\"='$revChqID'";
+		if($res=pg_query($upmain)){
+		}else{
+			$status++;
+		}
+		
+		// หา KeeperID ล่าสุด
+		$qry_chqKeeperID = pg_query("SELECT
+										max(\"chqKeeperID\") as \"maxid_chqKeeperID\"
+									FROM
+										finance.\"thcap_receive_cheque_keeper\"
+									WHERE
+										\"revChqID\" = '$revChqID' AND
+										\"keepFrom\" = '2' AND
+										\"giveTakerID\" is null ");
+		$maxid_chqKeeperID = pg_fetch_result($qry_chqKeeperID,0);
+		
+		//update ข้อมูลกลับไปตอนที่ยังไม่ยืนยัน (เฉพาะรายการก่อนหน้ารายการล่าสุด 1 รายการเป็นต้นไปเท่านั้น คือ เฉพาะรายการล่าสุดและรายการก่อนล่าสุด)
+		$updatekeep="update finance.thcap_receive_cheque_keeper set \"replyByTakerID\"=null,
+			\"replyByTakerStamp\"=null,
+			\"bankRevDate\"=null,
+			\"bankRevResult\"=null
+			where \"revChqID\"='$revChqID'
+			and \"chqKeeperID\" >= (select max(\"chqKeeperID\") from finance.\"thcap_receive_cheque_keeper\" where \"revChqID\"='$revChqID' and \"chqKeeperID\" < '$maxid_chqKeeperID') ";
+		if($resupkeep=pg_query($updatekeep)){
+		}else{
+			$status++;
+		}
+		
+		/*ลบ ข้อมูล ใน  finance.thcap_receive_cheque_keeper โดยจะหา เก็บ log ของ finance.thcap_receive_cheque_keeper 
+		แล้วจึงลบข้อมูลที่  finance.thcap_receive_cheque_keeper
+		*/
+		$inskeep="INSERT INTO finance.thcap_receive_cheque_keeper_log(
+				\"revChqID\", \"keepFrom\", \"keeperID\", \"keeperStamp\", \"giveTakerID\", 
+				\"giveTakerStamp\", \"giveTakerDate\", \"replyByTakerID\", 
+				\"replyByTakerStamp\", \"bankRevDate\", \"bankRevResult\", \"getBankSlip\", 
+				\"giveCusConID\", \"giveCusDate\", \"receiptIDForReturn\", \"keepChqDate\", 
+				\"BID\",\"result\")
+				SELECT \"revChqID\", \"keepFrom\", \"keeperID\", \"keeperStamp\", \"giveTakerID\", 
+				\"giveTakerStamp\", \"giveTakerDate\", \"replyByTakerID\", 
+				\"replyByTakerStamp\", \"bankRevDate\", \"bankRevResult\", \"getBankSlip\", 
+				\"giveCusConID\", \"giveCusDate\", \"receiptIDForReturn\", \"keepChqDate\", 
+				\"BID\",\"result\" FROM finance.thcap_receive_cheque_keeper WHERE \"chqKeeperID\"='$maxid_chqKeeperID'";
+		if(pg_query($inskeep)){
+		}else{
+				$status++;
+		}
+		
+		$del_data=" DELETE FROM finance.\"thcap_receive_cheque_keeper\"	WHERE \"chqKeeperID\" ='$maxid_chqKeeperID'";
+		if(pg_query($del_data)){
+		}else{
+			$status++;
+		}
 	}
 	
 }else if($cmd=='calleasefine'){ //คำนวณเบี้ยปรับตามวันที่ต้องการ
@@ -726,7 +748,14 @@ if($status==-1){ //กรณีรายการคืนเช็คขออ�
 			echo $script;
 		}
 		else{
-			echo "2";
+			if($cmd == "returnchq_bounced" && $error_returnchq_bounced != "")
+			{
+				echo "$error_returnchq_bounced";
+			}
+			else
+			{
+				echo "2";
+			}
 		}
 	}
 }

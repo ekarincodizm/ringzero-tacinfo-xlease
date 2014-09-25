@@ -36,7 +36,7 @@ if($sql_row5 = pg_fetch_array($sql_query5))
 	
 	if($cancel==0 && $P_ACCLOSE=='f'){	 
 		$car_license=$sql_row5["C_REGIS"];
-		$cpro_name= $sql_row5['full_name'];	
+		//$cpro_name= $sql_row5['full_name'];
 	}
 }				
 ?>

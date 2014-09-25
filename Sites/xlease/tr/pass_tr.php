@@ -60,7 +60,7 @@ include("../config/config.php");
     <td width="95">Receipt</td>
   </tr>
   <?php
-  $sdate=$_GET["trdate"];
+  $sdate = pg_escape_string($_GET["trdate"]);
   $qry_tr=pg_query("select * from \"TranPay\" WHERE (post_on_date='$sdate') AND (tran_type!='TR') ");
   while($res_tr=pg_fetch_array($qry_tr))
   {
@@ -72,7 +72,7 @@ include("../config/config.php");
    
    if(empty($res_tr["post_by"]))
    {
-    $bt_recive="<button onclick=\"window.location='process_pass_tranpay.php?pid=".trim($ppid)."&idno=".trim($idnoid)."&samt=$amtid'\">Receipt</button>";
+    $bt_recive="<button onclick=\"disabled=true; window.location='process_pass_tranpay.php?pid=".trim($ppid)."&idno=".trim($idnoid)."&samt=$amtid'\">Receipt</button>";
    }
    else
    {

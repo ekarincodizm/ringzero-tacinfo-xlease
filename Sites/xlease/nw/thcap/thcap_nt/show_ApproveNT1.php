@@ -1,6 +1,7 @@
 <?php
 include("../../../config/config.php");
-$contractID = $_GET["contractID"];
+include("../../function/checknull.php");
+$contractID = pg_escape_string($_GET["contractID"]);
 
 $qrydata=pg_query("SELECT * FROM \"thcap_NT1_temp\" 
 WHERE \"NT_1_Status\"='2' and \"contractID\"='$contractID' order by \"CusState\"='0'");
@@ -9,6 +10,7 @@ if($resdata=pg_fetch_array($qrydata)){
 	$NT_1_guaranID=$resdata['NT_1_guaranID']; //ประเภทสินทรัพย์ที่จำนอง
 	$NT_1_Date=$resdata['NT_1_Date'];//วันที่ทำสัญญาจำนอง
 	$NT_1_Lawyer_Name=$resdata['NT_1_Lawyer_Name'];//ทนายความผู้รับมอบอำนาจ
+	$NT_1_withInDay = $resdata['NT_1_withInDay']; // จำนวนวันที่ชำระภายในกี่วัน
 	$NT_1_startDue=$resdata['NT_1_startDue']; //งวดที่เริ่มค้าง
 	$NT_1_endDue=$resdata['NT_1_endDue'];//งวดสุดท้ายที่ค้าง
 	$NT_1_Duenext=$resdata['NT_1_Duenext'];//งาดที่ค้างในอนาคต
@@ -18,8 +20,10 @@ if($resdata=pg_fetch_array($qrydata)){
 	$NT_1_bank=$resdata['NT_1_bank'];// บัญชีธนาคาร
 	$NT_1_Result=$resdata['NT_1_Result']; //หมายเหตุ
 	
+	$NT_1_Duenext_checknull = checknull($NT_1_Duenext);
+	
 	//หาวันที่ครบกำหนดชำระงวดถัดไป
-	$qrydatenext=pg_query("select \"ptDate\" from account.\"thcap_loan_payTerm_left\" where \"contractID\"='$contractID' and \"ptNum\"='$NT_1_Duenext'");
+	$qrydatenext=pg_query("select \"ptDate\" from account.\"thcap_loan_payTerm_left\" where \"contractID\"='$contractID' and \"ptNum\"=$NT_1_Duenext_checknull ");
 	list($ptDatenext)=pg_fetch_array($qrydatenext);
 	
 	if($NT_1_Duenext==""){
@@ -99,6 +103,12 @@ function confirmappv(no){
 						<input type="text" name="proctor" id="proctor"size="40" value="<?php echo $NT_1_Lawyer_Name;?>" readonly>
 					</td>
 				</tr>
+				<tr height="25">
+					<td>จำนวนวันที่ชำระภายใน  </td>
+					<td>
+						<input type="text" name="withInDay" id="withInDay" size="3" value="<?php echo $NT_1_withInDay;?>" readonly> วัน
+					</td>
+				</tr>
 				</table>
 			</fieldset>
 			</div>
@@ -165,7 +175,7 @@ function confirmappv(no){
 			echo "<input type=\"text\" size=\"110\" value=\"$NT_1_bank\" readonly>";
 			?> 
 			</div>
-			<div style="padding-top:5px;"><b>รายละเีอียดการติดต่อ : </b>
+			<div style="padding-top:5px;"><b>รายละเอียดการติดต่อ : </b>
 			<?php
 			$detailcontact=$NT_1_contact;
 			echo "<input type=\"text\" name=\"detailcontact\" id=\"detailcontact\" value=\"$detailcontact\" size=\"100\" readonly>";

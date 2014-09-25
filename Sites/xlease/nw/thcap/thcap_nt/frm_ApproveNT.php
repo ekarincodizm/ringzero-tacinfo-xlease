@@ -78,6 +78,8 @@ function popU(U,N,T){
 				<?php
 				if($contype=='LOAN' || $contype=='JOINT_VENTURE' || $contype=='PERSONAL_LOAN'){
 					echo "<span onclick=\"javascript:popU('show_ApproveNT1.php?contractID=$contractID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1100,height=800')\" style=\"cursor: pointer;\"><u>แสดงรายการ</u></span>";
+				}else{
+					echo "<span onclick=\"javascript:popU('show_ApproveNT1.php?contractID=$contractID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1100,height=800')\" style=\"cursor: pointer;\"><u>แสดงรายการ</u></span>";
 				}
 				?>
 				</td>

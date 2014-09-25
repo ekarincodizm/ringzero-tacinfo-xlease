@@ -3,6 +3,7 @@ session_start();
 include("../../../config/config.php");
 require_once("../../../settings.php");
 include("../../function/currency_totext.php"); //function แปลงจำนวนเงินเป็นตัวหนังสือ
+include("../../function/checknull.php");
 
 $nt_num = pg_escape_string($_GET['NTID1']); //เลขที่หนังสือ NT
 if($nt_num==""){ //ถ้าไม่มีการส่งค่าแบบ GET แสดงว่าส่งแบบ  POST
@@ -11,13 +12,24 @@ if($nt_num==""){ //ถ้าไม่มีการส่งค่าแบบ 
 
 $nowdate=nowDateTime();
 
+pg_query("BEGIN WORK");
+$status = 0;
+
 //วันที่ภาษาไทย
 $qrydatethai=pg_query("select get_date_thai_format('$nowdate')");
 list($nowdatethai)=pg_fetch_array($qrydatethai);
 
+// หาวันที่ออก NT
+$qry_NT_Date = pg_query("select \"NT_Date\" from \"thcap_history_nt\" where \"NT_ID\" = '$nt_num' ");
+$NT_Date = pg_fetch_result($qry_NT_Date,0);
+
+// หาวันที่ออก NT ภาษาไทย
+$qryNT_DateThai=pg_query("select get_date_thai_format('$NT_Date')");
+list($NT_DateThai)=pg_fetch_array($qryNT_DateThai);
+
 //หาข้อมูลที่จะนำมาแสดงในหนังสือ
 $qrydetail=pg_query("select \"contractID\",\"CusState\",\"NT_1_cusname\",\"NT_1_guaranID\",\"NT_1_Lawyer_Name\",\"NT_1_startDue\",\"NT_1_endDue\"
-,\"NT_1_Debtmore\",\"NT_1_Duenext\",\"NT_1_Paynext\",\"NT_1_Paytagnext\",\"NT_1_contact\",\"NT_1_bank\"
+,\"NT_1_Debtmore\",\"NT_1_Duenext\",\"NT_1_Paynext\",\"NT_1_Paytagnext\",\"NT_1_contact\",\"NT_1_bank\",\"NT_1_withInDay\"
 ,get_date_thai_format(\"NT_1_Date\") as startdate from \"thcap_NT1\" where \"NTID1\"='$nt_num'");
 if($resdt=pg_fetch_array($qrydetail)){
 	$contractID=$resdt['contractID']; //เลขที่สัญญา
@@ -33,6 +45,7 @@ if($resdt=pg_fetch_array($qrydetail)){
 	$type_asset=$resdt['NT_1_guaranID']; //ประเภทสินทรัพย์ที่จำนอง
 	$startdate=$resdt['startdate']; //วันที่ทำสัญญาจำนอง
 	$laywer=$resdt['NT_1_Lawyer_Name']; //ทนายความผู้รับมอบอำนาจ
+	$withInDay = $resdt['NT_1_withInDay']; // ให้ชำระภายในกี่วัน
 	$pnum_start_remain=$resdt['NT_1_startDue']; //งวดที่เริ่มค้าง
 	$pnum_end_remain=$resdt['NT_1_endDue']; //งวดที่ค้างล่าสุด
 	$CusState=$resdt['NT_1_Debtmore']; //หนี้ที่ต้องการเรียบเก็บเพิ่มเติม
@@ -41,6 +54,15 @@ if($resdt=pg_fetch_array($qrydetail)){
 	$damages=number_format($resdt['NT_1_Paytagnext'],2); //ค่าติดตามทวงถามอนาคต
 	$contact=$resdt['NT_1_contact']; //รายละเอียดการติดต่อ
 	$bank=$resdt['NT_1_bank']; //บัญชีธนาคาร
+	
+	$pnum_next = checknull($pnum_next);
+	
+	// ถ้าไม่มีค่า ให้ชำระภายในกี่วัน ให้กำหนดเป็น 30 วันที
+	if($withInDay == ""){$withInDay = "30";}
+	
+	//หาว่าเป็นสัญญาประเภทใด
+	$qrytype=pg_query("select \"thcap_get_creditType\"('$contractID')");
+	list($contype)=pg_fetch_array($qrytype);
 	
 	//หาวันที่ของดิว จากวันที่เริ่มค้าง
 	$qrydatest=pg_query("select get_date_thai_format(\"ptDate\") from account.\"thcap_payTerm\" where \"contractID\"='$contractID' and \"ptNum\"='$pnum_start_remain'");
@@ -51,7 +73,7 @@ if($resdt=pg_fetch_array($qrydetail)){
 	list($date_end_remain)=pg_fetch_array($qrydateend);
 	
 	//หาวันที่ค้างในอนาคต
-	$qrydatenext=pg_query("select get_date_thai_format(\"ptDate\") from account.\"thcap_payTerm\" where \"contractID\"='$contractID' and \"ptNum\"='$pnum_next'");
+	$qrydatenext=pg_query("select get_date_thai_format(\"ptDate\") from account.\"thcap_payTerm\" where \"contractID\"='$contractID' and \"ptNum\"=$pnum_next ");
 	list($txtdate_next)=pg_fetch_array($qrydatenext);
 		
 	$pnum_total_remain=($pnum_end_remain-$pnum_start_remain)+1; //หาวันรวมที่ผิดนัด
@@ -64,17 +86,37 @@ if($resdt=pg_fetch_array($qrydetail)){
 	list($allmoney_remain)=pg_fetch_array($qryallmoney);
 	$allmoney_remain=number_format($allmoney_remain,2);
 
-	//ข้อมูลสัญญา
-	$qrycon=pg_query("select \"conLoanAmt\",\"conMinPay\",\"conRepeatDueDay\",\"conTerm\",get_date_thai_format(\"conFirstDue\") as txtstartdate from thcap_contract where \"contractID\"='$contractID'");
-	if($rescon=pg_fetch_array($qrycon)){
-		$conLoanAmt=$rescon['conLoanAmt']; //จำนวนเงินกู้
-		$txtmoney=bahtThai($conLoanAmt);//แปลงจำนวนเงินเป็นภาษาไทย
-		$money=number_format($conLoanAmt,2); //จำนวนเงินกู้
-		$moneypmonth=number_format($rescon['conMinPay'],2); //จำนวนเงินผ่อนขั้นต่ำต่อ Due
-		$everyday=$rescon['conRepeatDueDay']; //Due วันที่ชำระของทุกๆเดือน เช่น 01 หรือ 28
-		$pnum=$rescon['conTerm']; //ระยะเวลาผ่อนชำระคืนเงินกู้ (เดือน)
-		$txtstartdate=$rescon['txtstartdate']; //Due แรก
-		
+	if($contype=='LOAN' || $contype=='JOINT_VENTURE' || $contype=='PERSONAL_LOAN')
+	{
+		//ข้อมูลสัญญา
+		$qrycon=pg_query("select \"conLoanAmt\",\"conMinPay\",\"conRepeatDueDay\",\"conTerm\",get_date_thai_format(\"conFirstDue\") as txtstartdate from thcap_contract where \"contractID\"='$contractID'");
+		if($rescon=pg_fetch_array($qrycon)){
+			$conLoanAmt=$rescon['conLoanAmt']; //จำนวนเงินกู้
+			$txtmoney=bahtThai($conLoanAmt);//แปลงจำนวนเงินเป็นภาษาไทย
+			$money=number_format($conLoanAmt,2); //จำนวนเงินกู้
+			$moneypmonth=number_format($rescon['conMinPay'],2); //จำนวนเงินผ่อนขั้นต่ำต่อ Due
+			$everyday=$rescon['conRepeatDueDay']; //Due วันที่ชำระของทุกๆเดือน เช่น 01 หรือ 28
+			$pnum=$rescon['conTerm']; //ระยะเวลาผ่อนชำระคืนเงินกู้ (เดือน)
+			$txtstartdate=$rescon['txtstartdate']; //Due แรก
+		}
+	}
+	elseif($contype=='GUARANTEED_INVESTMENT' || $contype=='HIRE_PURCHASE')
+	{
+		//ข้อมูลสัญญา
+		$qrycon=pg_query("select \"conFinanceAmount\",\"conMinPay\",\"conRepeatDueDay\",\"conTerm\",get_date_thai_format(\"conFirstDue\") as txtstartdate from thcap_contract where \"contractID\"='$contractID'");
+		if($rescon=pg_fetch_array($qrycon)){
+			$conLoanAmt=$rescon['conFinanceAmount']; // ยอดจัด/ยอดลงทุน ของ เช่าซื้อ ลีสซิ่ง...
+			$txtmoney=bahtThai($conLoanAmt);//แปลงจำนวนเงินเป็นภาษาไทย
+			$money=number_format($conLoanAmt,2); //จำนวนเงินกู้
+			$moneypmonth=number_format($rescon['conMinPay'],2); //จำนวนเงินผ่อนขั้นต่ำต่อ Due
+			$everyday=$rescon['conRepeatDueDay']; //Due วันที่ชำระของทุกๆเดือน เช่น 01 หรือ 28
+			$pnum=$rescon['conTerm']; //ระยะเวลาผ่อนชำระคืนเงินกู้ (เดือน)
+			$txtstartdate=$rescon['txtstartdate']; //Due แรก
+		}
+	}
+	else
+	{
+		echo iconv('UTF-8','windows-874',"ยังไม่รองรับสัญญา $contype<br>");
 	}
 }
 
@@ -84,23 +126,23 @@ require('../../../thaipdfclass.php');
 class PDF extends ThaiPDF {
 }
 
-$pdf=new PDF('P' ,'mm','a4');
+$pdf=new PDF('P' ,'mm','legal');
 $pdf->SetLeftMargin(0);
 $pdf->SetTopMargin(0);
 $pdf->AliasNbPages( 'tp' );
 $pdf->SetThaiFont();
 $pdf->AddPage();
 
-$cline = 54;
+$cline = 45;
 
 $pdf->SetFont('AngsanaNew','B',14);
 $pdf->SetXY(20,$cline);
-$title=iconv('UTF-8','windows-874',"วันที่ $nowdatethai");
+$title=iconv('UTF-8','windows-874',"วันที่ $NT_DateThai");
 $pdf->MultiCell(170,6,$title,0,'C',0);
 
 $pdf->SetFont('AngsanaNew','B',14);
 $pdf->SetXY(20,$cline);
-$title=iconv('UTF-8','windows-874',"NT $nt_num");
+$title=iconv('UTF-8','windows-874',"ที่ $nt_num");
 $pdf->MultiCell(170,6,$title,0,'L',0);
 
 $cline += 10;
@@ -112,7 +154,18 @@ $pdf->MultiCell(15,6,$title,0,'L',0);
 
 $pdf->SetFont('AngsanaNew','B',14);
 $pdf->SetXY(35,$cline);
-$title=iconv('UTF-8','windows-874',"ให้ชำระหนี้ตามสัญญากู้ยืมเงินและบอกเลิกสัญญากู้ยืมเงิน ( เตือนครั้งสุดท้าย )");
+if($contype=='LOAN' || $contype=='JOINT_VENTURE')
+{
+	$title=iconv('UTF-8','windows-874',"ให้ชำระหนี้ตามสัญญากู้ยืมเงินและบอกเลิกสัญญากู้ยืมเงิน ( เตือนครั้งสุดท้าย )");
+}
+elseif($contype=='PERSONAL_LOAN')
+{
+	$title=iconv('UTF-8','windows-874',"ให้ชำระหนี้ตามสัญญากู้ยืมเงินและบอกเลิกสัญญากู้ยืมเงิน");
+}
+elseif($contype=='GUARANTEED_INVESTMENT' || $contype=='HIRE_PURCHASE')
+{
+	$title=iconv('UTF-8','windows-874',"ให้ชำระหนี้ตามสัญญา");
+}
 $pdf->MultiCell(190,6,$title,0,'L',0);
 
 $cline += 5;
@@ -162,12 +215,12 @@ $pdf->MultiCell(25,6,$title,0,'C',0);
 $cline += 5;
 $pdf->SetFont('AngsanaNew','',14);
 $pdf->SetXY(20,$cline);
-$title=iconv('UTF-8','windows-874',"($txtmoney) และสัญญาว่าจะชำระคืนเงินกู้และดอกเบี้ยไม่น้อยกว่าเดือนละ $moneypmonth บาท ทุกวันที่ $everyday ของทุกๆ เดือน");
+$title=iconv('UTF-8','windows-874',"($txtmoney) และสัญญาว่าจะชำระคืนเงินกู้และดอกเบี้ยไม่น้อยกว่าเดือนละ $moneypmonth บาท");
 $pdf->MultiCell(190,6,$title,0,'L',0);
 
 $cline += 5;
 $pdf->SetXY(20,$cline);
-$title=iconv('UTF-8','windows-874',"ติดต่อกันไปจนกว่าจะครบ $pnum งวดเดือน เริ่มชำระงวดแรกวันที่  $txtstartdate เป็นต้นไป");
+$title=iconv('UTF-8','windows-874',"ทุกวันที่ $everyday ของทุกๆ เดือน ติดต่อกันไปจนกว่าจะครบ $pnum งวดเดือน เริ่มชำระงวดแรกวันที่  $txtstartdate เป็นต้นไป");
 $pdf->MultiCell(190,6,$title,0,'L',0);
 
 $cline += 5;
@@ -260,7 +313,7 @@ $title=iconv('UTF-8','windows-874',"ชื่อบัญชี  บริษั
 $pdf->MultiCell(60,5,$title,0,'L',0);
 
 $pdf->SetXY(155,$cline);
-$title=iconv('UTF-8','windows-874',"ภายใน  30 วันนับแต่วันที่ท่าน");
+$title=iconv('UTF-8','windows-874',"ภายใน  $withInDay วันนับแต่วันที่ท่าน");
 $pdf->MultiCell(42,5,$title,B,'L',0);
 
 $cline +=5;
@@ -281,9 +334,9 @@ $pdf->MultiCell(170,6,$title,B,'L',0);
 $cline +=5;
 $pdf->SetXY(20,$cline);
 $title=iconv('UTF-8','windows-874',"ค่าเสียหายจากการติดตามเพิ่มอีก  $damages บาท (หากมี) รวมกับยอดเงินที่แจ้งข้างต้น");
-$pdf->MultiCell(110,6,$title,B,'L',0);
+$pdf->MultiCell(113,6,$title,B,'L',0);
 
-$pdf->SetXY(130,$cline);
+$pdf->SetXY(135,$cline);
 $title=iconv('UTF-8','windows-874',"เพื่อให้ชำระหนี้เงินกู้ตรงตามสัญญาครบถ้วน");
 $pdf->MultiCell(100,6,$title,0,'L',0);
 
@@ -357,5 +410,24 @@ $pdf->SetXY(20,$cline);
 $title=iconv('UTF-8','windows-874',"$contact");
 $pdf->MultiCell(190,6,$title,0,'L',0);
 
-$pdf->Output();
+//บันทึกข้อมูล
+$ins = "UPDATE \"thcap_history_nt\"
+		SET \"NT_isprint\" = \"NT_isprint\" + 1
+		WHERE \"NT_ID\" = '$nt_num' ";
+if($resin=pg_query($ins)){
+	$ntid = pg_fetch_result($resin,0); // NT
+}else{
+	$status++;
+}
+
+if($status==0)
+{ 
+	$pdf->Output();
+	pg_query("COMMIT");
+}
+else
+{
+	pg_query("ROLLBACK");
+	echo iconv('UTF-8','windows-874',"เกิดข้อผิดพลาด");
+}
 ?>

@@ -335,6 +335,7 @@ if($numchk>0)
 						$conSubType_serial = $result["conSubType_serial"]; // ประเภทสัญญาย่อย
 						$conResidualValue = $result["conResidualValue"]; // ค่าซาก
 						$conPLIniRate = $result["conPLIniRate"]; // ค่าธรรมเนียมการใช้วงเงินสินเชื่อส่วนบุคคล
+						$case_owners_id = $result["case_owners_id"]; // รหัสพนักงาน เจ้าของเคส
 						
 						$conNumExceptDays = $result["conNumExceptDays"]; // จำนวนวันที่ผ่อนผันเรื่องค่าติดตามทวงถาม และการปรับอัตราดอกเบี้ย นับจาก Due
 						$conNumNTDays = $result["conNumNTDays"]; // จำนวนวันที่ผ่อนผันการออกหนังสือเตือนหนี้ NT นับจาก Due
@@ -534,6 +535,7 @@ if($numchk>0)
 					$conFinAmtExtVat = checknull($conFinAmtExtVat);
 					$conResidualValue = checknull($conResidualValue); // ค่าซาก
 					$conPLIniRate = checknull($conPLIniRate); // ค่าธรรมเนียมการใช้วงเงินสินเชื่อส่วนบุคคล
+					$case_owners_id = checknull($case_owners_id); // รหัสพนักงาน เจ้าของเคส
 					
 					$conResidualValueIncVat = checknull($conResidualValueIncVat); // ค่าซากรวมภาษีมูลค่าเพิ่ม
 					$conLeaseIsForceBuyResidue = checknull($conLeaseIsForceBuyResidue); // บังคับซื้อซาก
@@ -555,11 +557,11 @@ if($numchk>0)
 					$conSubType_serial = checknull($conSubType_serial);
 				
 					// ทำการ INSERT ลง ตาราง thcap_contract
-					$sql_add = "insert into public.\"thcap_contract\" (\"contractID\",\"conType\",\"conCompany\",\"conLoanAmt\",\"conLoanIniRate\",\"conCredit\",\"conLoanMaxRate\",\"conTerm\"
+					$sql_add = "insert into public.\"thcap_contract\" (\"contractID\",\"conType\",\"conCompany\",\"conLoanAmt\",\"conLoanIniRate\",\"conCredit\",\"conLoanMaxRate\",\"conTerm\",\"case_owners_id\"
 																		,\"conMinPay\",\"conPenaltyRate\",\"conDate\",\"conStartDate\",\"conEndDate\",\"conFirstDue\",\"conRepeatDueDay\",\"conFreeDate\"
 																		,\"conClosedDate\",\"conClosedFee\",\"conStatus\",\"conFlow\",\"rev\",\"conCreditRef\",\"conFinanceAmount\",\"conFinAmtExtVat\",\"conExtRentMinPay\"
 																		,\"conDownToDealer\",\"conDownToFinance\",\"conDownToFinanceVat\",\"conSubType_serial\",\"conMonthlyAdviserFee\",\"conPLIniRate\")
-													values ('$contractID',$conType,$conCompany,$conLoanAmt,$conLoanIniRate,$conCredit,$conLoanMaxRate,$conTerm
+													values ('$contractID',$conType,$conCompany,$conLoanAmt,$conLoanIniRate,$conCredit,$conLoanMaxRate,$conTerm,$case_owners_id
 															,$conMinPay,$conPenaltyRate,$conDate,$conStartDate,$conEndDate,$conFirstDue,$conRepeatDueDay,$conFreeDate
 															,$conClosedDate,$conClosedFee,$conStatus,$conFlow,$rev,$conCreditRef,$conFinanceAmount,$conFinAmtExtVat,$conExtRentMinPay
 															,$conDownToDealer,$conDownToFinance,$conDownToFinanceVat,$conSubType_serial,$conMonthlyAdviserFee,$conPLIniRate)";

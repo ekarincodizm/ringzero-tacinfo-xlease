@@ -10,6 +10,7 @@ $method=pg_escape_string($_POST['method']);
 $contractID = trim(pg_escape_string($_POST['conid'])); // เลขที่สัญญา
 $conType = trim(pg_escape_string($_POST['contype'])); // ประเภทสัญญา
 $conCompany = trim(pg_escape_string($_POST['conCompany'])); // ชื่อบริษัท
+$case_owners = trim(pg_escape_string($_POST['case_owners'])); // เจ้าของเคส
 $conLoanAmt = trim(pg_escape_string($_POST['conloanamt'])); // จำนวนเงินกู้
 $conguaranteeamt = checknull(trim(pg_escape_string($_POST['conguaranteeamt'])));  // จำนวนเงินค้ำประกัน
 $conGuaranteeAmtForCredit = checknull(trim(pg_escape_string($_POST['conGuaranteeAmtForCredit'])));  // จำนวนเงินค้ำประกัน (สัญญาวงเงิน)
@@ -52,6 +53,8 @@ $conLeaseBaseFinanceForCal = pg_escape_string($_POST['conLeaseBaseFinanceForCal'
 
 $conPLIniRate = pg_escape_string($_POST['conPLIniRate']); // ค่าธรรมเนียมการใช้วงเงินสินเชื่อส่วนบุคคล
 
+list($case_owners_id, $case_owners_name) = explode('#',$case_owners); // รหัส และ ชื่อ เจ้าของเคส
+$case_owners_id_checknull = checknull($case_owners_id); // เช็คค่าว่างของรหัสพนักงานเจ้าของเคส
 
 $date = nowDateTime();
 
@@ -686,7 +689,7 @@ else
 		if($chk_con_type == "HIRE_PURCHASE" || $chk_con_type == "LEASING" || $chk_con_type == "GUARANTEED_INVESTMENT" || $chk_con_type == "FACTORING" || $chk_con_type == "SALE_ON_CONSIGNMENT")
 		{ // ถ้าเป็นสัญญาประเภทการเช่า
 			$sql3 = "INSERT INTO thcap_contract_temp(
-						\"contractID\", \"conType\", \"conCompany\", \"conFinanceAmount\", \"conLoanIniRate\", 
+						\"contractID\", \"conType\", \"conCompany\", \"conFinanceAmount\", \"conLoanIniRate\", \"case_owners_id\",
 						\"conLoanMaxRate\", \"conTerm\", \"conMinPay\", \"conPenaltyRate\", 
 						\"conDate\", \"conStartDate\", \"conEndDate\" ,\"conFirstDue\", \"conRepeatDueDay\",
 						\"conFreeDate\", \"conClosedFee\", \"conStatus\", \"conInvoicePeriod\", \"conFinAmtExtVat\", \"conFineRate\", \"conExtRentMinPay\",
@@ -694,7 +697,7 @@ else
 						\"conFlow\", rev, \"CusIDarray\", \"conCreditRef\", \"addrTempID\", \"doerUser\", \"doerStamp\", \"editNumber\", \"conSubType_serial\",
 						\"conNumExceptDays\", \"conNumNTDays\", \"conNumSueDays\", \"sendNCB\",
 						\"conResidualValueIncVat\", \"conLeaseIsForceBuyResidue\", \"conLeaseBaseFinanceForCal\", \"conGuaranteeAmtForCredit\" $conDown $txtfield)
-				VALUES ($contractID, $conType, $conCompany, $conLoanAmt, $conLoanIniRate,
+				VALUES ($contractID, $conType, $conCompany, $conLoanAmt, $conLoanIniRate, $case_owners_id_checknull,
 						'15', $conTerm, $conMinPay, $conPenaltyRate,
 						$conDate, $conStartDate, $conEndDate, $conFirstDue, $conRepeatDueDay,
 						$conFreeDate, $conClosedFee, '10', $conInvoicePeriod, $conFinAmtExtVat, $conFineRate, $conExtRentMinPay,
@@ -709,14 +712,14 @@ else
 			if($chk_con_type == "PERSONAL_LOAN"){$conLoanMaxRate = "28";}else{$conLoanMaxRate = "15";}
 			
 			$sql3 = "INSERT INTO thcap_contract_temp(
-						\"contractID\", \"conType\", \"conCompany\", \"conLoanAmt\", \"conLoanIniRate\", 
+						\"contractID\", \"conType\", \"conCompany\", \"conLoanAmt\", \"conLoanIniRate\", \"case_owners_id\",
 						\"conLoanMaxRate\", \"conTerm\", \"conMinPay\", \"conPenaltyRate\", 
 						\"conDate\", \"conStartDate\", \"conEndDate\" ,\"conFirstDue\", \"conRepeatDueDay\", 
 						\"conFreeDate\", \"conClosedFee\", \"conStatus\", \"conInvoicePeriod\", \"conFineRate\", \"conExtRentMinPay\",
 						\"conCusFullnameArray\", \"conCusAddressArray\", \"conPLIniRate\",
 						\"conFlow\", rev, \"CusIDarray\", \"conCreditRef\", \"addrTempID\", \"doerUser\", \"doerStamp\", \"editNumber\",\"conGuaranteeAmt\",
 						\"conNumExceptDays\", \"conNumNTDays\", \"conNumSueDays\", \"sendNCB\", \"conGuaranteeAmtForCredit\" $txtfield)
-				VALUES ($contractID, $conType, $conCompany, $conLoanAmt, $conLoanIniRate,
+				VALUES ($contractID, $conType, $conCompany, $conLoanAmt, $conLoanIniRate, $case_owners_id_checknull,
 						'$conLoanMaxRate', $conTerm, $conMinPay, $conPenaltyRate,
 						$conDate, $conStartDate, $conEndDate, $conFirstDue, $conRepeatDueDay,
 						$conFreeDate, $conClosedFee, '10',  $conInvoicePeriod, $conFineRate, $conExtRentMinPay,

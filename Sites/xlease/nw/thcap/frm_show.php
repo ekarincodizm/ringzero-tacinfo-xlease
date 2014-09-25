@@ -55,16 +55,16 @@ function clearapp(revtran)
 
 //function เช็คคืน
 function badchq(revtran){
-	$('body').append('<div id="dialog2"></div>');
-		$('#dialog2').load('selectchq_popup.php?revtran='+revtran);
-		$('#dialog2').dialog({
+	$('body').append('<div id="dialog3"></div>');
+		$('#dialog3').load('selectchq_popup.php?revtran='+revtran);
+		$('#dialog3').dialog({
 		title: 'เลือกรายการเช็คคืน',
 		resizable: false,
 		modal: true,  
 		width: 1100,
 		height: 600,
 		close: function(ev, ui){
-			$('#dialog2').remove();
+			$('#dialog3').remove();
 		}
 	});
 }
@@ -138,6 +138,23 @@ function returnchq_bounced(revChq){
 		}else{
 			return false;
 		}
+}
+//function สำหรับบันทึกข้อความการติดต่อจากลูกค้า 
+function contact_note(revtran){
+	/*$('body').append('<div id="dialog2"></div>'); 
+		$('#dialog2').load('Money_transfers_Note?revtran='+revtran);
+		$('#dialog2').dialog({
+		title: 'บันทึกข้อความ',
+		resizable: false,
+		modal: true,  
+		width: 1100,
+		height: 600,
+		close: function(ev, ui){
+			$('#dialog2').remove();
+		}
+	});
+	*/
+	popU('Money_transfers_Note.php?revtran='+revtran,'','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=600,height=600');
 }
 </script>
 <style type="text/css">
@@ -327,6 +344,7 @@ if($app==1){ //กรณีบัญชีอนุมัติ
 	<div style="text-align:left;padding-top:10px;"><font color="red"><img src="images/mix.png" width="24" height="23"> หมายถึง  map เช็คกับใบเสร็จที่ออกไปแล้ว</font></div>
 	<div style="text-align:left;padding-top:10px;"><font color="red"><img src="images/refresh.png" width="23" height="23"> หมายถึง  ยกเลิกรายการเช็คนี้ กลับไปเมนู "ยืนยันนำเช็คเข้าธนาคาร" อีกครั้ง</font></div>
 	<div style="text-align:left;padding-top:10px;"><font color="red"><img src="images/return.gif" width="20" height="20"> หมายถึง  ทำรายการเช็คคืน</font></div>
+	<div style="text-align:left;padding-top:10px;"><font color="red"><img src="images/note_icon.png" width="20" height="20"> หมายถึง  บันทึกข้อความ หมายเหตุ การตรวจสอบการโอนเงิน</font></div>
 	<div style="text-align:left;padding-top:10px;"><font color="red"><img src="images/anonymous_icon.jpg" width="23" height="23"> หมายถึง  ทำรายการว่ารายการนี้ไม่ทราบว่าเป็นเงินของใคร หรือ อาจไม่ใช่เงินของลูกค้า หรือเงินที่ธนาคารโอนมาผิด เมื่อครบกำหนดต้องปิดบัญชีแล้ว โดยการทำรายการดังกล่าวจะมีผลให้เกิด Receive Voucher ณ วันที่รับเงิน โดยเข้าบัญชี เจ้าหนี้ - (211002) เงินพักไม่สามารถระบุชื่อผู้ชำระ หรือเพื่อรอทำคืนกรณีที่ไม่ใช่เงินลูกค้า หรือธนาคารโอนผิด</font></div>
 	<?php
 	}
@@ -452,7 +470,7 @@ if($app==1){ //กรณีบัญชีอนุมัติ
 										<input type=\"hidden\" name=\"ConID\" value=\"$contractID\">
 										<input type=\"submit\" value=\"เลือกใช้รายการนี้\"> $txtamt";
 										echo "</td>";
-										echo "<td>";
+										echo "<td><img src=\"images/note_icon.png\" width=\"20\" height=\"20\" title=\"บันทึกข้อความ\" onclick=\"contact_note('$revTranID')\" style=\"cursor:pointer;\">";
 										//ตรวจสอบ emplevel ข้อพนักงาน
 										if($emplevel<=1){
 											//ตรวจสอบก่อนว่าเงินใช้ไปแล้วหรือยัง ถ้าใช้แล้วจะไม่สามารถล้างรายการได้
@@ -544,6 +562,7 @@ if($app==1){ //กรณีบัญชีอนุมัติ
 											echo "&nbsp;<img src=\"images/del.png\" width=\"23\" height=\"23\" title=\"ลบข้อมูล\" onclick=\"delapp('$revTranID')\" style=\"cursor:pointer;\">";
 											echo "&nbsp;<img src=\"images/return.gif\" width=\"20\" height=\"20\" title=\"เช็คคืน\" onclick=\"badchq('$revTranID')\" style=\"cursor:pointer;\">";
 										}
+										echo "<img src=\"images/note_icon.png\" width=\"20\" height=\"20\" title=\"บันทึกข้อความ\" onclick=\"contact_note('$revTranID')\" style=\"cursor:pointer;\">";
 										echo "</td>";
 										
 									}else{
