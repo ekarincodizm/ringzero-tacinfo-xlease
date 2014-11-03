@@ -179,14 +179,15 @@
 		<?php
 	}
 	function List_Contract_For_Check(){
-		echo "ประเภทสัญญา : ";
+		echo "<span style=\"cursor:pointer;\" onClick=\"selectOrClearAllType();\"><font color=\"#0000CC\"><u><B>ประเภทสัญญา</B></u></font></span> :";
 		$Str_Get_Contract_Type = " SELECT \"conType\"  FROM thcap_contract_type ";
 		$List_Contract_Type = pg_query($Str_Get_Contract_Type); 
 		$i = 0;
 		while($loop_typeContract = pg_fetch_array($List_Contract_Type)){
 			// 
 			?>
-			<input type="checkbox" name="Contract_Check" id = "contract[<?php echo $i; ?>]" value="<?php echo $loop_typeContract["conType"];  ?>"> 
+			<input type="checkbox" name="Contract_Check" id = "contract[<?php echo $i; ?>]" 
+			   	value="<?php echo $loop_typeContract["conType"];  ?>"  checked > 
 			<?php
 			echo $loop_typeContract["conType"]." ";
 			$i++;
@@ -194,7 +195,8 @@
 	}
 ?>	
 
-<script>
+<script> 
+	var selectAll = 'N'; // เริ่มแรก ประเภทสินเชื่อ จะให้ติ๊กเลือกทั้งหมด
 	function  chk_contract_select(){
 		var objCheck = document.getElementsByName('Contract_Check');
 		var Contract_Selected = "";
@@ -241,6 +243,24 @@
 		}
 	}
 	
+	function selectOrClearAllType(){
+		
+		var objCheck = document.getElementsByName('Contract_Check'); 
+		
+		if(selectAll =='Y'){
+			for (i = 0; i < objCheck.length; i++){
+    			objCheck[i].checked = true;
+    		}
+    		selectAll ='N';	
+		}else if(selectAll =='N'){
+			for (i = 0; i < objCheck.length; i++){
+    			objCheck[i].checked = false;
+    		}
+			selectAll ='Y';
+		}
+		
+	}
+	
 </script>
 
 <script>
@@ -252,7 +272,7 @@
 <h1>(THCAP) รายงานสรุปสัญญาประจำเดือน</h1>
 </center>
 
-<fieldset><legend><b>เงื่่อนไข</b></legend>
+<fieldset><legend><b>เงื่อนไข</b></legend>
 	<FORM Name = "InPutCnd" id = "InPutCnd" Method = "post" action = "aaa.php" >
 		<?php List_Contract_For_Check(); ?>
 		เดือน :<?php Month_For_Select(); ?>		

@@ -4,8 +4,8 @@ include("../function/nameMonth.php");
 $user_report = $_SESSION["av_iduser"]; //user ที่ทำการออกรายการ
 $date_report = nowDateTime(); //วันเวลาที่ออกรายการ 
 
-$option=$_GET["option"];
-$contype = $_GET["contype"];
+$option = pg_escape_string($_GET["option"]);
+$contype = pg_escape_string($_GET["contype"]);
 
 //ค้นหาชื่อผู้ออกรายงาน
 $qryname=pg_query("select fullname from \"Vfuser\" where id_user='$user_report'");
@@ -55,7 +55,7 @@ for($con = 0;$con < sizeof($contype) ; $con++){
 				$txtcon=$txtcon.", แสดงรายการที่อนุมัติและลูกค้ามีการจ่ายแล้ว";
 			}else if($contype[$con] == "2"){ //กรณีที่อนุมัติและยังไม่จ่าย
 				$contypeqry = $contypeqry."OR (\"dcNoteStatus\" = '1' AND \"debtStatus\"='1') ";
-				$txtcon=$txtcon.", แสดงรายการที่อนุมัติและลูกค้ายังไม่ไ่ด้จ่าย";
+				$txtcon=$txtcon.", แสดงรายการที่อนุมัติและลูกค้ายังไม่ได้จ่าย";
 			}else{
 				$contypeqry = $contypeqry."OR \"dcNoteStatus\" = '$contype[$con]' ";
 				if($contype[$con]==8){
@@ -126,30 +126,34 @@ $buss_name=iconv('UTF-8','windows-874',"เงื่อนไขรายงา�
 $pdf->MultiCell(285,4,$buss_name,'B','L',0);
 
 $pdf->SetFont('AngsanaNew','B',10);
-$pdf->SetXY(5,37); 
+$pdf->SetXY(2,37);
+$buss_name=iconv('UTF-8','windows-874',"เลขที่ CN/DN");
+$pdf->MultiCell(18,8,$buss_name,0,'C',0);
+
+$pdf->SetXY(20,37);
 $buss_name=iconv('UTF-8','windows-874',"เลขที่สัญญา");
 $pdf->MultiCell(25,8,$buss_name,0,'C',0);
 
-$pdf->SetXY(30,37); 
+$pdf->SetXY(45,37); 
 $buss_name=iconv('UTF-8','windows-874',"ชื่อผู้กู้หลัก/ผู้เช่าซื้อ");
 $pdf->MultiCell(25,8,$buss_name,0,'C',0);
 
 $pdf->SetFont('AngsanaNew','B',8);
-$pdf->SetXY(55,37); 
+$pdf->SetXY(70,37);
 $buss_name=iconv('UTF-8','windows-874',"รหัส");
 $pdf->MultiCell(10,4,$buss_name,0,'C',0);
-	$pdf->SetXY(55,41); 
+	$pdf->SetXY(70,41);
 	$buss_name=iconv('UTF-8','windows-874',"ค่าใช้จ่าย");
 	$pdf->MultiCell(10,4,$buss_name,0,'C',0);
 
 $pdf->SetFont('AngsanaNew','B',10);
-$pdf->SetXY(65,37); 
+$pdf->SetXY(80,37); 
 $buss_name=iconv('UTF-8','windows-874',"รายละเอียดหนี้");
-$pdf->MultiCell(30,8,$buss_name,0,'C',0);
-
-$pdf->SetXY(95,37); 
-$buss_name=iconv('UTF-8','windows-874',"เลขอ้างอิง");
 $pdf->MultiCell(25,8,$buss_name,0,'C',0);
+
+$pdf->SetXY(105,37); 
+$buss_name=iconv('UTF-8','windows-874',"เลขอ้างอิง");
+$pdf->MultiCell(15,8,$buss_name,0,'C',0);
 
 $pdf->SetXY(120,37); 
 $buss_name=iconv('UTF-8','windows-874',"จำนวนหนี้แรกเริ่ม");
@@ -201,7 +205,9 @@ $j = 0;
 $qry = pg_query("SELECT  * FROM account.thcap_dncn_discount_report where \"dcType\" = '2' $condition ");
 $row=pg_num_rows($qry);
 	
-while($res=pg_fetch_array($qry)){
+while($res=pg_fetch_array($qry))
+{
+	$dcNoteID = $res["dcNoteID"]; // รหัส CreditNote หรือ DebitNote
 	$conid = $res["contractID"];	//เลขที่สัญญา		
 	$maincus_fullname = $res["maincus_fullname"]; //-- หาชื่อผู้กู้หลัก
 	$typePayID = $res["typePayID"]; // รหัสประเภทค่าใช้จ่าย
@@ -215,6 +221,7 @@ while($res=pg_fetch_array($qry)){
 	$appv_fullname=$res["appvName"]; //ชื่อผู้อนุมัติ
 	$appvStamp=$res["appvStamp"]; //วันเวลาที่อนุมัติ	
 	$status = $res["statusname"];//สถานะการอนุมัติ
+	$debtStatus = $res["debtStatus"];//สถานะการจ่าย
 	
 	if($debtStatus == 5)
 	{
@@ -254,30 +261,34 @@ while($res=pg_fetch_array($qry)){
 		$pdf->MultiCell(285,4,$buss_name,'B','L',0);
 
 		$pdf->SetFont('AngsanaNew','B',10);
-		$pdf->SetXY(5,37); 
+		$pdf->SetXY(2,37);
+		$buss_name=iconv('UTF-8','windows-874',"เลขที่ CN/DN");
+		$pdf->MultiCell(18,8,$buss_name,0,'C',0);
+
+		$pdf->SetXY(20,37);
 		$buss_name=iconv('UTF-8','windows-874',"เลขที่สัญญา");
 		$pdf->MultiCell(25,8,$buss_name,0,'C',0);
 
-		$pdf->SetXY(30,37); 
+		$pdf->SetXY(45,37); 
 		$buss_name=iconv('UTF-8','windows-874',"ชื่อผู้กู้หลัก/ผู้เช่าซื้อ");
 		$pdf->MultiCell(25,8,$buss_name,0,'C',0);
 
 		$pdf->SetFont('AngsanaNew','B',8);
-		$pdf->SetXY(55,37); 
+		$pdf->SetXY(70,37);
 		$buss_name=iconv('UTF-8','windows-874',"รหัส");
 		$pdf->MultiCell(10,4,$buss_name,0,'C',0);
-			$pdf->SetXY(55,41); 
+			$pdf->SetXY(70,41);
 			$buss_name=iconv('UTF-8','windows-874',"ค่าใช้จ่าย");
 			$pdf->MultiCell(10,4,$buss_name,0,'C',0);
 
 		$pdf->SetFont('AngsanaNew','B',10);
-		$pdf->SetXY(65,37); 
+		$pdf->SetXY(80,37); 
 		$buss_name=iconv('UTF-8','windows-874',"รายละเอียดหนี้");
-		$pdf->MultiCell(30,8,$buss_name,0,'C',0);
-
-		$pdf->SetXY(95,37); 
-		$buss_name=iconv('UTF-8','windows-874',"เลขอ้างอิง");
 		$pdf->MultiCell(25,8,$buss_name,0,'C',0);
+
+		$pdf->SetXY(105,37); 
+		$buss_name=iconv('UTF-8','windows-874',"เลขอ้างอิง");
+		$pdf->MultiCell(15,8,$buss_name,0,'C',0);
 
 		$pdf->SetXY(120,37); 
 		$buss_name=iconv('UTF-8','windows-874',"จำนวนหนี้แรกเริ่ม");
@@ -323,29 +334,33 @@ while($res=pg_fetch_array($qry)){
 	}
 
 	$pdf->SetFont('AngsanaNew','',9);
-	$pdf->SetXY(5,$cline); 
+	$pdf->SetXY(2,$cline); 
+	$buss_name=iconv('UTF-8','windows-874',$dcNoteID);
+	$pdf->MultiCell(18,4,$buss_name,0,'C',0);
+	
+	$pdf->SetXY(20,$cline); 
 	$buss_name=iconv('UTF-8','windows-874',$conid);
 	$pdf->MultiCell(25,4,$buss_name,0,'C',0);
 
-	$pdf->SetXY(30,$cline); 
+	$pdf->SetXY(45,$cline); 
 	$buss_name=iconv('UTF-8','windows-874',$maincus_fullname);
 	$pdf->MultiCell(25,4,$buss_name,0,'L',0);
 
-	$pdf->SetXY(55,$cline); 
+	$pdf->SetXY(70,$cline); 
 	$buss_name=iconv('UTF-8','windows-874',$typePayID);
 	$pdf->MultiCell(10,4,$buss_name,0,'C',0);
 
-	$pdf->SetXY(65,$cline); 
+	$pdf->SetXY(80,$cline); 
 	$buss_name=iconv('UTF-8','windows-874',$tpdetail);
-	$pdf->MultiCell(30,4,$buss_name,0,'L',0);
+	$pdf->MultiCell(25,4,$buss_name,0,'L',0);
 
-	$pdf->SetXY(95,$cline); 
+	$pdf->SetXY(105,$cline); 
 	$buss_name=iconv('UTF-8','windows-874',$typePayRefValue);
-	$pdf->MultiCell(25,4,$buss_name,0,'C',0);
+	$pdf->MultiCell(15,4,$buss_name,0,'C',0);
 
 	$pdf->SetXY(120,$cline); 
 	$buss_name=iconv('UTF-8','windows-874',$netstart);
-	$pdf->MultiCell(25,4,$buss_name,0,'C',0);
+	$pdf->MultiCell(25,4,$buss_name,0,'R',0);
 
 	$pdf->SetXY(145,$cline); 
 	$buss_name=iconv('UTF-8','windows-874',$netbefore);

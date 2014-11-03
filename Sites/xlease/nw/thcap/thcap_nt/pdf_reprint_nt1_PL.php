@@ -67,6 +67,18 @@ $pdf->SetThaiFont();
 $Cus_all_forPage_array = split(",",$Cus_all_forPage);
 for($Cus_all_array=1; $Cus_all_array<=count($Cus_all_forPage_array); $Cus_all_array++)
 {
+	// ตรวจสอบว่าใช่ ผู้ค้ำประกันหรือไม่
+	$cus_chk_guarantee = $Cus_all_forPage_array[$Cus_all_array-1];
+	$qry_chk_guarantee = pg_query("select '$cus_chk_guarantee' like '%(ผู้ค้ำประกัน)%' ");
+	$res_chk_guarantee = pg_fetch_result($qry_chk_guarantee,0);
+	if($res_chk_guarantee == 't')
+	{
+		$is_guarantee = "yes"; // เป็นผู้ค้ำประกัน
+	}
+	else
+	{
+		$is_guarantee = "no"; // ไม่ใช่ผู้ค้ำประกัน
+	}
 
 $pdf->AddPage();
 
@@ -125,41 +137,66 @@ $pdf->MultiCell(15,6,$title,0,'L',0);
 $qrydatethai_conDate=pg_query("select get_date_thai_format('$conDate')");
 list($nowdatethai_conDate)=pg_fetch_array($qrydatethai_conDate);
 
-$pdf->SetXY(35,$cline);
-$title=iconv('UTF-8','windows-874',"หนังสือสัญญากู้เงินสินเชื่อส่วนบุคคล  เลขที่  $contractID  ฉบับลงวันที่ $nowdatethai_conDate");
-$pdf->MultiCell(180,6,$title,0,'L',0);
+if($is_guarantee == "yes") // ถ้าเป็นผู้ค้ำประกัน
+{
+	$pdf->SetXY(35,$cline);
+	$title=iconv('UTF-8','windows-874',"หนังสือสัญญากู้เงินสินเชื่อส่วนบุคคลและหนังสือสัญญาค้ำประกัน  เลขที่  $contractID  ฉบับลงวันที่ $nowdatethai_conDate");
+	$pdf->MultiCell(150,6,$title,0,'L',0);
+	
+	$cline += 15;
 
-$cline += 15;
+	$pdf->SetXY(40,$cline);
+	$title=iconv('UTF-8','windows-874',"ตามที่ ท่านได้ทำสัญญากู้ยืมเงินและสัญญาค้ำประกันจำนวน ");
+	$pdf->MultiCell(80,6,$title,0,'L',0);
+	
+	$pdf->SetFont('AngsanaNew','B',14);
+	$pdf->SetXY(120,$cline);
+	$title=iconv('UTF-8','windows-874',number_format($conLoanAmt,2)." บาท");
+	$pdf->MultiCell(28,6,$title,0,'L',0);
 
-$pdf->SetXY(40,$cline);
-$title=iconv('UTF-8','windows-874',"ตามที่ ท่านได้ทำสัญญากู้ยืมเงินจำนวน ");
-$pdf->MultiCell(70,6,$title,0,'L',0);
+	$pdf->SetFont('AngsanaNew','',14);
+	$pdf->SetXY(148,$cline);
+	$title=iconv('UTF-8','windows-874',"จาก");
+	$pdf->MultiCell(10,6,$title,0,'L',0);
 
-$pdf->SetFont('AngsanaNew','B',14);
-$pdf->SetXY(92,$cline);
-$title=iconv('UTF-8','windows-874',number_format($conLoanAmt,2)." บาท");
-$pdf->MultiCell(28,6,$title,0,'L',0);
+	$pdf->SetFont('AngsanaNew','B',14);
+	$pdf->SetXY(155,$cline);
+	$title=iconv('UTF-8','windows-874',"บริษัท  ไทยเอซ  แคปปิตอล  จำกัด  ");
+	$pdf->MultiCell(52,6,$title,0,'L',0);
+}
+else // ถ้าไม่ใช่ผู้ค้ำประกัน
+{
+	$pdf->SetXY(35,$cline);
+	$title=iconv('UTF-8','windows-874',"หนังสือสัญญากู้เงินสินเชื่อส่วนบุคคล  เลขที่  $contractID  ฉบับลงวันที่ $nowdatethai_conDate");
+	$pdf->MultiCell(150,6,$title,0,'L',0);
+	
+	$cline += 15;
 
-$pdf->SetFont('AngsanaNew','',14);
-$pdf->SetXY(120,$cline);
-$title=iconv('UTF-8','windows-874',"จาก");
-$pdf->MultiCell(10,6,$title,0,'L',0);
+	$pdf->SetXY(40,$cline);
+	$title=iconv('UTF-8','windows-874',"ตามที่ ท่านได้ทำสัญญากู้ยืมเงินจำนวน ");
+	$pdf->MultiCell(70,6,$title,0,'L',0);
+	
+	$pdf->SetFont('AngsanaNew','B',14);
+	$pdf->SetXY(92,$cline);
+	$title=iconv('UTF-8','windows-874',number_format($conLoanAmt,2)." บาท");
+	$pdf->MultiCell(28,6,$title,0,'L',0);
 
-$pdf->SetFont('AngsanaNew','B',14);
-$pdf->SetXY(126,$cline);
-$title=iconv('UTF-8','windows-874',"บริษัท  ไทยเอซ  แคปปิตอล  จำกัด  ");
-$pdf->MultiCell(52,6,$title,0,'L',0);
+	$pdf->SetFont('AngsanaNew','',14);
+	$pdf->SetXY(120,$cline);
+	$title=iconv('UTF-8','windows-874',"จาก");
+	$pdf->MultiCell(10,6,$title,0,'L',0);
 
-$pdf->SetFont('AngsanaNew','',14);
-$pdf->SetXY(175,$cline);
-$title=iconv('UTF-8','windows-874',"ตามหนังสือ");
-$pdf->MultiCell(50,6,$title,0,'L',0);
+	$pdf->SetFont('AngsanaNew','B',14);
+	$pdf->SetXY(126,$cline);
+	$title=iconv('UTF-8','windows-874',"บริษัท  ไทยเอซ  แคปปิตอล  จำกัด  ");
+	$pdf->MultiCell(52,6,$title,0,'L',0);
+}
 
 $cline += 6;
 
 $pdf->SetFont('AngsanaNew','',14);
 $pdf->SetXY(20,$cline);
-$title=iconv('UTF-8','windows-874',"สัญญากู้เงินสินเชื่อส่วนบุคคลที่อ้างถึง โดยท่านสัญญาว่าจะชำระคืนเงินกู้ทุกวันที่  $conRepeatDueDay ของทุกๆ   เดือนไม่น้อยกว่าเดือนละ");
+$title=iconv('UTF-8','windows-874',"ตามหนังสือสัญญากู้เงินสินเชื่อส่วนบุคคลที่อ้างถึง โดยท่านสัญญาว่าจะชำระคืนเงินกู้ทุกวันที่  $conRepeatDueDay ของทุกๆ   เดือนไม่น้อยกว่าเดือนละ");
 $pdf->MultiCell(190,6,$title,0,'L',0);
 
 $cline += 6;

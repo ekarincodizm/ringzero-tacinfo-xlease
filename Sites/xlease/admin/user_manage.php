@@ -65,10 +65,14 @@ else
  
  <div class="style5" style="width:auto;  padding-left:10px;">
   <?php
-  $qry_user=pg_query("select \"id_user\",\"username\",\"fullname\",\"user_group\",\"office_id\" from \"Vfuser\" order by user_group,status_user desc");
+  $qry_user=pg_query("	select 
+  								\"id_user\",\"username\",\"fullname\",\"user_group\",\"office_id\",\"status_user\" 
+  						from 
+  								\"Vfuser\" 
+  						order by 
+  								user_group,status_user desc");
   
-  
-  ?>
+   ?>
   <table width="778" border="0" style="background-color:#EEEDCC;">
   <tr>
     <td colspan="4" style="text-align:center;"><input type="button" onclick="javascript:history.back();" value="BACK" /></td>
@@ -103,9 +107,10 @@ else
     <td><?php echo $res["user_group"]; ?></td>
     <td><?php echo $res["office_id"]; ?></td>
     <td><?php 
+    	 // print_r($res);
 	     if($res["status_user"]=='t')
 		 {
-		   echo "ใช้งานได้";
+		   echo "ใช้งาน";
 		 }
 		 else
 		 {

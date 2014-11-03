@@ -46,7 +46,7 @@ else
 	$doerID = pg_fetch_result($qry,0);
 	
 	// ตรวจสอบสิทธิ
-	if($app_user != $doerID || $emplevel <= 0)
+	if($app_user != $doerID || $emplevel <= 1)
 	{ // ถ้า คนละคนกัน หรือ level น้อยกว่าหรือเท่ากับ 0 สามารถทำงานได้ตามปกติ
 		//บันทึกข้อมูล
 		$ins=pg_query("SELECT thcap_process_setdebtloan(null,null,null,null,null,null,null,'2','$debtID','$debstatus','$app_user')");

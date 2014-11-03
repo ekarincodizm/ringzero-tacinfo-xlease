@@ -1,7 +1,10 @@
 <?php 
 include("../../config/config.php");
 include("../../nw/function/load_date_table_ thcap_temp_money_hold_secure.php");
+include("../../nw/function/emplevel.php");
 
+$user_id = $_SESSION["av_iduser"]; // รหัสพนักงาน
+$emplevel = emplevel($user_id); // ระดับพนักงาน
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html>
@@ -29,9 +32,13 @@ include("../../nw/function/load_date_table_ thcap_temp_money_hold_secure.php");
 					<input type="radio" id="money_secure" name="search_type"  value="997"  checked />
 				</td>
 				<td><b>เงินค้ำประกัน</b></td>
-				
 			</tr>
-			
+			<tr>
+				<td ALIGN  = "RIGHT" >
+					<input type="radio" id="money_deposits" name="search_type" value="deposits" />
+				</td>
+				<td><b>เงินมัดจำ</b></td>
+			</tr>
 			<tr>
 				<td ALIGN  = "RIGHT">
 					<b>วันที่ข้อมูล</b>
@@ -66,9 +73,9 @@ include("../../nw/function/load_date_table_ thcap_temp_money_hold_secure.php");
 			<!--จบตามปี-->
 			
 			<tr>
-				<td colspan="3" align="right">
-				<!-- <input type="hidden" name="val" value="1"/> -->
-				<input type="button" id="Search"  value="ค้นหา" />
+				<td colspan="2" align="center">
+					<input type="button" id="Search"  value="ค้นหา" style="cursor:pointer;" />
+					<input type="button" id="btnGen" value="GEN" onClick="popupGen();" style="cursor:pointer;" />
 				</td>
 		    </tr>
 		</table>
@@ -83,77 +90,59 @@ include("../../nw/function/load_date_table_ thcap_temp_money_hold_secure.php");
     
 </bodY>
 </html>
+
 <script>
-
-$("#s_voucher").autocomplete({
-        source: "voucher_autocomplete.php",
-        minLength:1
-});
-
-$("#Search").click(function(){
-	var money_type = $("input[name=search_type]:checked").val();
-    var date_sel;	
-	var date_sel = $("#date_sel").val();
-	var searchValue = $("input[name=search_type]:checked").val();
+	var emplevel = '<?php echo $emplevel; ?>'; // ระดับพนักงาน
+	var typeGen; // ข้อมูลที่จะ Gen
 	
+	function checkChoice() // ตรวจสอบตัวเลือก
+	{
+		if(document.getElementById("money_hold").checked == true && emplevel <= 1) // ถ้าเลือก เงินพัก และระดับพนักงาน น้อยกว่าหรือเท่ากับ 1
+		{
+			document.getElementById("btnGen").style.visibility = 'visible'; // แสดงปุ่ม GEN ข้อมูล
+			typeGen = document.getElementById("money_hold").value;
+		}
+		else if(document.getElementById("money_secure").checked == true && emplevel <= 1) // ถ้าเลือก เงินค้ำประกัน และระดับพนักงาน น้อยกว่าหรือเท่ากับ 1
+		{
+			document.getElementById("btnGen").style.visibility = 'visible'; // แสดงปุ่ม GEN ข้อมูล
+			typeGen = document.getElementById("money_secure").value;
+		}
+		else
+		{
+			document.getElementById("btnGen").style.visibility = 'hidden'; // ซ้อนปุ่ม GEN ข้อมูล
+		}
+	}
 	
-	$("#list_tmp_money_hold_secure").load("list_tmp_money_hold_secure.php",{
+	checkChoice(); // เช็คตัวเลือกเมื่อเข้าโปรแกรมครั้งแรก
+	
+	function popupGen() // เปิด popup เพื่อ Gen ข้อมูล
+	{
+		popU('popup_gen_money_hold_secure.php?typeGen='+typeGen+'','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=650,height=350');
+	}
+	
+	// เมื่อคลิกปุ่มค้นหา
+	$("#Search").click(function(){
+		var money_type = $("input[name=search_type]:checked").val();
+		var date_sel;	
+		var date_sel = $("#date_sel").val();
+		var searchValue = $("input[name=search_type]:checked").val();
+		
+		$("#list_tmp_money_hold_secure").html('<img src="../../images/progress.gif" border="0" width="32" height="32" alt="กำลังค้นหา โปรดรอสักครู่...">');
+		
+		$("#list_tmp_money_hold_secure").load("list_tmp_money_hold_secure.php",{
 			p_money_type:money_type,
 			p_date_sel:date_sel,
-			p_searchValue:searchValue,
-			
-			});
-	
-	// ตรวจสอบว่า ในส่วนเงื่อนไขรอง มีการเลือกที่จะ  ค้นหาตามรายละเอียดหรือไม่
-	if($("#chk_s_detail").is(':checked')){
-		chk_sel_detail = "on";
-	}else{
-		chk_sel_detail = "off";
+			p_searchValue:searchValue
+		});
+	});
+
+	// เมื่อเปลี่ยนตัวเลือกที่จะค้นหา
+	$("input[name=search_type]").change(function(){
+		checkChoice();
+	});
+
+	function popU(U,N,T)
+	{
+		newWindow = window.open(U, N, T);
 	}
-	
-	
-	if($("#chk_voucher_purpose").is(':checked')){
-		chk_sel_purpose = "on";
-	}else{
-		chk_sel_purpose = "off";
-	}
-	
-	
-	
-	// ตรวจสอบว่า เลือกค้นหาตามรายละเอียดในเงื่อนไขรองหรือไม่ 
-	
-	if(chk == 0){
-		$("#list_voucher").html('<img src="../../images/progress.gif" border="0" width="32" height="32" alt="กำลังโหลด...">');
-		$("#list_voucher").load("list_voucher.php",{
-			txt_voucher:tv,
-			s_date:date1,
-			s_month:month,
-			s_year:year,
-			s_datefrom:datefrom,
-			s_dateto:dateto,
-			s_sel_year:sel_year,
-			s_value:searchValue,
-			s_cancel:cancel,
-			s_detail:detail,
-			s_purpose_idx:purpose_idx,
-			s_chk_detail:chk_sel_detail,
-			s_chk_purpose:chk_sel_purpose
-			});
-	}else{
-		alert(errorMessage);
-		return false;
-	}
-});
-$("input[name=search_type]").change(function(){
-	$("#s_voucher").val('');
-	$("#datepicker").val('');
-	$("#month").val('');
-	$("#datefrom").val('');
-	$("#dateto").val('');
-	$("#s_detail").val('');
-	$("#sel_year").val('<?php echo $v_year ?>');
-});
-function popU(U,N,T) {
-    newWindow = window.open(U, N, T);
-}
 </script>

@@ -4,7 +4,7 @@ include("../../config/config.php");
 $s_date = pg_escape_string($_REQUEST['s_date']); // วันที่สนใจ
 $s_contractType = pg_escape_string($_REQUEST['s_contractType']); // ประเภทสัญญา
 
-// ไม่เอาเลขที่สัญญาดังนี้
+// ไม่เอาเลขที่สัญญาดังนี้ :: อ้างอิงเลขงาน #6529
 $whereConNo = "and \"contractID\" not in('FA-BK01-5600002/0024', 'FA-BK01-5600002/0026', 'FA-BK01-5600002/0028', 'FA-BK01-5600002/0029', 'FA-BK01-5600002/0030',
 'FA-BK01-5600002/0031', 'FA-BK01-5600002/0032', 'FA-BK01-5600002/0033', 'FA-BK01-5600002/0034', 'FA-BK01-5600002/0035', 'FA-BK01-5600002/0036',
 'FA-BK01-5600002/0037', 'FA-BK01-5600002/0038', 'FA-BK01-5600002/0039', 'FA-BK01-5600002/0040', 'FA-BK01-5600002/0041', 'FA-BK01-5600002/0042',
@@ -67,6 +67,10 @@ elseif($s_contractType == "FI")
 				$num_row = pg_num_rows($query_list);
 				if($num_row>0)
 				{
+					// รายการบัญชีที่จะไม่ให้นำมาคำนวณ :: อ้างอิงเลขงาน #7348
+					$where_abh_no = "and a.\"abh_id\" not in('AR14010600004', 'AR14010700004', 'AR14010900002', 'AR14012200003', 'AR14012700002',
+															'AR14013000002', 'AR14020800019', 'AR14020800020', 'AR14022000008','AJ14033100062')";
+															
 					$i = 0;
 					while($res_v = pg_fetch_array($query_list))
 					{
@@ -78,7 +82,7 @@ elseif($s_contractType == "FI")
 									left join account.\"all_accBookDetail\" b on a.\"abh_autoid\" = b.\"abd_autoidabh\"
 									where a.\"abh_status\" <> '0' and a.\"abh_correcting_entries_abh_autoid\" is null and a.\"abh_is_correcting_entries\" <> '1'
 									and a.\"abh_refid\" in (select \"voucherID\" from thcap_temp_voucher_tag where \"contractID\" = '$contractID')
-									and b.\"abd_accBookID\" = '$accBookID' and b.\"abd_bookType\" = '2'";
+									and b.\"abd_accBookID\" = '$accBookID' and b.\"abd_bookType\" = '2' $where_abh_no";
 						$qry_cr_list = pg_query($qry_cr);
 						$minDate = pg_result($qry_cr_list,0); // วันที่เริ่มบันทึกบัญชี
 						$amountCr = pg_result($qry_cr_list,1); // ยอด เครดิต ทั้งหมด
@@ -89,7 +93,7 @@ elseif($s_contractType == "FI")
 									left join account.\"all_accBookDetail\" b on a.\"abh_autoid\" = b.\"abd_autoidabh\"
 									where a.\"abh_status\" <> '0' and a.\"abh_correcting_entries_abh_autoid\" is null and a.\"abh_is_correcting_entries\" <> '1'
 									and a.\"abh_refid\" in (select \"voucherID\" from thcap_temp_voucher_tag where \"contractID\" = '$contractID')
-									and b.\"abd_accBookID\" = '$accBookID' and b.\"abd_bookType\" = '1'";
+									and b.\"abd_accBookID\" = '$accBookID' and b.\"abd_bookType\" = '1' $where_abh_no";
 						$qry_dr_list = pg_query($qry_dr);
 						$maxDate = pg_result($qry_dr_list,0); // วันที่สิ้นสุดบันทึกบัญชี
 						$amountDr = pg_result($qry_dr_list,1); // ยอด เดบิต ทั้งหมด

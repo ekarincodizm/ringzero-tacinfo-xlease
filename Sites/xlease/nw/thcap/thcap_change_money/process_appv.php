@@ -109,7 +109,7 @@ if($resultappv=="yes")
 			$contractBalance = pg_fetch_result($qry_money_balance,0);
 			
 			// ตรวจสอบว่าเมื่ออนุมัติจะทำให้จำนวนเงินของสัญญาที่โอนมาให้ติดลบหรือไม่
-			if(($contractBalance - $all_trans_money) < 0)
+			if(($contractBalance - $end_trans_money) < 0)
 			{
 				$status++;
 				

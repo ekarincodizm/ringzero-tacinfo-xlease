@@ -34,7 +34,8 @@ $rights = array(
 		SELECT 
 		  \"Vfuser\".user_group, 
 		  \"Vfuser\".id_user,
-		  \"Vfuser\".fullname
+		  \"Vfuser\".fullname,
+		  \"Vfuser\".isadmin
 		FROM 
 		  public.\"Vfuser\"
 	 ";
@@ -43,7 +44,19 @@ $rights = array(
 	 //  INSERT สิทธิ์ กระจายตามแผนก/ฝ่าย/กลุ่ม ที่อยู่ ตาม ARRAY ข้างต้น
 	 while($row = pg_fetch_array($tmp))
 	 {
-		if($row['user_group']=='ACC'){
+		if($row['isadmin']=='1'){
+			$count = count($rights['AD']);
+			for($i=0;$i<$count;$i++){
+				 $sql_command="
+					INSERT INTO f_usermenu(
+								id_menu, id_user)
+						VALUES ('".$rights['AD'][$i]."', '".$row['id_user']."');
+				 ";
+				 pg_query($sql_command);
+				 echo "Executed: AD (".$row['fullname'].") : ".$sql_command." <br>";
+			}
+		}
+		else if($row['user_group']=='ACC'){
 			$count = count($rights['ACC']);
 			for($i=0;$i<$count;$i++){
 				 $sql_command="
@@ -65,18 +78,6 @@ $rights = array(
 				 ";
 				 pg_query($sql_command);
 				 echo "Executed: ACS (".$row['fullname'].") : ".$sql_command." <br>";
-			}
-		}
-		else if($row['user_group']=='AD'){
-			$count = count($rights['AD']);
-			for($i=0;$i<$count;$i++){
-				 $sql_command="
-					INSERT INTO f_usermenu(
-								id_menu, id_user)
-						VALUES ('".$rights['AD'][$i]."', '".$row['id_user']."');
-				 ";
-				 pg_query($sql_command);
-				 echo "Executed: AD (".$row['fullname'].") : ".$sql_command." <br>";
 			}
 		}
 		else if($row['user_group']=='AUD'){

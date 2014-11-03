@@ -182,33 +182,33 @@ function CR_text($day , $month , $year , $myWhere) // ข้อความใ�
 				{
 					$queryCR = pg_query("select '$contractID'::character varying as \"contractID\", min(\"conDate\") as \"conDate\", min(\"conStartDate\") as \"conStartDate\",
 												sum(\"conFinanceAmount\")::numeric(15,2) as \"conLoanAmt\", max(\"conTerm\") as \"conTerm\" , min(\"conMinPay\")::numeric(15,2) as \"conMinPay\",
-												max(thcap_checkcontractcloseddate(\"contractID\")) as \"conClosedDate\" , max(\"conEndDate\") as \"conEndDate\"
+												max(thcap_get_all_date_absclose(\"contractID\")) as \"conClosedDate\" , max(\"conEndDate\") as \"conEndDate\"
 										from \"thcap_lease_contract\"
 										where \"conCreditRef\"::text like '%$contractID%'
 												and \"contractID\" not in(select a.\"contractID\"
 												from \"vthcap_contract_creditRef_all\" a
 												left join \"thcap_contract\" b on a.\"contractID\"=b.\"contractID\" 
 												where \"contractCredit\"='$contractID'
-												and thcap_checkcontractcloseddate(a.\"contractID\") is not null
-												and thcap_checkcontractcloseddate(a.\"contractID\") < '$year-$month-01')
+												and thcap_get_all_date_absclose(a.\"contractID\") is not null
+												and thcap_get_all_date_absclose(a.\"contractID\") < '$year-$month-01')
 												and \"conDate\" <= '$date' and \"conDate\" <= '2012-12-31'
-												and (thcap_checkcontractcloseddate(\"contractID\") <= '$date' or thcap_checkcontractcloseddate(\"contractID\") is null) ");
+												and (thcap_get_all_date_absclose(\"contractID\") <= '$date' or thcap_get_all_date_absclose(\"contractID\") is null) ");
 				}
 				else
 				{
 					$queryCR = pg_query("select '$contractID'::character varying as \"contractID\", min(\"conDate\") as \"conDate\", min(\"conStartDate\") as \"conStartDate\",
 												sum(\"conLoanAmt\")::numeric(15,2) as \"conLoanAmt\", max(\"conTerm\") as \"conTerm\" , min(\"conMinPay\")::numeric(15,2) as \"conMinPay\",
-												max(thcap_checkcontractcloseddate(\"contractID\")) as \"conClosedDate\" , max(\"conEndDate\") as \"conEndDate\"
+												max(thcap_get_all_date_absclose(\"contractID\")) as \"conClosedDate\" , max(\"conEndDate\") as \"conEndDate\"
 										from \"thcap_mg_contract\"
 										where \"conCreditRef\"::text like '%$contractID%'
 												and \"contractID\" not in(select a.\"contractID\"
 												from \"vthcap_contract_creditRef_all\" a
 												left join \"thcap_contract\" b on a.\"contractID\"=b.\"contractID\" 
 												where \"contractCredit\"='$contractID'
-												and thcap_checkcontractcloseddate(a.\"contractID\") is not null
-												and thcap_checkcontractcloseddate(a.\"contractID\") < '$year-$month-01')
+												and thcap_get_all_date_absclose(a.\"contractID\") is not null
+												and thcap_get_all_date_absclose(a.\"contractID\") < '$year-$month-01')
 												and \"conDate\" <= '$date' and \"conDate\" <= '2012-12-31'
-												and (thcap_checkcontractcloseddate(\"contractID\") <= '$date' or thcap_checkcontractcloseddate(\"contractID\") is null) ");
+												and (thcap_get_all_date_absclose(\"contractID\") <= '$date' or thcap_get_all_date_absclose(\"contractID\") is null) ");
 				}
 				
 				while($resultCR = pg_fetch_array($queryCR))
@@ -244,10 +244,10 @@ function CR_text($day , $month , $year , $myWhere) // ข้อความใ�
 												from \"vthcap_contract_creditRef_all\" a
 												left join \"thcap_contract\" b on a.\"contractID\"=b.\"contractID\" 
 												where \"contractCredit\"='$contractID'
-												and thcap_checkcontractcloseddate(a.\"contractID\") is not null
-												and thcap_checkcontractcloseddate(a.\"contractID\") < '$year-$month-01')
+												and thcap_get_all_date_absclose(a.\"contractID\") is not null
+												and thcap_get_all_date_absclose(a.\"contractID\") < '$year-$month-01')
 												and \"conDate\" <= '$date' and \"conDate\" <= '2012-12-31'
-												and thcap_checkcontractcloseddate(\"contractID\") is null ");
+												and thcap_get_all_date_absclose(\"contractID\") is null ");
 				}
 				else
 				{
@@ -258,10 +258,10 @@ function CR_text($day , $month , $year , $myWhere) // ข้อความใ�
 												from \"vthcap_contract_creditRef_all\" a
 												left join \"thcap_contract\" b on a.\"contractID\"=b.\"contractID\" 
 												where \"contractCredit\"='$contractID'
-												and thcap_checkcontractcloseddate(a.\"contractID\") is not null
-												and thcap_checkcontractcloseddate(a.\"contractID\") < '$year-$month-01')
+												and thcap_get_all_date_absclose(a.\"contractID\") is not null
+												and thcap_get_all_date_absclose(a.\"contractID\") < '$year-$month-01')
 												and \"conDate\" <= '$date' and \"conDate\" <= '2012-12-31'
-												and thcap_checkcontractcloseddate(\"contractID\") is null ");
+												and thcap_get_all_date_absclose(\"contractID\") is null ");
 				}
 				$row_chkConClose = pg_num_rows($qry_chkConClose);
 				if($row_chkConClose > 0){$conClosedDate = "";} // ถ้าในกลุ่มนี้ยังปิดบัญชีไม่ครบ
@@ -383,7 +383,7 @@ function CR_text($day , $month , $year , $myWhere) // ข้อความใ�
 				}
 				
 				// หาวันที่ปิดบัญชีจริง
-				$qry_conClosedDate = pg_query("select thcap_checkcontractcloseddate('$contractID') ");
+				$qry_conClosedDate = pg_query("select thcap_get_all_date_absclose('$contractID') ");
 				$conClosedDate = pg_result($qry_conClosedDate,0);
 			}
 			

@@ -93,6 +93,7 @@ function checkproctorid(){
 							<option value="">--------เลือก--------</option>
 							<option value="ที่ดิน">ที่ดิน</option>
 							<option value="ที่ดินพร้อมสิ่งปลูกสร้าง">ที่ดินพร้อมสิ่งปลูกสร้าง</option>
+							<option value="รถจักรยานยนต์">รถจักรยานยนต์</option>
 							<option value="ห้องชุด">ห้องชุด</option>
 						</select><font color="red"><b>*</b></font>
 					</td>

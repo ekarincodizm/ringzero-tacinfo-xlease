@@ -286,11 +286,11 @@ $s_cancel = "on"; // แสดงรายการที่ยกเลิก/�
 		if($s_valuee=="0"){ // ค้นหา "Voucher ID"
 			$Cnd1 = " where a.\"voucherID\"='$txt_voucher' $condition_c ";
 		}else if($s_valuee=="1"){ // ค้นหา  "วันที่"
-			$Cnd1 = " where a.\"doerStamp\"='$s_date' $condition_c ";
+			$Cnd1 = " where a.\"doerStamp\"::date = '$s_date' $condition_c ";
 		}else if($s_valuee=="2"){ // ค้นหา "ตามเดือน"
 			$Cnd1 = " where EXTRACT(MONTH FROM a.\"doerStamp\")='$s_month' and EXTRACT(YEAR FROM a.\"doerStamp\")='$s_year' $condition_c ";
 		}else if($s_valuee=="3"){ // ค้นหา  "ตามช่วง"
-			$Cnd1 .= " where a.\"doerStamp\" between '$s_datefrom' and '$s_dateto' $condition_c ";
+			$Cnd1 .= " where a.\"doerStamp\"::date between '$s_datefrom' and '$s_dateto' $condition_c ";
 		}else if($s_valuee=="4"){ //ค้นหา "ทัั้งหมด" 
 			$Cnd1 = "$condition_c";
 		}else if($s_valuee=="5"){ //เค้นหา  "ตามปี"

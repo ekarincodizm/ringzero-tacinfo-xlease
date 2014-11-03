@@ -46,6 +46,8 @@ $pdf->SetThaiFont();
 $qry_REF1 = pg_query("select \"ta_array1d_get\"(\"thcap_encode_invoice_ref\"('$contractID','000000IMG-00000',false),0)");
 $REF1 = pg_fetch_result($qry_REF1,0); // ref1
 
+$REF2 = 0; // ref2 ให้ fix เป็น 0
+
 // define barcode style  
 $styleBarcode = array(
 	'position' => '',
@@ -126,7 +128,12 @@ $pdf->AddPage();
 	$pdf->SetFont('helvetica','',5);
 	$pdf->SetXY(20,116);
 	$txtRef1=iconv('UTF-8','windows-874',"REF1: ".$REF1);
-	$pdf->MultiCell(75,0.5,$txtRef1,0,'L',0); //Ref1
+	$pdf->MultiCell(37,0.5,$txtRef1,0,'L',0); //Ref1
+	
+	$pdf->SetFont('helvetica','',5);
+	$pdf->SetXY(57,116);
+	$txtRef2=iconv('UTF-8','windows-874',"REF2: ".$REF2);
+	$pdf->MultiCell(37,0.5,$txtRef2,0,'L',0); //Ref2
 	
 	$pdf->SetXY(20,99);
 	$pdf->write1DBarcode("|".$txtdata, 'C128', '', '', '75', '12', 1, $styleBarcode, 'N'); // barcode
@@ -158,7 +165,12 @@ $pdf->AddPage();
 	$pdf->SetFont('helvetica','',5);
 	$pdf->SetXY(116,116);
 	$txtRef1=iconv('UTF-8','windows-874',"REF1: ".$REF1);
-	$pdf->MultiCell(75,0.5,$txtRef1,0,'L',0); //Ref1
+	$pdf->MultiCell(37,0.5,$txtRef1,0,'L',0); //Ref1
+	
+	$pdf->SetFont('helvetica','',5);
+	$pdf->SetXY(153,116);
+	$txtRef2=iconv('UTF-8','windows-874',"REF2: ".$REF2);
+	$pdf->MultiCell(37,0.5,$txtRef2,0,'L',0); //Ref2
 	
 	$pdf->SetXY(116,99);
 	$pdf->write1DBarcode("|".$txtdata, 'C128', '', '', '75', '12', 1, $styleBarcode, 'N'); // barcode

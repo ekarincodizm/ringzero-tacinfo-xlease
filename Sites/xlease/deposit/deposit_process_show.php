@@ -110,41 +110,60 @@ table = '<div style="border-style: dashed; border-width: 1px; border-color:#D0D0
                 return false;
             }
         }
-        
-        
-        $("#submitButton").attr('disabled', true);
-        $.post('deposit_process_submit.php',{
-            <?php for($i=1; $i<=10; $i++){ ?>
-                typepayment<?php echo $i; ?>: $('#typepayment' + <?php echo $i; ?>).val(),
-            <?php } ?>
-            <?php for($i=1; $i<=10; $i++){ ?>
-                amt<?php echo $i; ?>: $('#amt' + <?php echo $i; ?>).val(),
-            <?php } ?>
-            <?php for($i=1; $i<=10; $i++){ ?>
-                newidno<?php echo $i; ?>: $('#newidno' + <?php echo $i; ?>).val(),
-            <?php } ?>
-            <?php for($i=1; $i<=10; $i++){ ?>
-                submitchkconfirm<?php echo $i; ?>: $('#submitchkconfirm' + <?php echo $i; ?>).val(),
-            <?php } ?>
-            idno: '<?php echo $idno; ?>',
-            datepicker: $('#datepicker').val(),
-            countpay: $('#countpay').val(),
-            divmoney: $('#divmoney').val(),
-            discount: $('#discount').val(),
-            old_cusid: '<?php echo $CusID; ?>',
-            old_asid: '<?php echo $asset_id; ?>',
-            money: $('#show_money_big').text(),
-            counter: counter
-        },
-        function(data){
-            if(data.success){
-                //alert(data.message);
-                document.location='deposit_print.php?idno=<?php echo $idno; ?>&data='+ data.message;
-            }else{
-                alert(data.message);
-                $("#submitButton").attr('disabled', false);
-            }
-        },'json');
+
+        $("#submitButton").attr('disabled', true); // ห้ามคลิกปุ่มบันทึกซ้ำ
+		
+		$("#load_process").html('<img src="../images/progress.gif" border="0" width="32" height="32" alt="กำลังโหลด...">'); // รูปโหลด
+		
+        $.ajax({
+			url : "deposit_process_submit.php",
+			type : "post",
+			data : {
+						<?php for($i=1; $i<=10; $i++){ ?>
+							typepayment<?php echo $i; ?>: $('#typepayment' + <?php echo $i; ?>).val(),
+						<?php } ?>
+						<?php for($i=1; $i<=10; $i++){ ?>
+							amt<?php echo $i; ?>: $('#amt' + <?php echo $i; ?>).val(),
+						<?php } ?>
+						<?php for($i=1; $i<=10; $i++){ ?>
+							newidno<?php echo $i; ?>: $('#newidno' + <?php echo $i; ?>).val(),
+						<?php } ?>
+						<?php for($i=1; $i<=10; $i++){ ?>
+							submitchkconfirm<?php echo $i; ?>: $('#submitchkconfirm' + <?php echo $i; ?>).val(),
+						<?php } ?>
+						idno: '<?php echo $idno; ?>',
+						datepicker: $('#datepicker').val(),
+						countpay: $('#countpay').val(),
+						divmoney: $('#divmoney').val(),
+						discount: $('#discount').val(),
+						old_cusid: '<?php echo $CusID; ?>',
+						old_asid: '<?php echo $asset_id; ?>',
+						money: $('#show_money_big').text(),
+						counter: counter
+					},
+			dataType : "json",
+			success : function(data){
+				// handle http 200 responses
+				if(data.success){
+					//alert(data.message);
+					document.location='deposit_print.php?idno=<?php echo $idno; ?>&data='+ data.message;
+				}else{
+					alert(data.message);
+					$("#load_process").html('');
+					$("#submitButton").attr('disabled', false);
+				}
+			},
+			error : function(){
+				// handle 500 or 404 responses
+				alert("server call failed!! กรุณาลองใหม่อีกครั้ง");
+				$("#load_process").html('');
+				$("#submitButton").attr('disabled', false);
+			},
+			complete : function(){
+				// if needed..  this will be called on both success and error http responses
+				// ไม่ว่าจะ success หรือ error ส่วนนี้ก็จะทำงานเสมอ ถ้าต้องการให้ทำอะไรเสมอ ให้มาใส่ในส่วนนี้ครับ
+			}
+		});
     });
     
     $("#countpay").change(function(){
@@ -630,6 +649,7 @@ echo $adata;
 
 <input type="hidden" id="counter" name="counter" value="0">
 
+<div name="load_process" id="load_process"></div>
 <div style="float:left"><input type="button" value="บันทึกข้อมูล" id="submitButton"></div>
 <div style="float:right">
 <input type="button" value="+ เพิ่มค่าใช้จ่ายอื่นๆ" id="addButton">

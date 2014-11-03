@@ -4,6 +4,10 @@
   
   include("config/configpost.php");
   include("lib/util.php");
+  include("config/config.php");
+  
+  $nowDate = nowDate(); // วันที่ปัจจุบัน โดยดึงมาจาก DataBase Postgresql
+  
   $cmd = pg_escape_string($_REQUEST['cmd']);
   if ($_POST["cmd"] == "check_cus")
   {
@@ -31,7 +35,7 @@ else if($cmd == "load_join1"){
 }
 else if ($_POST["cmd"] == "join_type")
   {
-	  include("config/config.php");
+
     $join_type1=pg_query("select join_get_join_type(pg_escape_string($_REQUEST[id]))"); 
     
     echo pg_fetch_result($join_type1,0); 
@@ -158,13 +162,13 @@ else if ($_POST["cmd"] == "join_type")
   {
     $payment = json_decode(stripcslashes($_POST["payment"]));
 
-    $postid = $outlet->query("select gen_pos_no('" . nowDate() . "')");
+    $postid = $outlet->query("select gen_pos_no('$nowDate')");
     $row = $postid->fetch();
     
     $new_postlog = new postlog();
     $new_postlog->postid = $row[0]; 
     $new_postlog->useridpost = $_SESSION["av_iduser"];         
-    $new_postlog->postdate = nowDate();
+    $new_postlog->postdate = $nowDate;
     $new_postlog->paytype = "CA";
     $new_postlog->acceptpost = 'false';
     $outlet->save($new_postlog);
@@ -186,14 +190,14 @@ else if ($_POST["cmd"] == "join_type")
   {
     $cheque = json_decode(stripcslashes($_POST["payment"])); 
     
-    $get_postid = $outlet->query("select gen_pos_no('" . nowDate() . "')");
+    $get_postid = $outlet->query("select gen_pos_no('$nowDate')");
     $row = $get_postid->fetch();  
     $postid = $row[0];
     
     $new_postlog = new postlog();
     $new_postlog->postid = $postid; 
     $new_postlog->useridpost = $_SESSION["av_iduser"];
-    $new_postlog->postdate = nowDate();
+    $new_postlog->postdate = $nowDate;
     $new_postlog->paytype = "CH";
     $new_postlog->acceptpost = 'false';
     $outlet->save($new_postlog);    
@@ -207,7 +211,7 @@ else if ($_POST["cmd"] == "join_type")
       $new_fcheque->bankname = $cheque[$i]->cheque_bank;
       $new_fcheque->bankbranch = $cheque[$i]->cheque_bankbranch;
       $new_fcheque->amtoncheque = $cheque[$i]->cheque_amount;
-      $new_fcheque->receiptdate = nowDate(); 
+      $new_fcheque->receiptdate = $nowDate; 
       $new_fcheque->dateoncheque = dmy2ymd($cheque[$i]->cheque_date);  
       $new_fcheque->outbangkok = ($cheque[$i]->cheque_outbkk) ? 'true' : 'false';
       $new_fcheque->numofreenter = 0;

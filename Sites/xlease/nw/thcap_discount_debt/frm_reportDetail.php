@@ -2,9 +2,9 @@
 include("../../config/config.php");
 $rootpath = redirect($_SERVER['PHP_SELF'],''); // rootpath สำหรับเรียกไฟล์ PHP โดยเริ่มต้นที่ root
 
-$option=$_GET["option"];
-$contype = $_GET["contype"];
-$contypepdf = $_GET["contype"]; //สำหรับส่งไปหน้า พิมพ์ PDF หรือ Excel
+$option = pg_escape_string($_GET["option"]);
+$contype = pg_escape_string($_GET["contype"]);
+$contypepdf = pg_escape_string($_GET["contype"]); //สำหรับส่งไปหน้า พิมพ์ PDF หรือ Excel
 
 if($option=="day"){
 	$datecon=$_GET["datecon"];
@@ -80,6 +80,7 @@ function popU(U,N,T){
 <div style="clear:both;"></div>
 	<table align="center" bgcolor="#FFE1EE" frame="box" width="99%" cellspacing="1" cellpadding="1">					
 	<tr bgcolor="#FFCCCC" height="25">
+		<th>เลขที่ CN/DN</th>
 		<th>เลขที่สัญญา</th>
 		<th>ชื่อผู้กู้หลัก/ผู้เช่าซื้อ</th>
 		<th>รหัสประเภทค่าใช้จ่าย</th>
@@ -100,8 +101,9 @@ function popU(U,N,T){
 	//-- หากมีข้อมูล
 	if($row != 0){	
 	$i = 0; //--== กำหนดตัวแปรไว้วนจำนวนแถวเพื่อสลับสีแถวข้อมูล ( ไม่จำเป็นต้องเปลี่ยน )
-	while($res = pg_fetch_array($qry)){
-		
+	while($res = pg_fetch_array($qry))
+	{
+		$dcNoteID = $res["dcNoteID"]; // รหัส CreditNote หรือ DebitNote
 		$conid = $res["contractID"];	//เลขที่สัญญา		
 		$maincus_fullname = $res["maincus_fullname"]; //-- หาชื่อผู้กู้หลัก
 		$typePayID = $res["typePayID"]; // รหัสประเภทค่าใช้จ่าย
@@ -153,8 +155,12 @@ function popU(U,N,T){
 	?>
 	<tr bgcolor="<?php echo $bgcolor_TR2; ?>" onmouseover="javascript:this.bgColor='<?php echo $bgcolor_HL2; ?>'" onmouseout="javascript:this.bgColor='<?php echo $bgcolor_TR2; ?>'" align="center" height="25">
 		<td align="center">
+			<span onclick="javascript:popU('<?php echo $rootpath; ?>/nw/thcap_dncn/popup_dncn.php?idapp=<?php echo $dcNoteID?>','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=800,height=700')" style="cursor:pointer;"  >
+			<font color="blue"><u><?php echo "$dcNoteID"?><u></font></span>
+		</td>
+		<td align="center">
 			<span onclick="javascript:popU('<?php echo $rootpath; ?>/nw/thcap_installments/frm_Index.php?show=1&idno=<?php echo $conid?>','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1100,height=800')" style="cursor:pointer;"  >
-			<font color="red"><u><?php echo "$conid"?><u></font>
+			<font color="red"><u><?php echo "$conid"?><u></font></span>
 		</td>
 		<td align="left"><?php echo "$maincus_fullname"; ?></td>
 		<td><?php echo "$typePayID"; ?></td>

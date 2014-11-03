@@ -2,8 +2,10 @@
 session_start();
 include('../../config/config.php');
 include('../function/checknull.php');
+include("../function/emplevel.php");
 
 $user_id = $_SESSION["av_iduser"];
+$emplevel = emplevel($user_id); // ระดับพนักงาน
 $prevoucherdetailsid = pg_escape_string($_POST['prevoucherdetailsid']);
 $appv_remark = pg_escape_string($_POST['appv_remark']); 
 $appv_status = pg_escape_string($_POST['appv_status']);
@@ -18,8 +20,14 @@ function popU(U,N,T){
 <?php 
 $lostData = 0;
 $status = 0;
-	pg_query("Begin");
-	
+pg_query("Begin");
+
+// หารหัสพนักงานที่ทำรายการใบสำคัญ
+$qry_doerID = pg_query("select \"doerID\" from \"thcap_temp_voucher_pre_details\" where \"prevoucherdetailsid\" = '$prevoucherdetailsid' ");
+$doerID = pg_fetch_result($qry_doerID,0);
+
+if($user_id != $doerID || $emplevel <= 1)
+{
 	if(!empty($prevoucherdetailsid) and !empty($user_id) and !empty($appv_remark)) {
 		
 		if($appv_status == "1"){
@@ -83,4 +91,11 @@ $status = 0;
 			}		
 		}
 	}
+}
+else
+{
+	pg_query("ROLLBACK");
+	echo "<br><b><center><font color=\"red\">ผิดผลาด คุณไม่มีสิทธิอนุมัติรายการที่ตนเองเป็นคนทำ!</font></b></center><br>";
+	echo "<center><input type=\"button\" value=\"ปิด\" onclick=\"window.close();\" /></center>";
+}
 ?>

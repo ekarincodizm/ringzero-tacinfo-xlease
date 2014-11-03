@@ -20,7 +20,8 @@ $(document).ready(function(){
 	$("#showdata").load("frm_histority.php");
 	$("#contractID").autocomplete({
 		source: "s_contractID.php",
-        minLength:1
+		minLength:1,
+		delay:800
     });
 	$('#btnsearch').click(function(){
 		$("#panel").load("frm_dncnDetail.php?contractID="+ $("#contractID").val());

@@ -470,7 +470,20 @@ if($app==1){ //กรณีบัญชีอนุมัติ
 										<input type=\"hidden\" name=\"ConID\" value=\"$contractID\">
 										<input type=\"submit\" value=\"เลือกใช้รายการนี้\"> $txtamt";
 										echo "</td>";
-										echo "<td><img src=\"images/note_icon.png\" width=\"20\" height=\"20\" title=\"บันทึกข้อความ\" onclick=\"contact_note('$revTranID')\" style=\"cursor:pointer;\">";
+										echo "<td>";
+										
+										// ตรวจสอบว่า มีการบันทึกรายละเอียดเงินโอนไปแล้วหรือยัง
+										$qry_noteDetail = pg_query("select \"auto_id\" from finance.thcap_note_transfer where \"revTranID\" = '$revTranID' ");
+										$row_noteDetail = pg_num_rows($qry_noteDetail);
+										if($row_noteDetail > 0)
+										{ // ถ้าเคยบันทึกแล้ว ให้ใช้รูป icon สมดโน๊ตสีเขียว
+											echo "<img src=\"images/note_icon_done.png\" width=\"20\" height=\"20\" title=\"บันทึกข้อความ\" onclick=\"contact_note('$revTranID')\" style=\"cursor:pointer;\">";
+										}
+										else
+										{ // ถ้ายังไม่เคยบันทึก ให้ใช้รูป icon สมดโน๊ตสีแดง
+											echo "<img src=\"images/note_icon.png\" width=\"20\" height=\"20\" title=\"บันทึกข้อความ\" onclick=\"contact_note('$revTranID')\" style=\"cursor:pointer;\">";
+										}
+										
 										//ตรวจสอบ emplevel ข้อพนักงาน
 										if($emplevel<=1){
 											//ตรวจสอบก่อนว่าเงินใช้ไปแล้วหรือยัง ถ้าใช้แล้วจะไม่สามารถล้างรายการได้
@@ -478,6 +491,7 @@ if($app==1){ //กรณีบัญชีอนุมัติ
 												echo "<img src=\"images/clean.png\" width=\"23\" height=\"23\" title=\"ทำรายการล้างข้อมูล กลับไปสถานะตรวจสอบรายการ\" onclick=\"clearapp('$revTranID')\" style=\"cursor:pointer;\">";
 											}
 										}
+										
 										echo "</td>";
 									}else{
 										echo "<td>ไม่สามารถทำรายการได้</td>";
@@ -562,7 +576,19 @@ if($app==1){ //กรณีบัญชีอนุมัติ
 											echo "&nbsp;<img src=\"images/del.png\" width=\"23\" height=\"23\" title=\"ลบข้อมูล\" onclick=\"delapp('$revTranID')\" style=\"cursor:pointer;\">";
 											echo "&nbsp;<img src=\"images/return.gif\" width=\"20\" height=\"20\" title=\"เช็คคืน\" onclick=\"badchq('$revTranID')\" style=\"cursor:pointer;\">";
 										}
-										echo "<img src=\"images/note_icon.png\" width=\"20\" height=\"20\" title=\"บันทึกข้อความ\" onclick=\"contact_note('$revTranID')\" style=\"cursor:pointer;\">";
+										
+										// ตรวจสอบว่า มีการบันทึกรายละเอียดเงินโอนไปแล้วหรือยัง
+										$qry_noteDetail = pg_query("select \"auto_id\" from finance.thcap_note_transfer where \"revTranID\" = '$revTranID' ");
+										$row_noteDetail = pg_num_rows($qry_noteDetail);
+										if($row_noteDetail > 0)
+										{ // ถ้าเคยบันทึกแล้ว ให้ใช้รูป icon สมดโน๊ตสีเขียว
+											echo "<img src=\"images/note_icon_done.png\" width=\"20\" height=\"20\" title=\"บันทึกข้อความ\" onclick=\"contact_note('$revTranID')\" style=\"cursor:pointer;\">";
+										}
+										else
+										{ // ถ้ายังไม่เคยบันทึก ให้ใช้รูป icon สมดโน๊ตสีแดง
+											echo "<img src=\"images/note_icon.png\" width=\"20\" height=\"20\" title=\"บันทึกข้อความ\" onclick=\"contact_note('$revTranID')\" style=\"cursor:pointer;\">";
+										}
+										
 										echo "</td>";
 										
 									}else{

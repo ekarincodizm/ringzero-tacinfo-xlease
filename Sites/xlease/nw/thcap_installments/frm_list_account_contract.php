@@ -13,7 +13,7 @@ else{$cancel='off';}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html>
 <head>
-    <title>(THCAP) บัญชีสมุดรายวันทั่วไป</title>
+    <title>รายการบันทึกบัญชีของสัญญา</title>
     <meta http-equiv="Content-Type" content="txt/html; charset=utf-8" />
     <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
     <link type="text/css" rel="stylesheet" href="act.css"></link>  
@@ -29,13 +29,19 @@ $(document).ready(function(){
 	}
 });
 </script>
-<body>	
+<body>
+<fieldset>
+	<legend>
+		<input type="button" value="แสดงผลแบบปกติ" style="height:40px;" disabled />
+		<input type="button" value="แสดงผลแบบละเอียด" style="cursor:pointer; height:40px;" onClick="window.location='frm_list_account_contract_drcr.php?idno=<?php echo $idno; ?>';" />
+	</legend>
+	
 	<div id="panel" style="padding-top: 20px;">
 	<form name="my" method="post" action="frm_list_account_contract.php">
 		<input type="checkbox" name="s_cancel" id="s_cancel" />แสดงรายการที่ยกเลิก
 		<input type="text" id="cancel" name="cancel" hidden />
 		<input type="text" id="idno" name="idno"  value="<?php echo $idno;?>" hidden />
-		<input type="submit" id="search_cancel" name="search_cancel"  value="แสดง" onclick="cancel_show();"/>
+		<input type="submit" id="search_cancel" name="search_cancel"  value="แสดง" onclick="cancel_show();" style="cursor:pointer;" />
 	</form>
 		<br>
 		<table width="100%" align="center" border="0" cellSpacing="1" cellPadding="3" align="center" bgcolor="#D0D0D0" class="sort-table">
@@ -156,21 +162,25 @@ $(document).ready(function(){
 								echo "<td align=center>$abh_id</td>";
 								echo "<td align=center>$abh_type</td>";
 								echo "<td align=center> ";
-								if($abh_reftype=='0'){									
+								if($abh_reftype=='0'){ // Receipt (ใบเสร็จรับเงิน)
 									echo "<span onclick=\"javascript:popU('../thcap/Channel_detail.php?receiptID=$abh_refid','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1100,height=800')\" style=\"cursor:pointer;\"><font color=\"red\">
 									<u>$abh_refid</u></font></span></td>";
 								}
-								else if($abh_reftype=='1'){								
+								else if($abh_reftype=='1'){ // Payment voucher
 									echo "<span onclick=\"javascript:popU('../thcap_payment_voucher/voucher_channel_detail.php?voucherID=$abh_refid','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1100,height=800')\" style=\"cursor:pointer;\"><font color=\"red\">
 									<u>$abh_refid</u></font></span></td>";
 								}
-								else if($abh_reftype=='2'){
+								else if($abh_reftype=='2'){ // Receive voucher
 								
 								echo "<span onclick=\"javascript:popU('../thcap_receive_voucher/frm_voucher_channel_detail.php?voucherID=$abh_refid','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1100,height=800')\" style=\"cursor:pointer;\"><font color=\"red\">
 									<u>$abh_refid</u></font></span></td>";
 								}
-								else if($abh_reftype=='3'){							
+								else if($abh_reftype=='3'){ // Journal voucher
 									echo "<span onclick=\"javascript:popU('../thcap_journal_voucher/voucher_channel_detail.php?voucherID=$abh_refid','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1100,height=800')\" style=\"cursor:pointer;\"><font color=\"red\">
+									<u>$abh_refid</u></font></span></td>";
+								}
+								else if($abh_reftype=='998'){ // Taxinvoice (ใบกำกับภาษี)
+									echo "<span onclick=\"javascript:popU('../thcap/Channel_detail_v.php?receiptID=$abh_refid','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1100,height=800')\" style=\"cursor:pointer;\"><font color=\"red\">
 									<u>$abh_refid</u></font></span></td>";
 								}
 								else {
@@ -192,10 +202,11 @@ $(document).ready(function(){
 		</table>
 		<table width="100%" align="center" border="0" cellSpacing="0" cellPadding="0" align="center" bgcolor="#D0D0D0">
 			<tr height="50" bgcolor="#FFFFFF">
-				<td align="right"><input type="button" value="  Close  " onclick="javascript:window.close();"></td>
+				<td align="right"><input type="button" value="  Close  " onclick="javascript:window.close();" style="cursor:pointer;" /></td>
 			</tr>
 		</table>
 	</div>
+</fieldset>
 </body>
 </html>
 <script type="text/javascript">		

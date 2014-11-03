@@ -4,8 +4,8 @@ include("../../config/config.php");
 $current_date=nowDate();
 $id_user=$_SESSION["av_iduser"];
 
-//ตรวจสอบ user ที่เข้าใช้งานว่าเป็น 'AD' หรือไม่
-$quryuser=pg_query("select * from \"fuser\" where \"id_user\"='$id_user' and \"user_group\"='AD'");
+//ตรวจสอบ user ที่เข้าใช้งานว่าเป็นระดับ admin หรือไม่
+$quryuser=pg_query("select * from \"fuser\" where \"id_user\"='$id_user' and \"isadmin\"='1'");
 $numuser=pg_num_rows($quryuser);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">

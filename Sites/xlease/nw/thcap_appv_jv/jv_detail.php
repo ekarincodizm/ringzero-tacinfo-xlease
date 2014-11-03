@@ -1,8 +1,11 @@
 <?php
 include("../../config/config.php");
+include("../function/emplevel.php");
 
 $user_id = $_SESSION["av_iduser"];
 $app_page = pg_escape_string($_GET['page']);
+$emplevel = emplevel($user_id); // ระดับพนักงาน
+
 // ตรวจสอบสิทธิ์ ว่าสามารถใช้งานเมนู "(THCAP) อนุมัติยกเลิกใบสำคัญรายวันทั่วไป" ได้หรือไม่
 /*$qry_canUseMenuAP82 = pg_query("select ta_get_usermenu_rights('AP82','$user_id')");
 $canUseMenuAP82 = pg_result($qry_canUseMenuAP82,0);*/
@@ -96,7 +99,7 @@ $qry_pre = pg_query("select * from \"thcap_temp_voucher_pre_details\" where \"pr
 			<div style="margin-top:10px;">
 				<table align="right">
 					<tr>
-						<td align="right"><b>ผู้ำทำรายการ:</b></td>
+						<td align="right"><b>ผู้ทำรายการ:</b></td>
 						<td ><?php echo $doerFull; ?></td>
 					</tr>
 					<tr>
@@ -249,8 +252,19 @@ $qry_pre = pg_query("select * from \"thcap_temp_voucher_pre_details\" where \"pr
 		<td align="center" colspan="2">
 		<input hidden name ="prevoucherdetailsid" id ="prevoucherdetailsid" value="<?php echo $prevoucherdetailsid; ?>"/>
 			<input hidden name="appv_status" id="appv_status" />
-			<input type="button" value="อนุมัติ" onclick="appv('1');"/>
-			<input type="button" value="ไม่อนุมัติ" onclick="appv('0');"/>
+			
+			<?php
+			if($user_id != $doerID || $emplevel <= 1)
+			{
+				$canAppv = ""; // สามารถทำรายการอนุมัติได้
+			}
+			else
+			{
+				$canAppv = "title=\"คุณไม่มีสิทธิอนุมัติรายการที่ตนเองเป็นคนทำ\" disabled";
+			}
+			?>
+			<input type="button" value="อนุมัติ" onclick="appv('1');" <?php echo $canAppv; ?> />
+			<input type="button" value="ไม่อนุมัติ" onclick="appv('0');" <?php echo $canAppv; ?> />
 			
 			<input type="button" name="close" value="  ปิด   "onclick="window.close();">
 			</form>

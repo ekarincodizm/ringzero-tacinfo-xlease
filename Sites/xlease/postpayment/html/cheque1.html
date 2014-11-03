@@ -750,6 +750,12 @@ if(ck_else ==0){
             alert("บันทึกรายการเรียบร้อย");
             location.href = "frm_postav.php";
           }
+		  else
+		  {
+			alert('ผิดพลาด!! '+data);
+			$("#btn_save").attr("disabled", false);
+			$("#btn_addcheque").attr("disabled", false);
+		  }
         }  
       );    
     }

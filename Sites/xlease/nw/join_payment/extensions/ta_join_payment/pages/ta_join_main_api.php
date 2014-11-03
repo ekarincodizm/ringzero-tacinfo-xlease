@@ -42,11 +42,11 @@ function MM_jumpMenu(targ,selObj,restore){
 	";
 
 
-$f_type = $_POST[f_type];
-$id =$_REQUEST[id];	
-$ta_join_pm_id = $_POST[ta_join_pm_id];
-$name = getCusJoin($_POST[cus_id],$f_type,$id); //หาชื่อลูกค้า
-	if($_POST[form_name] == "add"){
+$f_type = pg_escape_string($_POST[f_type]);
+$id = pg_escape_string($_REQUEST[id]);	
+$ta_join_pm_id = pg_escape_string($_POST[ta_join_pm_id]);
+$name = getCusJoin(pg_escape_string($_POST[cus_id]),$f_type,$id); //หาชื่อลูกค้า
+	if(pg_escape_string($_POST[form_name]) == "add"){
 
 			$ta_join_pm_id = generate_id("TAJM-", "ta_join_main" ,"ta_join_pm_id",date("ymd"),4);
 		//$cpro_name = explode('#',$_POST[cpro_name]);
@@ -101,32 +101,32 @@ $name = getCusJoin($_POST[cus_id],$f_type,$id); //หาชื่อลูกค
 		
 		//------------------------------------------------------------------------edit
  
-else if($_POST[form_name] == "edit"){
+elseif(pg_escape_string($_POST[form_name]) == "edit"){
 	
-		$cb1 =$_REQUEST[cb1];	
+		$cb1 = pg_escape_string($_REQUEST[cb1]);	
 		if($cb1==1){
-		$idno =$_REQUEST[idno_new];	
+		$idno = pg_escape_string($_REQUEST[idno_new]);	
 		}else{
-		$idno =$_REQUEST[idno];		
+		$idno = pg_escape_string($_REQUEST[idno]);		
 			
 		}
-		$start_pay_date = date_ch_form($_POST[start_pay_date]);
+		$start_pay_date = date_ch_form(pg_escape_string($_POST[start_pay_date]));
 		//$cpro_name = explode('#',$_POST[cpro_name]);
-		$cancel_datetime = $_POST[cancel_datetime];
+		$cancel_datetime = pg_escape_string($_POST[cancel_datetime]);
 		if($cancel_datetime!=''){
-		$cancel_datetime = date_ch_form($_POST[cancel_datetime]);
+		$cancel_datetime = date_ch_form($cancel_datetime);
 		$ccc = ",cancel_datetime='$cancel_datetime' ";
 		}
 		
-		if($_POST[join_addr]!=$_POST[join_addr2]){
+		if(pg_escape_string($_POST[join_addr]) != pg_escape_string($_POST[join_addr2])){
 			
 			$ccc2 = ",addr_user='".$_SESSION["av_iduser"]."',addr_stamp='$info_currentdatetimesql2' ";
 			
 		}
 		
 		
-		$cancel =$_REQUEST[cancel];
-		$car_license  =$_REQUEST[car_license];
+		$cancel = pg_escape_string($_REQUEST[cancel]);
+		$car_license  = pg_escape_string($_REQUEST[car_license]);
 		if($cancel==1 || $cancel==2 || $cancel==3 || $cancel==4){
 			//$car_license2 = $car_license."/" ;
 					$query = "INSERT INTO  ta_join_main_bin  
@@ -137,14 +137,14 @@ else if($_POST[form_name] == "edit"){
 			//	echo $query;
 				// Update เมื่อ ยกเลิกสัญญา
 		$query =	"UPDATE ta_join_main SET
-										car_license='".$_POST[car_license]."',
-										cusid='$_POST[cus_id]',
+										car_license='".pg_escape_string($_POST[car_license])."',
+										cusid='".pg_escape_string($_POST[cus_id])."',
 				                        idno='$idno',
 										
 										start_pay_date='$start_pay_date',
-										address='$_POST[join_addr]',
-										cancel='".$_POST[cancel]."',
-										note='".$_POST[note]."',
+										address='".pg_escape_string($_POST[join_addr])."',
+										cancel='".pg_escape_string($_POST[cancel])."',
+										note='".pg_escape_string($_POST[note])."',
 										update_datetime='$info_currentdatetimesql2',
 										approve_status='2',
 										staff_check=0,
@@ -207,7 +207,7 @@ else if($_POST[form_name] == "edit"){
 		$sqlaction = pg_query("INSERT INTO action_log(id_user, action_desc, action_time) VALUES ('$user_id', '(TAL) แก้ไขข้อมูลเข้าร่วม', '$add_date')");
 if($cb1==1){
 	
-echo "<script>alert('ยกเลิกข้อมูลเรียบร้อยแล้ว');location.href='frm_main.php?idno=$idno&car_id_r=$_POST[car_id]&id=$id&action=add&new_sp=1'</script>";
+echo "<script>alert('ยกเลิกข้อมูลเรียบร้อยแล้ว');location.href='frm_main.php?idno=$idno&car_id_r=".pg_escape_string($_POST[car_id])."&id=$id&action=add&new_sp=1'</script>";
 }else{
 echo "<script>alert('ยกเลิกข้อมูลเรียบร้อยแล้ว');location.href='ta_join_payment_view_new.php?idno_names=$id&config=0&rf=1'</script>";		
 }
@@ -226,13 +226,13 @@ echo "<script>alert('ยกเลิกข้อมูลเรียบร้�
 				if (!$sql_query) {die('เกิดข้อผิดพลาด ไม่สามารถบันทึกข้อมูลได้!!: <br>' . $query . '<br>');}
 				
 		$query =	"UPDATE ta_join_main SET
-										car_license='".$_POST[car_license]."',
-				                        idno='".$_POST[idno]."',
-										cusid='$_POST[cus_id]',
+										car_license='".pg_escape_string($_POST[car_license])."',
+										idno='".pg_escape_string($_POST[idno])."',
+										cusid='".pg_escape_string($_POST[cus_id])."',
 										start_pay_date='$start_pay_date',
-										address='$_POST[join_addr]',
-										cancel='".$_POST[cancel]."',
-										note='".$_POST[note]."',
+										address='".pg_escape_string($_POST[join_addr])."',
+										cancel='".pg_escape_string($_POST[cancel])."',
+										note='".pg_escape_string($_POST[note])."',
 										update_datetime='$info_currentdatetimesql2',
 										approve_status='2',
 										staff_check=0,
@@ -258,7 +258,7 @@ echo "<script>alert('แก้ไขข้อมูลเรียบร้อ�
 
 		}
 	}
-else if ($_REQUEST[form_name]=='del'){
+elseif(pg_escape_string($_REQUEST[form_name]) == 'del'){
 	
 
 					$query = "INSERT INTO ta_join_main_bin  SELECT * FROM ta_join_main WHERE id='$id' ";

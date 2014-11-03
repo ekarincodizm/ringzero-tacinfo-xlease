@@ -156,7 +156,7 @@ function popU(U,N,T){
 			</tr>
 			<tr>
 				<td colspan="4">					
-					<fieldset><legend><b><u>คำอธิบาย</u></b></legend>
+					<fieldset><legend><b><u>คำอธิบายหัวข้อ</u></b></legend>
 						<div>"ยอดสินเชื่อเริ่มแรก" : ยอดเงินต้นสัญญากู้ หรือยอดสินค้าก่อนภาษีมูลค่าเพิ่มสำหรับสัญญาเช่า หรือเช่าซื้อ</div>
 						<div>"เงินต้นคงเหลือ" : เงินต้นคงเหลือ ณ สิ้นวันของวันที่สิ้นเดือนของเดือนและปีที่เลือก</div>
 						<div>"ดอกเบี้ยรับ" : ดอกเบี้ยที่รับมาแล้วจริงจากที่ลูกค้าจ่ายทั้งหมดตั้งแต่เริ่มสัญญา</div>
@@ -166,6 +166,18 @@ function popU(U,N,T){
 						<div>"รวมคงเหลือที่จะต้องรับชำระ" : เงินที่ลูกค้าจะต้องชำระทั้งหมดหากต้องการปิดบัญชี (เฉพาะค่างวด หรือค่าใช้จ่ายตามสัญญาทั้งหมด)</div>
 						<div>"ดอกเบี้ยคงเหลือทั้งสัญญา (การเงิน)" : ดอกเบี้ยคงเหลือทั้งสัญญาหักด้วยดอกเบี้ยทั้งหมดที่ลูกค้าได้ชำระมาแล้ว (เฉพาะ สัญญาเช่า หรือเช่าซื้อ)</div>
 						<div>"ดอกเบี้ยคงเหลือทั้งสัญญา (บัญชี)" : ดอกเบี้ยคงเหลือทั้งสัญญาหักด้วยดอกเบี้ยทั้งหมดที่ลูกค้าได้ชำระมาแล้ว หักด้วยดอกเบี้่ยค้างรับ (เท่ากับดอกเบี้ยตั้งพักรอรับรู้)</div>
+					</fieldset>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="4">					
+					<fieldset><legend><b><u>คำอธิบายสีและจะแสดงลำดับสีดังนี้ (โดยหากเข้าเงื่อนไขใดเรียงจากด้านบนก็จะแสดงสีนั้นๆทันทีที่เข้าเงื่อนไข โดยไม่แสดงสีลำดับต่อไป ยกเว้น กรณีที่ปิดบัญชี)</u></b></legend>
+						<div><font style="BACKGROUND-COLOR:#CCCCFF">* สัญญาที่ขายออกโดยวิธีการโอนสิทธิ</font></div>
+						<div><font style="BACKGROUND-COLOR:#DD0000">* สัญญาที่มีการยึดทรัพย์ครบถ้วนทั้งหมดตามสัญญาแล้ว</font></div>
+						<div><font style="BACKGROUND-COLOR:#FF6666">* สัญญาที่มีการยึดทรัพย์เริ่มยึดทรัพย์แต่ยังยึดไม่ครบถ้วนตามสัญญา</font></div>
+						<div><font style="BACKGROUND-COLOR:#FFFF55">* สัญญาที่มีการปรับโครงสร้างหนี้ หรือศาลมีคำพิพากษาแล้ว</font></div>
+						<div><font style="BACKGROUND-COLOR:#FFCC00">* สัญญาที่อยู่ระหว่างการฟ้องร้อง</font></div>
+						<div><font style="BACKGROUND-COLOR:#EEAEEE">* สัญญาที่ปิดบัญชีแล้วปกติ</font></div>
 					</fieldset>
 				</td>
 			</tr>
@@ -219,7 +231,14 @@ function popU(U,N,T){
 				// และสัญญาดังกล่าวจะต้องยังไม่ปิดบัญชี
 				// ============================================================================================
 				$qrycontract=pg_query("	select
-											\"contractID\", \"thcap_checkcontractcloseddate\"(\"contractID\",'$vfocusdate') as conclosedate
+											\"contractID\", 
+											\"thcap_checkcontractcloseddate\"(\"contractID\",'$vfocusdate') as conclosedate,
+											\"thcap_get_all_isSold\"(\"contractID\",'$vfocusdate') as conissold,
+											\"thcap_get_all_isSeize\"(\"contractID\",'$vfocusdate') as conisseize,
+											\"thcap_get_all_isTotalSeize\"(\"contractID\",'$vfocusdate') as conistotalseize,
+											\"thcap_get_all_isSue\"(\"contractID\",'$vfocusdate') as conissue,
+											\"thcap_get_all_isRestructure\"(\"contractID\",'$vfocusdate') as conisrestructure,
+											\"thcap_get_all_isAbsClose\"(\"contractID\",'$vfocusdate') as conisabsclose
 										from
 											\"thcap_contract\" 
 										where
@@ -239,6 +258,12 @@ function popU(U,N,T){
 					while($rescon=pg_fetch_array($qrycontract)){
 						$contractID=$rescon["contractID"];
 						$conclosedate=$rescon["conclosedate"];
+						$conissold=$rescon["conissold"];
+						$conisseize=$rescon["conisseize"];
+						$conistotalseize=$rescon["conistotalseize"];
+						$conissue=$rescon["conissue"];
+						$conisrestructure=$rescon["conisrestructure"];
+						$conisabsclose=$rescon["conisabsclose"];
 						
 						// ============================================================================================
 						// ตรวจสอบว่าถ้าสัญญาดังกล่าวปิดสัญญา ไม่ว่าจะด้วยชำระเสร็จสิ้น หรือด้วยขายหนี้ หรือถูกยึดแล้ว จะต้องปิดสัญญา (เฉพาะสัญญาที่ปิดในปีก่อนๆ สำหรับปิดในปีนี้ ยังต้องแสดงอยู่ เพราะต้องแสดงยอดรับรู้รายได้ปีนั้นๆ แต่ให้เงินต้น/ลูกหนี้ เหลือ = 0)
@@ -588,12 +613,39 @@ function popU(U,N,T){
 						}
 						
 						//if($sumin_prin1 > 0){	//หากเงินคงเหลือมากกว่า ศูนย์จึงจะแสดงข้อมูล (แก้ไข 2014-03-10 comment ออก เนื่องจากเปลือง perf ที่มาตรวจสอบทั้งหมดว่าไม่ใช่ตอนสุดท้าย และไล่หายาก)
-							//นับจำนวนแถวเพื่อสลับสีแถว ให้อ่านง่ายขึ้น
-							if($i%2==0){
-								echo "<tr bgcolor=#EED5B7 onmouseover=\"javascript:this.bgColor = '#FFFF99';\" onmouseout=\"javascript:this.bgColor = '#EED5B7';\" align=center>";
-							}ELSE{
-								echo "<tr bgcolor=#FFE4C4 onmouseover=\"javascript:this.bgColor = '#FFFF99';\" onmouseout=\"javascript:this.bgColor = '#FFE4C4';\" align=center>";
+						
+							// ถ้าเป็นสัญญาทั่วไปก็ให้เป็นสีสลับกัน แต่ถ้าเป็นสัญญาพิเศษ ก็ให้เป็นสีตามเงื่อนไข
+							if($conclosedate == '' && $conissold != '1' && $conisseize != '1' && $conistotalseize != '1' && $conisrestructure != '1' && $conissue != '1' && $conisabsclose != '1') {
+								//นับจำนวนแถวเพื่อสลับสีแถว ให้อ่านง่ายขึ้น
+								if($i%2==0){
+									echo "<tr bgcolor=#EED5B7 onmouseover=\"javascript:this.bgColor = '#FFFF99';\" onmouseout=\"javascript:this.bgColor = '#EED5B7';\" align=center>";
+								}else {
+									echo "<tr bgcolor=#FFE4C4 onmouseover=\"javascript:this.bgColor = '#FFFF99';\" onmouseout=\"javascript:this.bgColor = '#FFE4C4';\" align=center>";
+								}	
+							} 
+							// การแสดงผลต้องเรียงลำดับตามนี้เพื่อให้การแสดงผลถูกต้อง และ จะต้องมี $conclosedate อยู่อันดับท้ายสุด 
+							else if ($conisabsclose == '1') {
+								echo "<tr bgcolor=#EEAEEE onmouseover=\"javascript:this.bgColor = '#EEAEEE';\" onmouseout=\"javascript:this.bgColor = '#EEAEEE';\" align=center>";
+								
+							} else if ($conissold == '1') {
+								echo "<tr bgcolor=#CCCCFF onmouseover=\"javascript:this.bgColor = '#CCCCFF';\" onmouseout=\"javascript:this.bgColor = '#CCCCFF';\" align=center>";
+								
+							} else if ($conistotalseize == '1') {
+								echo "<tr bgcolor=#DD0000 onmouseover=\"javascript:this.bgColor = '#DD0000';\" onmouseout=\"javascript:this.bgColor = '#DD0000';\" align=center>";
+								
+							} else if ($conisseize == '1') {
+								echo "<tr bgcolor=#FF6666 onmouseover=\"javascript:this.bgColor = '#FF6666';\" onmouseout=\"javascript:this.bgColor = '#FF6666';\" align=center>";
+								
+							} else if ($conisrestructure == '1') {
+								echo "<tr bgcolor=#FFFF55 onmouseover=\"javascript:this.bgColor = '#FFFF55';\" onmouseout=\"javascript:this.bgColor = '#FFFF55';\" align=center>";
+								
+							} else if ($conissue == '1') {
+								echo "<tr bgcolor=#FFCC00 onmouseover=\"javascript:this.bgColor = '#FFCC00';\" onmouseout=\"javascript:this.bgColor = '#FFCC00';\" align=center>";
+								
+							} else if ($conclosedate != '') { // ปิดบัญชีทางบัญชี
+								echo "<tr bgcolor=#EEAEEE onmouseover=\"javascript:this.bgColor = '#EEAEEE';\" onmouseout=\"javascript:this.bgColor = '#EEAEEE';\" align=center>";
 							}
+							
 							
 							if($contype=='HIRE_PURCHASE' || $contype=='LEASING' || $contype=='FACTORING' || $contype=='PROMISSORY_NOTE' || $contype=='SALE_ON_CONSIGNMENT')
 							{

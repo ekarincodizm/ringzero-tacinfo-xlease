@@ -6,11 +6,11 @@ $qry_name=pg_query("select
 						\"fullname\",
 						\"nickname\"
 					from
-						\"Vfuser\"
+						\"Vfuser_active\"
 					where
 						(\"fullname\" like '%$term%' or \"nickname\" like '%$term%') and
-						resign_date is null and
-						\"user_group\" <> 'AD'"); //ยกเว้น แผนก AD
+						\"isadmin\" <> '1' and
+						\"user_dep\" IN(select \"fdep_id\" from \"f_department\" where \"fstatus\" = true)"); //ยกเว้น คนที่เป็นระดับ admin
 
 $numrows = pg_num_rows($qry_name);
 while($res_name=pg_fetch_array($qry_name)){

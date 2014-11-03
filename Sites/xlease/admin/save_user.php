@@ -15,7 +15,10 @@ $v_nickname = split(",",pg_escape_string($_GET["f_nickname"]));
 
 $user_id = $_SESSION["av_iduser"];
 $add_date=nowDateTime(); //ดึงข้อมูลวันเวลาจาก server
- 
+
+$v_isUseTA = split(",", pg_escape_string($_GET["IsUseTA"])); 
+$v_isAdmin = split(",", pg_escape_string($_GET["Admin_status"]));
+  
 include("../company.php");
 
 $all_user = sizeof($v_username);
@@ -55,12 +58,13 @@ while($i<$all_user)
 	$v_office1=checknull(trim($v_office[$i]));
 	$v_status1=checknull(trim($v_status[$i]));
 	$v_nickname1 = checknull(trim($v_nickname[$i]));
-		
+	$v_isUseTA_i = checknull(trim($v_isUseTA[$i]));
+	$v_isAdmin_i = checknull(trim($v_isAdmin[$i]));	
 	$qry_uname=pg_query("select * from fuser where username=$v_username1");
 	$nur_name=pg_num_rows($qry_uname);
 	if($nur_name > 0)
 	{
-	echo "ชื่อ username ซ้ำ";
+		echo "ชื่อ username ซ้ำ"; 
 	}
 	else
 	{
@@ -78,8 +82,8 @@ while($i<$all_user)
 		
 		$u_detail_sql = "insert into \"fuser_detail\"(\"id_user\",\"nickname\",\"user_keylast\",\"keydatelast\",\"work_status\") values('$id_plus',$v_nickname1,'$user_id','$add_date',$v_status1)";
 		
-		$in_sql="insert into fuser(id_user,username,password,office_id,user_group,status_user,title,fname,lname,user_dep) values('$id_plus',$v_username1,'$v_pass',$v_office1,$v_gp1,$v_status1,$v_title1,$v_fullname1,$v_lname1,$v_fd1)";
-	
+		$in_sql="insert into fuser(id_user,username,password,office_id,user_group,status_user,title,fname,lname,user_dep,\"isUserTA\",isadmin) values('$id_plus',$v_username1,'$v_pass',$v_office1,$v_gp1,$v_status1,$v_title1,$v_fullname1,$v_lname1,$v_fd1,$v_isUseTA_i,$v_isAdmin_i)";
+		
 		 if(!pg_query($in_sql))
 		 {
 			  $status.="error insert  fuser ".$in_sql."<br />";
@@ -106,6 +110,6 @@ else
 {
 	pg_query("ROLLBACK");
 }
-echo "<br />".$status;
+echo "<br />".$status; // แจ้งผลการทำงานของ Program
 
 ?>

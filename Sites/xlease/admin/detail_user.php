@@ -1,5 +1,5 @@
 <?php
-session_start();
+session_start(); 
 $_SESSION["av_iduser"];
 $idno=pg_escape_string($_POST["idno_names"]);
 include("../config/config.php");
@@ -148,7 +148,7 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 					  where A.id_user='$piduser' ");
   
   $resu=pg_fetch_array($qry_user);
-  
+  //  echo "151 Mark "; print_r($resu);
     $s_office=$resu["office_id"];
 	$title=trim($resu["title"]);
 	$fname=trim($resu["fname"]);
@@ -162,17 +162,17 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
    {
    
       $res_sta="<select name=\"a_status\" id=\"a_status\">
-	   <option value=\"1\">ใช้งาน</option>
-	   <option value=\"0\">ระังับใช้งาน</option>
-	</select>";
+	   				<option value=\"1\">ใช้งาน</option>
+					<option value=\"0\">ระงับใช้งาน</option>
+				</select>";
    
    }
    else
    {
        $res_sta="<select name=\"a_status\" id=\"a_status\">
-	   <option value=\"0\">ระังับใช้งาน</option>
-	   <option value=\"1\">ใช้งาน</option>
-	</select>";
+	   				<option value=\"0\">ระงับใช้งาน</option>
+				   	<option value=\"1\">ใช้งาน</option>
+				</select>";
    
    }
 
@@ -184,17 +184,18 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
   <br /><br />
   <form name="update_fuser" action="update_user.php" method="post" enctype="multipart/form-data">
   <table width="100%" border="0" style="background-color:#EEF2DB;" cellspacing="1" >
-  <tr style="background-color:#D0DCA0;">
-    <td>username</td>
-    <td>คำนำหน้า</td>
-	<td>ชื่อ</td>
-	<td>นามสกุล</td>
-    <td>กลุ่มผู้ใช้</td>
-	<td>ฝ่าย</td>
-    <td>office</td>
-    <td>status</td>
-	<td>ใช้งานระบบ</td>
-  </tr>
+  <thead><!-- Start thead 1 --> 	
+  	<tr style="background-color:#D0DCA0;">
+    	<td>username</td><!-- Col 1 -->
+    	<td>คำนำหน้า</td><!-- Col 2 -->
+		<td>ชื่อ</td><!-- Col 3 -->
+		<td>นามสกุล</td><!-- Col 4 -->
+	    <td>กลุ่มผู้ใช้</td><!-- Col 5 -->
+		<td>ฝ่าย</td><!-- Col 6 -->
+	    
+  	</tr>
+  </thead><!-- Start thead 1 -->
+  <tbody><!-- Start tbody 1 -->
   <tr style="background-color:#EEF2DB;"><input type="hidden" name="a_id" id="a_id" value="<?php echo $piduser; ?>"  />
     <td><input type="text" name="a_username" id="a_username" value="<?php echo trim($resu["username"]); ?>" size="10"/></td>
     <td><input type="text" name="a_title" id="a_title" value="<?php echo $title;?>" size="10" /></td>
@@ -212,8 +213,9 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 	<?php
 	 }
 	?>  
-	</select></td>
-		 <td>
+	</select>
+	</td>
+	<td>
 	<select name="a_fd" id="a_fd" value="<?php echo $a_fd?>">
 	<option value="" >---เลือก---</option>
 	<?php
@@ -227,25 +229,104 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 	?>  
 	 </td>
      <td>
-	<select name="a_ofiice" id="a_office">
-	 <option value="<?php echo $resu["office_id"]; ?>"><?php echo $s_office; ?></option>
-	<option value="<?php echo $_SESSION["session_company_nv"]; ?>">NV [<?php echo $_SESSION["session_company_nv"]; ?>]</option>
-	<option value="<?php echo $_SESSION["session_company_jr"]; ?>">JR[<?php echo $_SESSION["session_company_jr"]; ?>]</option>
-	<option value="<?php echo $_SESSION["session_company_tv"]; ?>">TV[<?php echo $_SESSION["session_company_tv"]; ?>]</option>
-		</select>	</td>
+	
+	</td>
     
 	<td>
-		<?php
-		echo $res_sta;
-		?>
 	</td>
 	<td>
-		<select name="u_system" id="u_system">
-			<option value="0" <?php if($resu["isUserTA"] == "0"){echo "selected";} ?> >XLEASE เท่านั้น</option>
-			<option value="1" <?php if($resu["isUserTA"] == "1"){echo "selected";} ?> >XLEASE และ TA</option>
-		</select>
 	</td>
   </tr>
+  </tbody><!-- End tbody 1 -->
+  <thead><!-- Start thead 2 -->
+  	<tr>
+  		<td style="background-color:#D0DCA0;">office</td><!-- Col 1 -->
+  		<td style="background-color:#D0DCA0;">status</td><!-- Col 2 -->
+  		<td style="background-color:#D0DCA0;">ใช้งานระบบ</td>
+  		
+  		<?php 
+  			$Str_Get_Status = "SELECT \"thcap_get_is_admin_status\"('".$_SESSION['uid']."')";
+			$Result = pg_query($Str_Get_Status);
+			$Login_Is_Admin = pg_fetch_result($Result,0,0);
+			if($Login_Is_Admin == 1) // กรณีที่ผู้ Login เป็น Admin
+			{
+				?>
+				<td style="background-color:#D0DCA0;">
+					 	IsAdmin
+				</td>				
+				<?php
+			}else{
+				?>
+				<td></td>
+				<?php
+			}
+  		?>	
+  		
+  		<td></td><td></td>	
+ 	</tr>
+  	
+  </thead><!-- End thead 2 -->
+  <tbody><!-- Start tbody2 -->
+  	<tr>
+  		<td>
+  			<select name="a_ofiice" id="a_office">
+	 			<option value="<?php echo $resu["office_id"]; ?>"><?php echo $s_office; ?></option>
+				<option value="<?php echo $_SESSION["session_company_nv"]; ?>">NV [<?php echo $_SESSION["session_company_nv"]; ?>]</option>
+				<option value="<?php echo $_SESSION["session_company_jr"]; ?>">JR[<?php echo $_SESSION["session_company_jr"]; ?>]</option>
+				<option value="<?php echo $_SESSION["session_company_tv"]; ?>">TV[<?php echo $_SESSION["session_company_tv"]; ?>]</option>
+			</select>
+  		</td>
+  		<td>
+  			<?php
+				echo $res_sta;
+			?>
+		</td>
+  		<td>
+  			<select name="u_system" id="u_system">
+				<option value="0" <?php if($resu["isUserTA"] == "0"){echo "selected";} ?> >XLEASE เท่านั้น</option>
+				<option value="1" <?php if($resu["isUserTA"] == "1"){echo "selected";} ?> >XLEASE และ TA</option>
+			</select>
+  		</td>
+  		
+  		
+  		<td>
+  			<?php 
+  				if($Login_Is_Admin == 1)// กรณึที่ผู้ Login มีสถานะเป็น Admin
+				{
+					$View_Status = "";
+				}else{
+					$View_Status = "hidden";
+				}
+				// End if ($Data == 1)	
+				if($resu["isadmin"] == 0) // กรณึที่ข้อมูลของผู้ใช้ไม่มีสถานะเป็น Admin เป็น 0
+				{ 
+					?>
+  					<select name = "is_admin" id = "is_admin" <?php echo $View_Status; ?>>
+  						<option value="0"><?php echo "ไม่เป็น Admin"; ?></option>
+  						<option value="1"><?php echo "เป็น Admin"; ?></option>
+  					</select>
+  					<?php
+				}else{ // กรณึที่ข้อมูลของผู้ใช้ไม่มีสถานะเป็น Admin เป็น 1
+					?>
+					<select name = "is_admin" id = "is_admin" <?php echo $View_Status; ?>>
+  						<option value="1"><?php echo "เป็น Admin"; ?></option>
+  						<option value="0"><?php echo "ไม่เป็น Admin"; ?></option>
+  					</select>	
+					<?php
+				}
+				
+  				
+			?>		
+  		</td>
+  		<td></td>
+  		<td></td>
+  		<td></td>
+  		<td></td>
+  		<td></td>
+  	</tr>	
+  </tbody><!-- End tbody2 -->
+  
+  
   <tr>
 	<td colspan="8">E-mail : <input type="text" name="email" id="email" value="<?php echo $email;?>" size="30" /></td>
   </tr>
@@ -264,7 +345,7 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 	if($pathu_sign !=""){
 	$pathu_sign='../nw/upload/sign/'.$pathu_sign;?>
 	<img src="<?php echo $pathu_sign;?>" width=150,height=50>
-	<?php }?>
+	<?php }?> 
   </td>
   </tr>
   </form>

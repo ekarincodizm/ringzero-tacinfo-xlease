@@ -628,8 +628,13 @@ list($sentaddress)=pg_fetch_array($qry_addr);
 	
 	// ถ้าเป็นเงินที่เคยถูกระบุว่าเป็นเงินที่ไม่รู้ว่าใครโอนชำระเข้ามา
 	if($v_chkanonymous == 1){
-		// วันที่ใบเสร็จ ตรง วันที่ปัจจุบัน (วันที่รับชำระเงิน ยังคงเดิม เนื่องจากเป็นเงินที่รับชำระมาก่อนหน้า)
-		$receiptDate = $logs_any_time;
+		/* todo ยกเลิกในส่วนนี้ โดยต่อให้เป็นเงินที่เคยถูกระบุว่าเป็นเงินที่ไม่รู้ว่าใครโอนชำระเข้ามา ก็ให้กำหนด วันที่ใบเสร็จ ตรงกับวันที่รับชำระ ตามเลขงาน #7461
+			// วันที่ใบเสร็จ ตรง วันที่ปัจจุบัน (วันที่รับชำระเงิน ยังคงเดิม เนื่องจากเป็นเงินที่รับชำระมาก่อนหน้า)
+			$receiptDate = $logs_any_time;
+		*/
+		
+		// วันที่ใบเสร็จ ตรงกับวันที่รับชำระ #7461
+		$receiptDate = $receiveDate;
 	}
 	// ถ้าเป็นเงินตามปกติทั่วไป
 	else{
@@ -740,7 +745,7 @@ $ChannelAmt = $money_Guarantee + $money_Deposit + $amtPenalty;
 		//############################จบการหาประเภทการจ่ายแบบเต็ม
 		
 		$in_log="insert into public.\"thcap_temp_receipt_details\" (\"receiptID\",\"doerID\",\"doerStamp\",\"backAmt\",\"nextDueAmt\",\"cusFullname\",\"cusCoFullname\",\"userFullname\",\"addrFull\",\"addrSend\",\"typeReceive\",\"typeDetail\",\"whtRef\",\"byChannelDetails\",\"receiptDate\",\"receiptTime\", \"receiptRemark\") 
-		values  ('$newreceipt','$username','$logs_any_time',null,null,'$name3',$nameco,'$userfullname','$address',$sentaddress,$selectVice2,$viceDetail2,null,$byChannelDetails,'$$receiptDate'::date,'$$receiptDate'::time without time zone, $reasontextother)"; // ใช้วันที่ออกใบเสร็จ $receiptDate
+		values  ('$newreceipt','$username','$logs_any_time',null,null,'$name3',$nameco,'$userfullname','$address',$sentaddress,$selectVice2,$viceDetail2,null,$byChannelDetails,'$receiptDate'::date,'$receiptDate'::time without time zone, $reasontextother)"; // ใช้วันที่ออกใบเสร็จ $receiptDate
 		if($resultLog=pg_query($in_log)); else $status++;
 	}	
 

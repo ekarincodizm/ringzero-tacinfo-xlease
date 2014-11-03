@@ -491,11 +491,11 @@ while( $res = pg_fetch_array($qry) ){
            <?php }if($action=='edit' || ($action=='view' && $cancel!='0') ) {?>
            <tr id="xx1">
              <td bgcolor="#F4F4F4"><div align="right">เปลี่ยนสถานะแล้วเปิดสัญญาเข้าร่วมใหม่ : </div></td>
-             <td><div align="left"><input id="cb1" name="cb1" type="checkbox" onclick="check_new_idno()" value="1" />  <span id="span1">เลขที่สัญญาเช่าซื้อล่าสุดที่จะนำมาปิด : <select name="idno_new" id="idno_new" onchange="ch_idno(this,'<?Php print $car_no ?>')" >
+             <td><div align="left"><input id="cb1" name="cb1" type="checkbox" onclick="check_new_idno()" value="1" />  <span id="span1">เลขที่สัญญาเช่าซื้อล่าสุดที่จะนำมาปิด : <select name="idno_new" id="idno_new" onchange="ch_idno(this,'pleaseSearch')" >
     <option value="" >เลือก</option>
 <?php
 
-$qry = pg_query("select \"IDNO\" from \"VJoin\" WHERE \"asset_id\" = '$car_no' ORDER BY \"P_STDATE\" desc  ");
+$qry = pg_query("SELECT \"IDNO\" FROM \"VJoin\" WHERE \"asset_id\" = '$car_no' OR \"C_REGIS\" = '$car_license' ORDER BY \"P_STDATE\" DESC");
 while( $res = pg_fetch_array($qry) ){
     $q_ref1 = $res['IDNO'];
 ?>

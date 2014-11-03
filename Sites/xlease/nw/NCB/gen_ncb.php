@@ -944,7 +944,7 @@ while($ncb = pg_fetch_array($sql_main))
 		if($Date_Account_Closed == "11")
 		{ // ถ้าสถานะเป็น ปิดบัญชีแล้ว
 			// หาวันที่ปิดบัญชีจาก function
-			$qry_closeDateFromFunction = pg_query("select \"thcap_checkcontractcloseddate\"('$current_or_new_account_number')");
+			$qry_closeDateFromFunction = pg_query("select \"thcap_get_all_date_absclose\"('$current_or_new_account_number')");
 			$closeDateFromFunction = pg_fetch_result($qry_closeDateFromFunction,0);
 			
 			if($closeDateFromFunction != "") // ถ้าเจอวันที่ปิดบัญชีจาก function ให้ใช้วันที่นี้เป็นวันที่ปิดบัญชี

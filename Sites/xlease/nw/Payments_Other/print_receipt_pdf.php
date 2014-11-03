@@ -70,7 +70,7 @@ $contractID=pg_escape_string($_GET["contractID"]); // เลขที่สั�
 
 if($contractID == "") // ถ้าไม่มีการส่งเลขที่สัญญามา ต้องหาเอง
 {
-	$qry_conid_spa = pg_query("select \"receiptID\" from \"thcap_v_receipt_details\" WHERE \"receiptID\" = '$receiptID'");
+	$qry_conid_spa = pg_query("select \"contractID\" from \"thcap_v_receipt_details\" WHERE \"receiptID\" = '$receiptID'");
 	$numchk1=pg_num_rows($qry_conid_spa);
 	if($numchk1==0){ //แสดงว่าใบเสร็จถูกยกเลิกแล้ว 
 		$qry_conid_spa = pg_query("select \"contractID\" from \"thcap_v_receipt_details_cancel\" WHERE \"receiptID\" = '$receiptID'");
@@ -132,7 +132,7 @@ if($p_ja!="1"){
 	$pdf->Image("images/12.png",60,100,100);  //barcode
 }
 //ค้นหาข้อมูลใบเสร็จ
-$qry_conid=pg_query("select \"receiptID\" from \"thcap_temp_receipt_channel\" where \"receiptID\" = '$receiptID' and \"byChannel\" <> '999' ");
+$qry_conid=pg_query("select \"receiveDate\" from \"thcap_temp_receipt_channel\" where \"receiptID\" = '$receiptID' and \"byChannel\" <> '999' ");
 if($result=pg_fetch_array($qry_conid))
 {	
 	$receiveDate=trim($result["receiveDate"]); // วันที่รับชำระ

@@ -111,16 +111,17 @@ $(function(){
 
 	});
 	
-	// ยกเลิกการแปลงวันทีี่อัตโนมัติ
+	// ยกเลิกการแปลงวันที่อัตโนมัติ
 	/*$('#BDate').change(function(){
     		$('#BDate').datepicker('setDate', $(this).val());
 		});
 	*/
 });
+
 $(document).ready(function(){
 
     $("#Cs_Data").autocomplete({
-        source: "s_cusmix.php",
+        source: "s_cuscorp.php",
         minLength:1
     });
 });
@@ -132,10 +133,25 @@ function check_Input_Date(data_In){
 	var Date_split = str.split("-");
 	var chk = 0; 
 	var Err_Msg;
-	if(Date_split.length!= 3){
-		chk++;
-	}else{
 	
+	if(str == '')
+	{
+		chk++;
+	}
+	else if(str.length != 10)
+	{
+		chk++;
+	}
+	else if(str.substring(4, 5) != "-" || str.substring(7, 8) != "-")
+	{
+		chk++;
+	}
+	else if(Date_split.length != 3)
+	{
+		chk++;
+	}
+	else
+	{
 		var dtYear = parseInt(Date_split[0]);   
 		var dtMonth = parseInt(Date_split[1]); 
 		var dtDay = parseInt(Date_split[2]); 
@@ -163,16 +179,15 @@ function check_Input_Date(data_In){
 		}
 	}
     
-     
 	if(chk>0){ 
-		Err_Msg = 'กรุณานำเช้า \"วันที่ติดต่อ\" ให้ถูกต้อง \n';
+		Err_Msg = '-> กรุณาระบุ \"วันที่ติดต่อ\" ให้ถูกต้อง \n';
 	}else{
 		Err_Msg ='';
 	}
+	
 	return(Err_Msg);
-	
-	
 }// End Of function check_Input_Date(data_In)
+
 function Chk_Input_Data(){
 	var Err_Msg = '';
 	var Err_Fnd = false;
@@ -180,7 +195,7 @@ function Chk_Input_Data(){
 /*	Check Customer Data Input  */	
 	var customer = document.frm_Input.Cs_Data.value;
 	if(customer==''){
-		Err_Msg = ' กรุณานำเข้า  \"ข้อมูลลูกค้า\"   \n '; 
+		Err_Msg = "-> กรุณาระบุ  \"ข้อมูลลูกค้า\"   \n";
 		Err_Fnd = true;
 	}else{
 	}
@@ -197,14 +212,14 @@ function Chk_Input_Data(){
 /* Check เวลาที่ติดต่อ เป็น ชั่วโมง*/	
 	var Hr_Chk = document.frm_Input.Hour.value;
 	if(Hr_Chk=='-'){
-		Err_Msg = Err_Msg + " กรุณาเลิอก \"ชั่วโมง\" ที่ติดต่อ \n";
+		Err_Msg = Err_Msg + "-> กรุณาเลิอก \"ชั่วโมง\" ที่ติดต่อ \n";
 		Err_Fnd = true;	
 	}
     
 /* Check นาทีที่ติดต่อ */	
 	var Min_Chk = document.frm_Input.Minute.value;
 	if(Min_Chk=='-'){
-		Err_Msg = Err_Msg + " กรุณาเลิอก \"นาที\" ที่ติดต่อ \n";
+		Err_Msg = Err_Msg + "-> กรุณาเลิอก \"นาที\" ที่ติดต่อ \n";
 		Err_Fnd = true;	
 	}
 	
@@ -213,7 +228,7 @@ function Chk_Input_Data(){
 	var Detail_Chk = document.frm_Input.detail_Input.value;
 	var n = Detail_Chk.length;
 	if(Detail_Chk==''){
-		Err_Msg = Err_Msg + " กรุณากรอกรายละเอียด \n";
+		Err_Msg = Err_Msg + "-> กรุณากรอก รายละเอียดการติดต่อ \n";
 		Err_Fnd = true;
 	}else{
 	}
@@ -265,7 +280,10 @@ function Chk_Input_Data(){
 						if($i<10){
 							$data_show="0".$data_show;
 						}
-						echo "<option value=\"$i\"   >$data_show</option>";
+						
+						if($data_show == $F_Hrs){$chk_select_H = "selected";}else{$chk_select_H = "";}
+						
+						echo "<option value=\"$i\" $chk_select_H >$data_show</option>";
 							
 					}// End Of for Loop	
   				?>	
@@ -289,7 +307,10 @@ function Chk_Input_Data(){
 						if($i<10){
 							$data_show="0".$data_show;
 						}
-						echo "<option value=\"$i\" >$data_show</option>";	
+						
+						if($data_show == $F_Min){$chk_select_M = "selected";}else{$chk_select_M = "";}
+						
+						echo "<option value=\"$i\" $chk_select_M >$data_show</option>";	
 					}	
   				?>
   				

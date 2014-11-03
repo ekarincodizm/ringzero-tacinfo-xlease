@@ -401,7 +401,6 @@ if($num_chk == 0 AND $revTranID != 'bid_1'){ //แสดงว่าอนุม
 					{9,$revtranstatussubtype_ref9}
 				}
 			";
-			echo $prevtranstatussubtype_ref_array;
 			
 			// ตรวจสอบว่าเป็นการรับเงินสด หรือไม่ ถ้าไม่ก็ทำตาม process เดิมปกติ
 			if($revTranID != 'bid_1'){
@@ -428,7 +427,8 @@ if($num_chk == 0 AND $revTranID != 'bid_1'){ //แสดงว่าอนุม
 				}
 			
 				// อนุมัติรายการ Receive voucher อัตโนมัติ
-				$qry_vvoucherid_rec_other = pg_query("
+				// todo ยกเลิกในส่วนนี้ออกไป เนื่องจากต้องการให้ไปอนุมัติเอง :: ถ้าต้องการใช้งานเหมือนเดิม สามารถเปิดออกได้ :: อ้างอิงการปิดความสามารถด้วยเลขงาน #7420
+				/*$qry_vvoucherid_rec_other = pg_query("
 					SELECT \"thcap_process_voucherApprove\"(
 							'$vprevoucherdetailsid_rec_other'::bigint, -- bigint : pprevoucherdetailsid : รหัสรายการที่จะอนุมัติ หรือไม่อนุมัติ
 							'$id_user', -- varchar : pappvid : รหัสผู้อนุมัติรายการ
@@ -441,7 +441,7 @@ if($num_chk == 0 AND $revTranID != 'bid_1'){ //แสดงว่าอนุม
 					echo "ทำรายการอนุมัติใบสำคัญจ่ายเลขที่ $vprevoucherid_rec_other แล้ว";
 				}else{
 					$status++;
-				}
+				}*/
 				
 				//update สถานะ chq ด้วยว่ามีการใช้เช็ค
 				$upchq="UPDATE finance.thcap_receive_cheque SET \"revChqStatus\"=1 WHERE \"revChqID\"='$prevtranstatussubtype_paid_chq'";
@@ -581,7 +581,7 @@ if($num_chk == 0 AND $revTranID != 'bid_1'){ //แสดงว่าอนุม
 			echo "<font size=4><b>บันทึกข้อมูลเรียบร้อยแล้ว</b></font><br><br>";
 			echo "<input type=\"submit\" value=\"  ปิด  \" onclick=\"javascript:RefreshMe();\" />";
 			//พิมพ์ pdf
-			if(($result==2 || $result==8) && $revTranID != 'bid_1'){
+			if(($result==2 || $result==8) && $revTranID != 'bid_1' && $vprevoucherid_rec_other != ""){
 				$chk_voucherType = " 
 					SELECT \"voucherType\"
 					FROM \"thcap_temp_voucher_details\"

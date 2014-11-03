@@ -182,7 +182,7 @@ $_SESSION["av_iduser"];
 	   }
 	  
 	// ห้ามคนเดียวกันรับเงินที่ตนเองตั้ง
-	 if($reslog["UserIDAccept"]=="" && ($_SESSION["av_iduser"]!=$reslog["UserIDPost"] || $res_acpt["user_group"]=='AD'))
+	 if($reslog["UserIDAccept"]=="" && ($_SESSION["av_iduser"]!=$reslog["UserIDPost"] || $res_acpt["isadmin"]=='1'))
 	 {
 	   $pptype=$reslog["paytype"];
 	   $bt_rec="<input type=\"button\" value=\"Receipt\" onclick=\"window.location='frm_recfunction.php?pID=$reslog[PostID]&PayType=$pptype'\" />";
@@ -191,7 +191,7 @@ $_SESSION["av_iduser"];
 	 {
 	   $bt_rec="";
 	   // ห้ามคนเดียวกัน -> ถ้าคนเเดียวกัน แล้วยังไม่ได้รับเงิน ให้โชว์ห้ามรับเงินตนเอง ถ้ารับเงินไปแล้ว ให้ไม่ต้องขึ้นอะไร เว้นแต่จะเป็น AD
-		if($_SESSION["av_iduser"]==$reslog["UserIDPost"] && $res_acpt["user_group"]!='AD' && $reslog["UserIDAccept"]=="")
+		if($_SESSION["av_iduser"]==$reslog["UserIDPost"] && $res_acpt["isadmin"]!='1' && $reslog["UserIDAccept"]=="")
 			$bt_rec="ไม่ให้รับตนเอง";
 	 }
 	 

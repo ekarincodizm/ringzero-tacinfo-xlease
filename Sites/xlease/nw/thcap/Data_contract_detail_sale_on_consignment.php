@@ -1,6 +1,10 @@
 <?php 
 if($contractID != "") // ถ้ามีการส่งค่ามา  // header
 {
+	function mysort1($x, $y) // เรียงข้อมูล key1 จากน้อยไปมาก
+	{
+		return strcasecmp($x['key1'],$y['key1']);
+	}
 ?>
 <script type="text/javascript">
 function popUPO(U,N,T) {
@@ -43,7 +47,6 @@ $showPic = pg_fetch_result($sql_showPic,0);
 ?>	
 	<legend><B>ข้อมูลสัญญา</B></legend>
 	<div align="center">
-	<?php  include "Data_Warn_Contract.php";  ?>
 		<div id="panel1" align="left" style="margin-top:10px">
 <?php
 $nowday = nowDate();
@@ -220,10 +223,48 @@ list($lease_fine) = $rs_get_lease_fine;
 	//$datelatere = pg_fetch_array($datelatesql);
 	//$datelate = $datelatere['datelaste'];
 
-	//หาวันที่ปิดบัญชี
-	$dateclosesql = pg_query("SELECT thcap_checkcontractcloseddate('$contractID')");
-	$dateclosere = pg_fetch_array($dateclosesql);
-	$dateclose = $dateclosere['thcap_checkcontractcloseddate'];
+	//=============================================
+	//  หาวันที่แจ้งเตือนต่างๆ
+	//=============================================
+		$arrayDateAlert = array(); // array วันที่ต่างๆที่จะแจ้งเตือนในตาราง
+
+		// หา วันที่ปิดชำระบัญชีทั้งหมด (ไม่มีหนี้ใดๆต่อกัน)
+		$dateclose_sql = pg_query("SELECT \"thcap_get_all_date_absclose\"('$contractID')");
+		$dateclose = pg_fetch_result($dateclose_sql,0);
+		if($dateclose != ""){array_push($arrayDateAlert, array('key1' => $dateclose, 'key2' => 'วันที่ปิดชำระบัญชีทั้งหมด (ไม่มีหนี้ใดๆต่อกัน)', 'key3' => '#EEAEEE'));}
+		
+		// หา วันที่ถูกขายโดยโอนสิทธิหนี้
+		$date_sold_sql = pg_query("SELECT \"thcap_get_all_date_sold\"('$contractID')");
+		$date_sold = pg_fetch_result($date_sold_sql,0);
+		if($date_sold != ""){array_push($arrayDateAlert, array('key1' => $date_sold, 'key2' => 'วันที่ถูกขายโดยโอนสิทธิหนี้', 'key3' => '#CCCCFF'));}
+		
+		// หา วันที่เริ่มยึดทรัพย์
+		$date_seize_sql = pg_query("SELECT \"thcap_get_all_date_seize\"('$contractID')");
+		$date_seize = pg_fetch_result($date_seize_sql,0);
+		if($date_seize != ""){array_push($arrayDateAlert, array('key1' => $date_seize, 'key2' => 'วันที่เริ่มยึดทรัพย์', 'key3' => '#FF6666'));}
+		
+		// หา วันที่ยึดทรัพย์ครบถ้วน
+		$date_totalseize_sql = pg_query("SELECT \"thcap_get_all_date_totalseize\"('$contractID')");;
+		$date_totalseize = pg_fetch_result($date_totalseize_sql,0);
+		if($date_totalseize != ""){array_push($arrayDateAlert, array('key1' => $date_totalseize, 'key2' => 'วันที่ยึดทรัพย์ครบถ้วน', 'key3' => '#DD0000'));}
+		
+		// หา วันที่ฟ้อง
+		$dateSue_sql = pg_query("SELECT \"thcap_get_all_dateSue\"('$contractID')");
+		$dateSue = pg_fetch_result($dateSue_sql,0);
+		if($dateSue != ""){array_push($arrayDateAlert, array('key1' => $dateSue, 'key2' => 'วันที่ฟ้อง', 'key3' => '#FFCC00'));}
+		
+		// หา วันที่ปรับโครงสร้างหนี้ หรือมีการพิพากษา
+		$isRestructure_sql = pg_query("SELECT \"thcap_get_all_dateRestructure\"('$contractID')");
+		$isRestructure = pg_fetch_result($isRestructure_sql,0);
+		if($isRestructure != ""){array_push($arrayDateAlert, array('key1' => $isRestructure, 'key2' => 'วันที่ปรับโครงสร้างหนี้ หรือมีการพิพากษา', 'key3' => '#FFFF55'));}
+		
+		// หา วันที่ยกเลิกสัญญา
+		$isCancel_sql = pg_query("SELECT \"thcap_get_all_date_cancel\"('$contractID')");
+		$isCancel = pg_fetch_result($isCancel_sql,0);
+		if($isCancel != ""){array_push($arrayDateAlert, array('key1' => $isCancel, 'key2' => 'วันที่ยกเลิกสัญญา', 'key3' => '#CCCCCC'));}
+	//=============================================
+	// จบการหาวันที่แจ้งเตือนต่างๆ
+	//=============================================
 	
 	//หารหัสเงินพัก
 	$holdmoney_qry = pg_query("select account.\"thcap_getHoldMoneyType\"('$contractID','1')");
@@ -244,18 +285,28 @@ list($lease_fine) = $rs_get_lease_fine;
 ?>
 	<center>
     <table>
-	<!--ยกเลิกการใช้งานตาม Req 7060 <?php if($dateclose != ""){ 
-	$img=redirect($_SERVER['PHP_SELF'],'nw/thcap/images/onebit_38.png');
+	<?php
+	// การแจ้งเตือนวันที่ต่างๆที่สำคัญ
+	$img = redirect($_SERVER['PHP_SELF'],'nw/thcap/images/onebit_38.png');
+	usort($arrayDateAlert, 'mysort1');
+	foreach ($arrayDateAlert as $key => $value)
+	{
 	?>
-	<tr bgcolor="#EEAEEE">
-		<td colspan="12">
-			<div style="width:280px">
-				<div style="float:left"><img src="<?php echo $img; ?>" width="20px" height="20px"/></div>
-				<div style="float:right;padding:3px 0px 0px"><b><span id="datecloseacc" style="font-size:14px;"></span></b></div>
-			</div><div style="clear:both;"></div> <!-- หาวันที่ปิดบัญชี -->
-		<!--</td> 
-	</tr>	
-	<?php } ?> สิ้นสุดยกเลิกการใช้งานตาม Req 7060	-->
+		<tr bgcolor="<?php echo $value[key3]; ?>">
+			<td colspan="12">
+				<div style="width:100%">
+					<div style="float:left">
+						<img src="<?php echo $img; ?>" width="20px" height="20px"/>
+						&nbsp;&nbsp;
+						<b><span style="font-size:14px;"><?php echo "$value[key2] : $value[key1]"; ?></span></b>
+					</div>
+				</div><div style="clear:both;"></div> <!-- หาวันที่ปิดบัญชี -->
+			</td>
+		</tr>
+	<?php
+	}
+	// จบการแจ้งเตือน
+	?>
 	<tr> <!--แสดง ประเภทสัญญาย่อย  ถ้าไม่มี path รูปภาพจะแสดงเป็นข้อความ -->
 		<td colspan="3"><?php echo $imgtexttype;?>
 		</td>
@@ -341,7 +392,6 @@ list($lease_fine) = $rs_get_lease_fine;
 	//echo "<input type=\"hidden\" id=\"interestnow\" name=\"interestnow\" value=\"$interestnow\">"; // จ่ายคืนเงินกู้ครั้งล่าสุดเมื่อ
 	//echo "<input type=\"hidden\" id=\"phpNowRate\" name=\"phpNowRate\" value=\"$conIntCurRate\">"; // อัตราดอกเบี้ยปัจจุบันของสัญญา
 	//echo "<input type=\"hidden\" id=\"InterestNowDay\" name=\"InterestNowDay\" value=\"".number_format($restInDay_function,2)."\">"; // ดอกเบี้ยถึงวันนี้
-	echo "<input type=\"hidden\" id=\"datecloseaccount\" name=\"datecloseaccount\" value=\"$dateclose\">"; // วันที่ปิดสัญญา
 	
 ?>
 		</div>
@@ -355,7 +405,4 @@ list($lease_fine) = $rs_get_lease_fine;
 //	}else{
 //		$("#interestnowdate").html('จ่ายคืนเงินกู้ครั้งล่าสุดเมื่อ '+$("#interestnow").val()+' วันที่แล้ว');
 //	}
-	if($("#datecloseaccount").val()!=""){
-		$("#datecloseacc").html('สัญญานี้ถูกปิดไปแล้วตั้งแต่ '+$("#datecloseaccount").val());
-	}
 </script>

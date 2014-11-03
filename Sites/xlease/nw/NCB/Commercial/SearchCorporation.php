@@ -174,7 +174,7 @@ function CorporationArray2D($day , $month , $year , $myWhere) // หานิต
 			if(substr($conDate,0,4) > $year){continue;}
 			
 			// หาวันที่ปิดบัญชีจริง
-			$qry_conClosedDate = pg_query("select thcap_checkcontractcloseddate('$contractID') ");
+			$qry_conClosedDate = pg_query("select thcap_get_all_date_absclose('$contractID') ");
 			$conClosedDate = pg_result($qry_conClosedDate,0);
 			
 			// ถ้ามีวันที่ปิดบัญชี

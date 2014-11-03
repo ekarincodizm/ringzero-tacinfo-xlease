@@ -241,7 +241,7 @@ $(document).ready(function(){
 							$paytype=pg_getminpaytype($contractID); //รหัสผ่อนชำระตามสัญญากู้ของแต่ละสัญญา
 							
 							//ถ้าเป็นสัญญาประเภท LOAN แสดงว่ามี type เงินต้นและดอกเบี้ย
-							if($contype=='LOAN' || $contype=='JOINT_VENTURE' || $contype=='PERSONAL_LOAN'){ 
+							if($contype=='LOAN' || $contype=='PERSONAL_LOAN'){ 
 								$paytype_a=pg_getprincipletype($contractID);//หารหัสผ่อนชำระตามสัญญากู้-คืนเงินต้น เช่น 1001
 								$paytype_b=pg_getinteresttype($contractID);//หารหัสผ่อนชำระตามสัญญากู้-ดอกเบี้ย เช่น 1002
 							}
@@ -458,7 +458,7 @@ $(document).ready(function(){
 							
 							if($showtype=="0"){ //กำหนดให้แสดง record 					
 								//กรณีเป็นแบบแจกแจง และเป็นการชำระเงินต้น
-								if($chkanalyze=="1" and ((($typepay==$paytype || $typePayID==$paytype) and ($contype=='LOAN' || $contype=='JOINT_VENTURE' || $contype=='PERSONAL_LOAN')) || ($typepay==$paytype_a and $paytype_a!="" and ($contype=='LOAN' || $contype=='JOINT_VENTURE' || $contype=='PERSONAL_LOAN')) || ($typepay==$paytype_b and $paytype_b!="" and ($contype=='LOAN' || $contype=='JOINT_VENTURE' || $contype=='PERSONAL_LOAN')))){ 
+								if($chkanalyze=="1" and ((($typepay==$paytype || $typePayID==$paytype) and ($contype=='LOAN' || $contype=='PERSONAL_LOAN')) || ($typepay==$paytype_a and $paytype_a!="" and ($contype=='LOAN' || $contype=='PERSONAL_LOAN')) || ($typepay==$paytype_b and $paytype_b!="" and ($contype=='LOAN' || $contype=='PERSONAL_LOAN')))){ 
 									$qry_2012=pg_query("select \"receivePriciple\",\"receiveInterest\",\"receiveAmount\" FROM thcap_temp_int_201201 where \"receiptID\"='$receiptID'");
 									list($receivePriciple,$receiveInterest,$receiveAmount)=pg_fetch_array($qry_2012);
 					

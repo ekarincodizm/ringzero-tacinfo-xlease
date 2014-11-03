@@ -103,7 +103,7 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 	 if($reslog["paytype"]=="CA")
 	 {
 	    $sty_border="style=\"background-color:#BCE4F6;\" ";
-		 $qry_name=pg_query("select A.\"UserIDAccept\",A.\"UserIDPost\",A.\"PostID\",B.\"PostID\",B.\"CusID\",C.\"CusID\",C.\"A_NAME\",C.\"A_SIRNAME\",D.id_user,D.username
+		 $qry_name=pg_query("select A.\"UserIDAccept\",A.\"UserIDPost\",A.\"PostID\",B.\"PostID\",B.\"CusID\",C.\"CusID\",C.\"A_NAME\",C.\"A_SIRNAME\",D.id_user,D.username,D.isadmin
 		  from \"PostLog\"  A
          LEFT OUTER JOIN \"FCash\" B ON B.\"PostID\"=A.\"PostID\" 
 		 LEFT OUTER JOIN \"Fa1\" C ON B.\"CusID\"=C.\"CusID\" 
@@ -115,7 +115,7 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 		 $s_postID=$res_cus["username"];
 		
 		// ห้ามคนเดียวกันรับเงินที่ตนเองตั้ง เว้นแต่เป็น Admin
-		if($res_cus["UserIDAccept"]=="" && ($_SESSION["av_iduser"]!=$reslog["UserIDPost"] || $res_user["user_group"]=='AD'))
+		if($res_cus["UserIDAccept"]=="" && ($_SESSION["av_iduser"]!=$reslog["UserIDPost"] || $res_user["isadmin"]=='1'))
 		{
 			$pptype=$m_paytype;
 			$bt_rec="<input type=\"button\" value=\"Receipt\" onclick=\"window.location='frm_recfunction.php?pID=$reslog[PostID]&PayType=$pptype'\" />";
@@ -123,7 +123,7 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 		else
 		{
 			$bt_rec="";
-			if($_SESSION["av_iduser"]==$reslog["UserIDPost"] && $res_user["user_group"]!='AD' && $res_cus["UserIDAccept"]=="")
+			if($_SESSION["av_iduser"]==$reslog["UserIDPost"] && $res_user["isadmin"]!='1' && $res_cus["UserIDAccept"]=="")
 				$bt_rec="ไม่ให้รับตนเอง";
 		}
 		
@@ -138,7 +138,7 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 	 else if($reslog["paytype"]=="CH")
 	 {   
 	 
-	    $qry_name=pg_query("select A.\"UserIDAccept\",A.\"UserIDPost\",A.\"PostID\",B.\"PostID\",B.\"CusID\",C.\"CusID\",C.\"A_NAME\",C.\"A_SIRNAME\",D.id_user,D.username
+	    $qry_name=pg_query("select A.\"UserIDAccept\",A.\"UserIDPost\",A.\"PostID\",B.\"PostID\",B.\"CusID\",C.\"CusID\",C.\"A_NAME\",C.\"A_SIRNAME\",D.id_user,D.username,D.isadmin
 		  from \"PostLog\"  A
          LEFT OUTER JOIN \"DetailCheque\" B ON B.\"PostID\"=A.\"PostID\" 
 		 LEFT OUTER JOIN \"Fa1\" C ON B.\"CusID\"=C.\"CusID\" 
@@ -150,7 +150,7 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 		 $s_postID=$res_fchq["username"];
 		 
 		// ห้ามคนเดียวกันรับเงินที่ตนเองตั้ง เว้นแต่เป็น Admin
-	    if($res_fchq["UserIDAccept" ]=="" && ($_SESSION["av_iduser"]!=$reslog["UserIDPost"] || $res_user["user_group"]=='AD'))
+	    if($res_fchq["UserIDAccept" ]=="" && ($_SESSION["av_iduser"]!=$reslog["UserIDPost"] || $res_user["isadmin"]=='1'))
 		 {
 		   $pptype=$m_paytype;
 		   $bt_rec="<input type=\"button\" value=\"Receipt\" onclick=\"window.location='frm_recfunction.php?pID=$reslog[PostID]&PayType=$pptype'\" />";

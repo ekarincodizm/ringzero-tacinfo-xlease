@@ -59,6 +59,10 @@ if($method=="edit"){
 		
 		//กรณีรับเข้าทำงานใหม่ จะแสดงครั้งที่เข้ามาทำงานปัจจุบันด้วย
 		$work_status_now=$work_status+1;
+		
+		// หารหัสบริษัท
+		$qry_organizeID = pg_query("select \"organizeID\" from \"f_department\" where \"fdep_id\" = '$fdep_id' ");
+		$organizeID = pg_fetch_result($qry_organizeID,0);
 	}
 }
 if($u_pic == "noimage.jpg" || $u_pic==""){
@@ -125,8 +129,17 @@ if(document.form1.u_birthday.value==""){
 if(document.form1.u_idnum.value==""){
 	theMessage = theMessage + "\n -->  กรุณากรอกเลขที่บัตรประชาชน";
 }
+if(document.form1.u_idnum.value!="" && document.form1.u_idnum.value.length!=13){
+	theMessage = theMessage + "\n -->  เลขที่บัตรประชาชนต้องมี 13 หลัก เท่านั้น";
+}
+if(document.form1.organizeID.value==""){
+	theMessage = theMessage + "\n -->  กรุณาเลือก บริษัท";
+}
+if(document.form1.fdep_id.value==""){
+	theMessage = theMessage + "\n -->  กรุณาเลือก ฝ่าย";
+}
 if(document.form1.dep_id.value==""){
-	theMessage = theMessage + "\n -->  กรุณาระบุแผนก";
+	theMessage = theMessage + "\n -->  กรุณาเลือก แผนก";
 }
 
 if (theMessage == noErrors) {
@@ -216,7 +229,7 @@ function check_num(evt) {
 	//ให้เป็นตัวเลขเท่านั้น
 	evt = (evt) ? evt : window.event;
 	var charCode = (evt.which) ? evt.which : evt.keyCode;
-	if ((charCode < 8 || charCode > 8) && (charCode < 45 || charCode > 45) && (charCode < 48 || charCode > 57) ) {
+	if (((charCode < 8 || charCode > 8) && (charCode < 45 || charCode > 45) && (charCode < 48 || charCode > 57)) || charCode == 45) {
 		alert("กรุณากรอกเป็นตัวเลขเท่านั้น!!");
 		document.form1.u_idnum.focus();
 		return false;
@@ -246,6 +259,46 @@ function check_num_tel_direct(evt) {
 	}
 	return true;
 }
+
+function list_f_department(organizeID = null, select_fdep_id = null) // ตัวเลือกฝ่าย :: parameter รหัสพนักงาน / รายการที่เลือก
+{
+	if(organizeID == null || organizeID == '')
+	{
+		organizeID = $('#organizeID').val();
+	}
+	
+	if(organizeID != '')
+	{	
+		$.post('list_f_department.php',{organizeID:organizeID, select_fdep_id:select_fdep_id},function(data){
+			$('#fdep_id').html(data);
+		});
+	}
+	else
+	{	
+		$('#fdep_id').html('<option value="">---เลือก---</option>');
+	}
+	
+	$('#dep_id').html('<option value="">---เลือก---</option>'); // เมื่อเลือกบริษัท ให้ลบแผนกออกไปก่อน เพื่อที่จะให้เลือกฝ่ายใหม่
+}
+
+function list_department(fdep_id = null, select_dep_id = null) // ตัวเลือกแผนก :: parameter รหัสฝ่าย / รายการที่เลือก
+{
+	if(fdep_id == null || fdep_id == '')
+	{
+		fdep_id = $('#fdep_id').val();
+	}
+	
+	if(fdep_id != '')
+	{	
+		$.post('list_department.php',{fdep_id:fdep_id, select_dep_id:select_dep_id},function(data){
+			$('#dep_id').html(data);
+		});
+	}
+	else
+	{	
+		$('#dep_id').html('<option value="">---เลือก---</option>');
+	}
+}
 </script>
 </head>
 
@@ -261,7 +314,7 @@ function check_num_tel_direct(evt) {
 		<div class="style1" id="menu" style="height:30px; padding-left:10px; padding-top:10px; padding-right:10px;"><?php if($method=="edit"){ echo "แก้ไข";}else{ echo "เพิ่ม";}?>พนักงาน<hr/></div>
 		<div style="height:auto; padding-left:10px; padding-right:10px;"><br />
 			<form method="post" name="form1" action="process_manage.php" enctype="multipart/form-data">
-			<table width="780" border="0" style="background-color:#EEF2DB;" cellspacing="1" align="center">
+			<table width="850" border="0" style="background-color:#EEF2DB;" cellspacing="1" align="center">
 			<tr id="showtime"><td colspan="9" align="right">(<b>เข้ามาทำงานครั้งที่ <?php echo $work_status_now;?></b>)</td></tr>
 			<tr style="background-color:#D0DCA0;" align="right">
 				<td height="25" align="right"><b>ชื่อภาษาไทย</b></td>
@@ -288,7 +341,7 @@ function check_num_tel_direct(evt) {
 			</tr>
 			<tr style="background-color:#D0DCA0;" align="left">
 				<td colspan="9">
-					<table width="780" border="0" style="background-color:#EEF2DB;" cellspacing="1" align="center">	
+					<table width="850" border="0" style="background-color:#EEF2DB;" cellspacing="1" align="center">	
 						<tr>
 							<td rowspan="11" align="center"><img src="<?php echo $pathpic;?>" width="150" height="164"><br>
 								<input name="image_name" type="file" id="image_name" onChange="browse()"><input type="hidden" name="MM_insert" value="form1" />
@@ -346,39 +399,38 @@ function check_num_tel_direct(evt) {
 							<td width="10">:</td>
 							<td><input type="radio" name="u_status" value="โสด" <?php if($u_status=="" || $u_status=="โสด"){ echo "checked"; }?>>โสด <input type="radio" name="u_status" value="สมรส" <?php if($u_status=="สมรส"){ echo "checked"; }?>>สมรส <input type="radio" name="u_status" value="หย่าร้าง"<?php if($u_status=="หย่าร้าง"){ echo "checked"; }?>>หย่าร้าง <input type="radio" name="u_status" value="หม้าย" <?php if($u_status=="หม้าย"){ echo "checked"; }?>>หม้าย</td>
 						</tr>
-						
 						<tr>
+							<td align="right" class="weightfont">บริษัท</td>
+							<td width="10">:</td>
+							<td colspan="4">
+								<select name="organizeID" id="organizeID" onChange="list_f_department();">
+									<option value="">---เลือก---</option>
+									<?php
+									$qry_organize = pg_query("select * from \"nw_organize\" order by \"organize_name\" ");
+									while($res_organize = pg_fetch_array($qry_organize))
+									{
+									?>
+										<option value="<?php echo $res_organize["organizeID"]; ?>" <?php if($organizeID == $res_organize["organizeID"]){ echo "selected"; }?>><?php echo $res_organize["organize_name"]; ?></option>
+									<?php
+									}
+									?>
+								</select> <font color="red"><b>*</b></font>
+							</td>
+						</tr>
+						<tr>
+							<td align="right" class="weightfont">ฝ่าย</td>
+							<td width="10">:</td>
+							<td>
+								<select name="fdep_id" id="fdep_id" onChange="list_department();">
+									<option value="">---เลือก---</option> 
+								</select> <font color="red"><b>*</b></font>
+							</td>
 							<td align="right" class="weightfont">แผนก</td>
 							<td width="10">:</td>
 							<td>
 								<select name="dep_id" id="dep_id">
-									<option value="">---เลือก---</option>
-									<?php
-									$qry_gpuser=pg_query("select * from department");
-									while($resg=pg_fetch_array($qry_gpuser))
-									 {
-									?>
-									  <option value="<?php echo $resg["dep_id"]; ?>" <?php if($dep_id==$resg["dep_id"]){ echo "selected"; }?>><?php echo $resg["dep_name"]; ?></option>
-									<?php
-									 }
-									?>  
+									<option value="">---เลือก---</option>  
 								</select> <font color="red"><b>*</b></font>
-							</td>
-							<td align="right" class="weightfont">ฝ่าย</td>
-							<td width="10">:</td>
-							<td>
-								<select name="fdep_id" id="fdep_id">
-									<option value="" >---เลือก---</option>
-									<?php
-									$qry_dep=pg_query("select * from f_department where fstatus='TRUE' order by fdep_id");
-									while($resd=pg_fetch_array($qry_dep))
-									 {
-									?>
-									  <option value="<?php echo $resd["fdep_id"]; ?>" <?php if($fdep_id==$resd["fdep_id"]){ echo "selected"; }?>><?php echo $resd["fdep_name"]; ?></option>
-									<?php
-									 }
-									?>  
-								</select>
 							</td>
 						</tr>
 						<tr>
@@ -443,4 +495,11 @@ function check_num_tel_direct(evt) {
 	</div>
 </div>
 </body>
+
+<script>
+	// สร้างตัวเลือก ฝ่าย และแผนกเดิมที่เคยเลือกไว้ (กรณีเปิดเมนูมาครั้งแรก)
+	list_f_department('<?php echo $organizeID; ?>', '<?php echo $fdep_id; ?>');
+	list_department('<?php echo $fdep_id; ?>', '<?php echo $dep_id; ?>');
+</script>
+
 </html>

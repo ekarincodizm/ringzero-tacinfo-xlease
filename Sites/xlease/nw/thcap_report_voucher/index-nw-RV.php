@@ -289,11 +289,11 @@ $s_cancel = "on"; // แสดงรายการที่ยกเลิก/�
 		if($s_valuee=="0"){ //เลือกค้นหา Receive ID:
 			$qry_c1 = " where a.\"voucherID\"='$txt_voucher' $condition_c ";
 		}else if($s_valuee=="1"){ //เลือกค้นหาตาม วันที่ :
-			$qry_c1 .= " where a.\"doerStamp\"='$s_date' $condition_c ";
+			$qry_c1 .= " where a.\"doerStamp\"::date = '$s_date' $condition_c ";
 		}else if($s_valuee=="2"){ //เลือกค้นหาตาม เดือน:
 			$qry_c1 = " where EXTRACT(MONTH FROM a.\"doerStamp\")='$s_month' and EXTRACT(YEAR FROM a.\"doerStamp\")='$s_year' $condition_c ";
 		}else if($s_valuee=="3"){ //เลือกค้นหาตาม ช่วงวันที่:
-			$qry_c1 = " where a.\"doerStamp\" between '$s_datefrom' and '$s_dateto' $condition_c ";
+			$qry_c1 = " where a.\"doerStamp\"::date between '$s_datefrom' and '$s_dateto' $condition_c ";
 		}else if($s_valuee=="4"){ //เลือกค้นหาทั้งหมด
 			$qry_c1 = $condition_c;
 		}else if($s_valuee=="5"){ //เลือกค้นหาตาม ปี

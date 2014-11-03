@@ -83,7 +83,17 @@ function popU(U,N,T) {
 		<select name="chk_department" id="chk_department">			
 			<option value="">- เลือก -</option>			
 			<?php
-				$qry_name=pg_query("select \"dep_id\",\"dep_name\" from department where \"dep_id\" <>'AD' order by \"dep_id\"");
+				$qry_name=pg_query("
+										SELECT
+											\"dep_id\",
+											\"dep_name\"
+										FROM
+											\"department\"
+										WHERE
+											\"fdep_id\" IN(select \"fdep_id\" from \"f_department\" where \"fstatus\" = true)
+										ORDER BY
+											\"dep_id\"
+									");
 				while($res_name=pg_fetch_array($qry_name))
 				{
 					$dep_id = $res_name["dep_id"]; 
@@ -121,14 +131,53 @@ function popU(U,N,T) {
 	</tr>	
 	<?php
 	if($find=='0'){
-		$qry_gpuser=pg_query("select \"dep_id\",\"dep_name\",\"dep_tel\",\"dep_email\" from department where \"dep_id\" <>'AD' order by \"dep_id\"");//แผนกในระบบทั้งหมด ยกเว้น AD	
+		$qry_gpuser=pg_query("
+								SELECT
+									\"dep_id\",
+									\"dep_name\",
+									\"dep_tel\",
+									\"dep_email\"
+								FROM
+									\"department\"
+								WHERE
+									\"fdep_id\" IN(select \"fdep_id\" from \"f_department\" where \"fstatus\" = true)
+								ORDER BY
+									\"dep_id\"
+							");//แผนกในระบบทั้งหมด
 	}
 	else if($find=='1'){
-		$qry_gpuser=pg_query("select \"dep_id\",\"dep_name\",\"dep_tel\",\"dep_email\" from department where \"dep_id\" ='$department_find' and \"dep_id\" <>'AD' order by \"dep_id\"");//แผนกที่เลือก		
+		$qry_gpuser=pg_query("
+								SELECT
+									\"dep_id\",
+									\"dep_name\",
+									\"dep_tel\",
+									\"dep_email\"
+								FROM
+									\"department\"
+								WHERE
+									\"dep_id\" = '$department_find' AND
+									\"fdep_id\" IN(select \"fdep_id\" from \"f_department\" where \"fstatus\" = true)
+								ORDER BY
+									\"dep_id\"
+							");//แผนกที่เลือก		
 	}
 	else if($find=='2'){
-		$qry_gpuser=pg_query("select a.\"dep_id\",a.\"dep_name\",a.\"dep_tel\",a.\"dep_email\" from department a 
-		left join \"Vfuser\" b on a.dep_id=b.user_group where b.id_user='$str_empId' and a.\"dep_id\" <>'AD'");
+		$qry_gpuser=pg_query("
+								SELECT
+									a.\"dep_id\",
+									a.\"dep_name\",
+									a.\"dep_tel\",
+									a.\"dep_email\"
+								FROM
+									\"department\" a 
+								LEFT JOIN
+									\"Vfuser\" b on a.\"dep_id\" = b.\"user_group\"
+								WHERE
+									b.\"id_user\" = '$str_empId' AND
+									b.\"isadmin\" <> '1' AND
+									a.\"fdep_id\" IN(select \"fdep_id\" from \"f_department\" where \"fstatus\" = true)
+							");
+		
 		$condition="a.id_user='$str_empId'";	
 	}
 	$i=0;
@@ -148,9 +197,30 @@ function popU(U,N,T) {
 		echo "<tr bgcolor=\"#AFEEEE\">";
 		echo "<td align=\"center\" colspan=6><b>$dep_name</b> $dep_tel_text : $dep_email_text</td></tr>";
 		
-		$query=pg_query("select a.fullname,b.u_extens,b.u_direct,b.u_tel,b.u_email,b.nickname from \"Vfuser\" a 
-			left join \"fuser_detail\" b on a.\"id_user\"=b.\"id_user\"			
-			where $condition and a.resign_date is null");			
+		$query=pg_query("SELECT
+							a.fullname,
+							b.u_extens,
+							b.u_direct,
+							CASE WHEN char_length(replace(b.u_tel, '-', '')) = 10 THEN -- เบอร์มือถือ
+								substring(replace(b.u_tel, '-', '') from 1 for 3)||'-'||substring(replace(b.u_tel, '-', '') from 4 for 3)||'-'||substring(replace(b.u_tel, '-', '') from 7 for 4)
+							ELSE
+								CASE WHEN char_length(replace(b.u_tel, '-', '')) = 9 THEN -- เบอร์บ้าน
+									substring(replace(b.u_tel, '-', '') from 1 for 2)||'-'||substring(replace(b.u_tel, '-', '') from 3 for 3)||'-'||substring(replace(b.u_tel, '-', '') from 6 for 4)
+								ELSE
+									b.u_tel
+								END
+							END AS \"u_tel\",
+							b.u_email,
+							b.nickname
+						FROM
+							\"Vfuser_active\" a 
+						LEFT JOIN
+							\"fuser_detail\" b on a.\"id_user\" = b.\"id_user\"			
+						WHERE
+							$condition AND
+							a.\"isadmin\" <> '1'
+						ORDER BY
+							a.id_user");
 		while($res_group=pg_fetch_array($query))
 		{ 	
 			$i++;
@@ -178,6 +248,14 @@ function popU(U,N,T) {
 				<td align=\"center\">$u_tel</td>
 				<td align=\"center\"><a href=\"mailto:$u_email\"><U>$u_email<U></a></td></tr>";
 		}
+	}
+	if($i == 0)
+	{
+		echo "
+				<tr>
+					<td align=\"center\" colspan=\"6\">-- ไม่พบข้อมูล --</td>
+				</tr>
+			";
 	}
 ?>
 </table>

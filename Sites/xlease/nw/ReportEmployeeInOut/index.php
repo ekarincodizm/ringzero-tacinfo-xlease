@@ -24,7 +24,15 @@
 		$Str_In_Employee = $Str_In_Employee." ) AS \"company\" ,";
  		$Str_In_Employee = $Str_In_Employee." b.\"u_extens\","; // เบอร์ภายใน
  		$Str_In_Employee = $Str_In_Employee." b.\"u_direct\", "; // เบอร์ตรง
- 		$Str_In_Employee = $Str_In_Employee." b.\"u_tel\", "; // เบอร์มือถือ
+ 		$Str_In_Employee = $Str_In_Employee." CASE WHEN char_length(replace(b.\"u_tel\", '-', '')) = 10 THEN -- รูปแบบเบอร์มือถือ
+													substring(replace(b.\"u_tel\", '-', '') from 1 for 3)||'-'||substring(replace(b.\"u_tel\", '-', '') from 4 for 3)||'-'||substring(replace(b.\"u_tel\", '-', '') from 7 for 4)
+												ELSE
+													CASE WHEN char_length(replace(b.\"u_tel\", '-', '')) = 9 THEN -- รูปแบบเบอร์บ้าน
+														substring(replace(b.\"u_tel\", '-', '') from 1 for 2)||'-'||substring(replace(b.\"u_tel\", '-', '') from 3 for 3)||'-'||substring(replace(b.\"u_tel\", '-', '') from 6 for 4)
+													ELSE
+														b.\"u_tel\"
+													END
+												END AS \"u_tel\", "; // เบอร์มือถือ
  		$Str_In_Employee = $Str_In_Employee." b.\"u_email\","; // e-mail
  		$Str_In_Employee = $Str_In_Employee." b.\"startwork\" "; // วันที่เรื่มงาน
  		$Str_In_Employee = $Str_In_Employee." FROM ";
@@ -58,7 +66,15 @@
 		$Str_Out_Employee = $Str_Out_Employee." ) AS \"company\",";
  		$Str_Out_Employee = $Str_Out_Employee." b.\"u_extens\","; // เบอร์ภายใน
  		$Str_Out_Employee = $Str_Out_Employee." b.\"u_direct\", "; // เบอร์ตรง
- 		$Str_Out_Employee = $Str_Out_Employee." b.\"u_tel\", "; // เบอร์มือถือ
+ 		$Str_Out_Employee = $Str_Out_Employee." CASE WHEN char_length(replace(b.\"u_tel\", '-', '')) = 10 THEN -- รูปแบบเบอร์มือถือ
+													substring(replace(b.\"u_tel\", '-', '') from 1 for 3)||'-'||substring(replace(b.\"u_tel\", '-', '') from 4 for 3)||'-'||substring(replace(b.\"u_tel\", '-', '') from 7 for 4)
+												ELSE
+													CASE WHEN char_length(replace(b.\"u_tel\", '-', '')) = 9 THEN -- รูปแบบเบอร์บ้าน
+														substring(replace(b.\"u_tel\", '-', '') from 1 for 2)||'-'||substring(replace(b.\"u_tel\", '-', '') from 3 for 3)||'-'||substring(replace(b.\"u_tel\", '-', '') from 6 for 4)
+													ELSE
+														b.\"u_tel\"
+													END
+												END AS \"u_tel\", "; // เบอร์มือถือ
  		$Str_Out_Employee = $Str_Out_Employee." b.\"u_email\","; // e-mail
  		$Str_Out_Employee = $Str_Out_Employee." b.\"startwork\","; // วันที่เรื่มงาน
  		$Str_Out_Employee = $Str_Out_Employee." b.\"resign_date\" "; // วันที่ลาออก 

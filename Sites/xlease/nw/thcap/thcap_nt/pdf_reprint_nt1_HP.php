@@ -61,6 +61,18 @@ $pdf->SetThaiFont();
 $Cus_all_forPage_array = split(",",$Cus_all_forPage);
 for($Cus_all_array=1; $Cus_all_array<=count($Cus_all_forPage_array); $Cus_all_array++)
 {
+	// ตรวจสอบว่าใช่ ผู้ค้ำประกันหรือไม่
+	$cus_chk_guarantee = $Cus_all_forPage_array[$Cus_all_array-1];
+	$qry_chk_guarantee = pg_query("select '$cus_chk_guarantee' like '%(ผู้ค้ำประกัน)%' ");
+	$res_chk_guarantee = pg_fetch_result($qry_chk_guarantee,0);
+	if($res_chk_guarantee == 't')
+	{
+		$is_guarantee = "yes"; // เป็นผู้ค้ำประกัน
+	}
+	else
+	{
+		$is_guarantee = "no"; // ไม่ใช่ผู้ค้ำประกัน
+	}
 
 $pdf->AddPage();
 
@@ -104,25 +116,50 @@ $pdf->MultiCell(15,6,$title,0,'L',0);
 $qrydatethai_conDate=pg_query("select get_date_thai_format('$conDate')");
 list($nowdatethai_conDate)=pg_fetch_array($qrydatethai_conDate);
 
-$pdf->SetXY(35,$cline);
-$title=iconv('UTF-8','windows-874',"หนังสือสัญญาเช่าซื้อ  เลขที่  $contractID  ฉบับลงวันที่ $nowdatethai_conDate");
-$pdf->MultiCell(180,6,$title,0,'L',0);
+if($is_guarantee == "yes") // ถ้าเป็นผู้ค้ำประกัน
+{
+	$pdf->SetXY(35,$cline);
+	$title=iconv('UTF-8','windows-874',"หนังสือสัญญาเช่าซื้อและหนังสือสัญญาค้ำประกัน  เลขที่  $contractID  ฉบับลงวันที่ $nowdatethai_conDate");
+	$pdf->MultiCell(180,6,$title,0,'L',0);
 
-$cline += 15;
+	$cline += 15;
 
-$pdf->SetXY(30,$cline);
-$title=iconv('UTF-8','windows-874',"ตามที่ ท่านได้ทำสัญญาเช่าซื้อตามที่อ้างถึงกับ   ");
-$pdf->MultiCell(70,6,$title,0,'L',0);
+	$pdf->SetXY(30,$cline);
+	$title=iconv('UTF-8','windows-874',"ตามที่ ท่านได้ทำสัญญาเช่าซื้อและสัญญาค้ำประกันตามที่อ้างถึงกับ   ");
+	$pdf->MultiCell(90,6,$title,0,'L',0);
+	
+	$pdf->SetFont('AngsanaNew','B',14);
+	$pdf->SetXY(118,$cline);
+	$title=iconv('UTF-8','windows-874',"บริษัท  ไทยเอซ  แคปปิตอล  จำกัด  ");
+	$pdf->MultiCell(52,6,$title,0,'L',0);
+	
+	$pdf->SetFont('AngsanaNew','',14);
+	$pdf->SetXY(165,$cline);
+	$title=iconv('UTF-8','windows-874',"นั้น  บัดนี้  ท่านได้ผิดนัด");
+	$pdf->MultiCell(90,6,$title,0,'L',0);
+}
+else // ถ้าไม่ใช่ผู้ค้ำประกัน
+{
+	$pdf->SetXY(35,$cline);
+	$title=iconv('UTF-8','windows-874',"หนังสือสัญญาเช่าซื้อ  เลขที่  $contractID  ฉบับลงวันที่ $nowdatethai_conDate");
+	$pdf->MultiCell(180,6,$title,0,'L',0);
 
-$pdf->SetFont('AngsanaNew','B',14);
-$pdf->SetXY(90,$cline);
-$title=iconv('UTF-8','windows-874',"บริษัท  ไทยเอซ  แคปปิตอล  จำกัด  ");
-$pdf->MultiCell(52,6,$title,0,'L',0);
+	$cline += 15;
 
-$pdf->SetFont('AngsanaNew','',14);
-$pdf->SetXY(138,$cline);
-$title=iconv('UTF-8','windows-874',"นั้น  บัดนี้  ท่านได้ผิดนัดการชำระ");
-$pdf->MultiCell(90,6,$title,0,'L',0);
+	$pdf->SetXY(30,$cline);
+	$title=iconv('UTF-8','windows-874',"ตามที่ ท่านได้ทำสัญญาเช่าซื้อตามที่อ้างถึงกับ   ");
+	$pdf->MultiCell(70,6,$title,0,'L',0);
+	
+	$pdf->SetFont('AngsanaNew','B',14);
+	$pdf->SetXY(90,$cline);
+	$title=iconv('UTF-8','windows-874',"บริษัท  ไทยเอซ  แคปปิตอล  จำกัด  ");
+	$pdf->MultiCell(52,6,$title,0,'L',0);
+	
+	$pdf->SetFont('AngsanaNew','',14);
+	$pdf->SetXY(138,$cline);
+	$title=iconv('UTF-8','windows-874',"นั้น  บัดนี้  ท่านได้ผิดนัด");
+	$pdf->MultiCell(90,6,$title,0,'L',0);
+}
 
 //----- งวดที่เริ่มค้าง
 	// งวดที่
@@ -137,7 +174,7 @@ $pdf->MultiCell(90,6,$title,0,'L',0);
 	$qrydebtDueDate=pg_query("select get_date_thai_format('$firstDueDate')");
 	list($s_debtDueDate)=pg_fetch_array($qrydebtDueDate);
 	
-	$Pay_1="หนี้เช่าซื้องวดที่  $firstDue  ถึงงวดที่   ";
+	$Pay_1="การชำระหนี้เช่าซื้องวดที่  $firstDue  ถึงงวดที่   ";
 	$Pay_2="คืองวดประจำวันที่  $s_debtDueDate";
 
 //----- งวดสุดท้ายที่ค้าง
@@ -157,7 +194,7 @@ $pdf->MultiCell(90,6,$title,0,'L',0);
 	$Pay_2.="ถึงงวดวันที่  $e_debtDueDate";
 
 $numPay = $endDue - $firstDue +1;
-$Pay_2 .= " รวม  $numPay งวด  เป็น";
+$Pay_2 .= " รวม  $numPay งวด";
 
 $cline += 5;
 
@@ -169,7 +206,7 @@ $pdf->MultiCell(180,6,$title,0,'L',0);
 $cline += 5;
 $pdf->SetFont('AngsanaNew','',14);
 $pdf->SetXY(20,$cline);
-$title=iconv('UTF-8','windows-874',"เงินจำนวน ". number_format($pay_amt,2)." บาท  การกระทำดังกล่าว  ถือว่าท่านทำผิดสัญญาเช่าซื้อทำให้บริษัทได้รับความเสียหาย  บริษัทได้บอกกล่าว");
+$title=iconv('UTF-8','windows-874',"เป็นเงินจำนวน ". number_format($pay_amt,2)." บาท  การกระทำดังกล่าว  ถือว่าท่านทำผิดสัญญาเช่าซื้อทำให้บริษัทได้รับความเสียหาย  บริษัทได้บอกกล่าว");
 $pdf->MultiCell(180,6,$title,0,'L',0);
 
 $cline += 5;
@@ -254,7 +291,7 @@ $title=iconv('UTF-8','windows-874',"ธรรมเนียม  เพิ่ม
 $pdf->MultiCell(180,6,$title,0,'L',0);
 */
 
-$cline += 15;
+$cline += 20;
 $pdf->SetXY(40,$cline);
 $title=iconv('UTF-8','windows-874',"จึงเรียนมาเพื่อทราบและดำเนินการ");
 $pdf->MultiCell(180,6,$title,0,'L',0);

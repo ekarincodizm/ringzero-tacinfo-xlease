@@ -126,8 +126,6 @@ else
 			
         pg_query("COMMIT");
         $data['success'] = true;
-        //pg_query("ROLLBACK");
-        //$data['success'] = false;
         $data['message'] = $data_arr;
     }else{
         pg_query("ROLLBACK");

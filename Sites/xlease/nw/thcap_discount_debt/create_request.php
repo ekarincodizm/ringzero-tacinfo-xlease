@@ -5,6 +5,10 @@ $debtID = pg_escape_string($_GET["debtID"]);
 $contractID = pg_escape_string($_GET["contractID"]);
 $nowdate = nowDate();
 
+// หาประเภทสัญญา
+$qry_creditType = pg_query("SELECT \"thcap_get_creditType\"('$contractID')");
+$creditType = pg_fetch_result($qry_creditType,0);
+
 $qry_other = pg_query("select \"typePayID\",\"typePayRefValue\",\"typePayRefDate\",\"typePayAmt\",\"typePayLeft\",\"debtNet\",\"debtVat\",\"debtDueDate\" from public.\"vthcap_otherpay_debt_current\" where \"debtID\" = '$debtID' ");
 while($res_name=pg_fetch_array($qry_other))
 {
@@ -114,6 +118,7 @@ $(document).ready(function(){
 <script>
 $("#submitbutton").click(function(){
 	var typePayRefDate = '<?php echo $typePayRefDate ?>'; // วันที่ตั้งหนี้
+	var creditType = '<?php echo $creditType; ?>'; // ประเภทสัญญา
 	
 	if(document.getElementById("typeDiscount").value=="")
 	{
@@ -196,7 +201,12 @@ $("#submitbutton").click(function(){
 		var typePayLeftNew = typePayLeft - sumDiscount; // จำนวนหนี้ค้างชำระ ใหม่
 			typePayLeftNew = parseFloat(typePayLeftNew).toFixed(2);
 			
-		if(parseFloat(sumDiscount) > parseFloat(typePayLeft))
+		if(creditType == 'HIRE_PURCHASE' && parseFloat(sumDiscount) > parseFloat(debtNet))
+		{
+			alert("สัญญาประเภท HIRE_PURCHASE ห้ามลดราคาเกินจำนวนหนี้ก่อน VAT : จำนวนหนี้ก่อน VAT คือ "+debtNet+" จำนวนที่จะลดคือ "+sumDiscount);
+			return false;
+		}
+		else if(parseFloat(sumDiscount) > parseFloat(typePayLeft))
 		{
 			alert("ห้ามลดราคาเกินจำนวนหนี้ที่ค้างชำระ จำนวนหนี้ค้างชำระคือ "+typePayLeft+" จำนวนที่จะลดคือ "+sumDiscount);
 			return false;

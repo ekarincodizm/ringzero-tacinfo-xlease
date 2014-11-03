@@ -113,6 +113,10 @@ if($method=='add'){ //กรณี Create NT
 		if($stsapp=='yes'){ //แสดงว่าอนุมัติ
 			$NT_1_Status=1; //สถานะอนุมัติแล้วรอส่งจดหมาย
 			
+			// สร้างเลขที่ใบแจ้งเตือน
+			$qry_ntid = pg_query("select \"thcap_gen_documentID\"('$contractID','$date','6') ");
+			$ntid = pg_fetch_result($qry_ntid,0);
+			
 			$qry_appv_temp_to_true = pg_query("select \"NT_tempID\" from \"thcap_NT1_temp\" where \"contractID\" = '$contractID' and \"NT_1_Status\" = '2' order by \"CusState\" ");
 			while($res_appv_temp_to_true = pg_fetch_array($qry_appv_temp_to_true))
 			{
@@ -124,13 +128,13 @@ if($method=='add'){ //กรณี Create NT
 					\"NT_1_Date\", \"NT_1_Lawyer_Name\", \"NT_1_startDue\", \"NT_1_endDue\", \"NT_1_withInDay\",
 					\"NT_1_Debtmore\", \"NT_1_Duenext\", \"NT_1_Paynext\", \"NT_1_Paytagnext\", 
 					\"NT_1_contact\", \"NT_1_bank\", \"NT_1_Result\", \"NT_tempID\")
-					SELECT \"thcap_gen_documentID\"('$contractID','$date','6'),\"contractID\", \"CusID\", \"CusState\", \"NT_1_cusname\", \"NT_1_guaranID\", 
+					SELECT '$ntid', \"contractID\", \"CusID\", \"CusState\", \"NT_1_cusname\", \"NT_1_guaranID\", 
 					\"NT_1_Date\", \"NT_1_Lawyer_Name\", \"NT_1_startDue\", \"NT_1_endDue\", \"NT_1_withInDay\",
 					\"NT_1_Debtmore\", \"NT_1_Duenext\", \"NT_1_Paynext\", \"NT_1_Paytagnext\", 
 					\"NT_1_contact\", \"NT_1_bank\", \"NT_1_Result\", \"NT_tempID\" FROM \"thcap_NT1_temp\"
-					WHERE \"NT_tempID\" = '$NT_tempID' and \"contractID\" = '$contractID' and \"NT_1_Status\" = '2' returning \"NTID1\" ";
+					WHERE \"NT_tempID\" = '$NT_tempID' and \"contractID\" = '$contractID' and \"NT_1_Status\" = '2' ";
 				if($resin=pg_query($ins)){
-					$ntid = pg_fetch_result($resin,0); // NT
+					
 				}else{
 					$status++;
 				}
@@ -146,16 +150,16 @@ if($method=='add'){ //กรณี Create NT
 				{
 					$next_NT_times = $max_NT_times + 1;
 				}
-				
-				//บันทึกข้อมูล ในตารางประวัติ
-				$ins="INSERT INTO \"thcap_history_nt\"(
+			}
+			
+			//บันทึกข้อมูล ในตารางประวัติ
+			$ins="INSERT INTO \"thcap_history_nt\"(
 					\"NT_ID\", \"contractID\", \"NT_Date\", \"NT_number\", \"NT_docversion\", \"NT_isprint\",\"NT_doerid\", \"NT_times\")
-					VALUES ('$ntid','$contractID','$nowdate','1', '1','0','$id_user', '$next_NT_times')";
-				if($resin=pg_query($ins)){
-				
-				}else{
-					$status++;
-				}
+				VALUES ('$ntid','$contractID','$nowdate','1', '1','0','$id_user', '$next_NT_times')";
+			if($resin=pg_query($ins)){
+			
+			}else{
+				$status++;
 			}
 
 			/***************ตั้งหนี้ค่าทนายอัตโนมัติ เมื่อกดอนุมัติ***********************/

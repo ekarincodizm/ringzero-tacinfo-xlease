@@ -286,11 +286,11 @@ $s_cancel = "on"; // แสดงรายการที่ยกเลิก/�
 		if($s_valuee=="0"){ // กรณีเลือก   "ค้นหา Voucher ID:"
 			$S_Cnd = " a.\"voucherID\"='$txt_voucher'  ";
 		}else if($s_valuee=="1"){ //กรณีเลือก  "ตามวันที่ :"
-			$S_Cnd = " a.\"doerStamp\"='$s_date'  ";
+			$S_Cnd = " a.\"doerStamp\"::date = '$s_date'  ";
 		}else if($s_valuee=="2"){ //กรณีเลือก "ตามเดือน"
 			$S_Cnd = " EXTRACT(MONTH FROM a.\"doerStamp\")='$s_month' and EXTRACT(YEAR FROM a.\"doerStamp\")='$s_year'  ";
 		}else if($s_valuee=="3"){//กรณีเลือก "ตามช่วง"
-			$S_Cnd = " a.\"doerStamp\" between '$s_datefrom' and '$s_dateto'  ";
+			$S_Cnd = " a.\"doerStamp\"::date between '$s_datefrom' and '$s_dateto'  ";
 		}else if($s_valuee=="4"){//กรณีเลือก "ค้นหาทั้งหมด"
 			$S_Cnd = "";
 		}else if($s_valuee=="5"){ //เลือกค้นหาตาม ปี

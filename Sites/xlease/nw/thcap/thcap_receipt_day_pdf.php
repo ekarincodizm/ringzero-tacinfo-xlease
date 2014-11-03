@@ -217,7 +217,7 @@ while($result=pg_fetch_array($qryreceipt)){
 	$paytype=pg_getminpaytype($contractID); //หารหัสผ่อนชำระตามสัญญากู้ เช่น 1000
 	
 	//ถ้าเป็นสัญญาประเภท LOAN แสดงว่ามี type เงินต้นและดอกเบี้ย
-	if($contype=='LOAN' || $contype=='JOINT_VENTURE' || $contype=='PERSONAL_LOAN'){ 
+	if($contype=='LOAN' || $contype=='PERSONAL_LOAN'){ 
 		$paytype_a=pg_getprincipletype($contractID);//หารหัสผ่อนชำระตามสัญญากู้-คืนเงินต้น เช่น 1001
 		$paytype_b=pg_getinteresttype($contractID);//หารหัสผ่อนชำระตามสัญญากู้-ดอกเบี้ย เช่น 1002
 	}

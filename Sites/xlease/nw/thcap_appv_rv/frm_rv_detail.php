@@ -1,8 +1,10 @@
 <?php
 include("../../config/config.php");
+include("../function/emplevel.php");
 
 $user_id = $_SESSION["av_iduser"];
 $app_page = pg_escape_string($_GET['page']);
+$emplevel = emplevel($user_id); // ระดับพนักงาน
 
 $autoID = pg_escape_string($_GET['autoID']);
 
@@ -250,9 +252,20 @@ $qry_pre = pg_query("select * from \"thcap_temp_voucher_pre_details\" where \"pr
 	<tr>
 		<td align="center" colspan="2">
 			<input hidden name ="prevoucherdetailsid" id ="prevoucherdetailsid" value="<?php echo $prevoucherdetailsid; ?>"/>
-			<input hidden name="appv_status" id="appv_status" />	
-			<input type="button" value="อนุมัติ" onclick="appv('1');"/>
-			<input type="button" value="ไม่อนุมัติ" onclick="appv('0');"/>
+			<input hidden name="appv_status" id="appv_status" />
+			
+			<?php
+			if($user_id != $doerID || $emplevel <= 1)
+			{
+				$canAppv = ""; // สามารถทำรายการอนุมัติได้
+			}
+			else
+			{
+				$canAppv = "title=\"คุณไม่มีสิทธิอนุมัติรายการที่ตนเองเป็นคนทำ\" disabled";
+			}
+			?>
+			<input type="button" value="อนุมัติ" onclick="appv('1');" <?php echo $canAppv; ?> />
+			<input type="button" value="ไม่อนุมัติ" onclick="appv('0');" <?php echo $canAppv; ?> />
 			
 			<input type="button" name="close" value="  ปิด   "onclick="window.close();">
 		</td>

@@ -28,7 +28,7 @@ $(document).ready(function(){
     });
 	
 	$('#btnserach').click(function(){
-		$("#showarea").load("กำลังดำเนินการ โปรดรอซักครู่...");
+		$("#showarea").html('<img src="../../images/progress.gif" border="0" width="32" height="32" alt="กำลังดำเนินการ โปรดรอสักครู่...">');
 		var contype = "";	
 		var j;
 		j=0;

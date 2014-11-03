@@ -6,8 +6,8 @@ include ("../../Classes/PHPExcel.php");
 $user_report = $_SESSION["av_iduser"]; //user ที่ทำการออกรายการ
 $date_report = nowDateTime(); //วันเวลาที่ออกรายการ 
 
-$option=$_GET["option"];
-$contype = $_GET["contype"];
+$option = pg_escape_string($_GET["option"]);
+$contype = pg_escape_string($_GET["contype"]);
 
 //ค้นหาชื่อผู้ออกรายงาน
 $qryname=pg_query("select fullname from \"Vfuser\" where id_user='$user_report'");
@@ -89,19 +89,20 @@ $objPHPExcel->getActiveSheet()->getStyle('A2')->getFont()->setBold(true);
 $objPHPExcel->getActiveSheet()->SetCellValue('A3',"เงื่อนไขรายงาน : $txtcon");
 $objPHPExcel->getActiveSheet()->getStyle('A3')->getFont()->setBold(true);
 
-$objPHPExcel->getActiveSheet()->SetCellValue('A5', 'เลขที่สัญญา');
-$objPHPExcel->getActiveSheet()->SetCellValue('B5', 'ชื่อผู้กู้หลัก/ผู้เช่าซื้อ');
-$objPHPExcel->getActiveSheet()->SetCellValue('C5', 'รหัสประเภทค่าใช้จ่าย');
-$objPHPExcel->getActiveSheet()->SetCellValue('D5', 'รายละเอียดหนี้');
-$objPHPExcel->getActiveSheet()->SetCellValue('E5', 'เลขอ้างอิง');
-$objPHPExcel->getActiveSheet()->SetCellValue('F5', 'จำนวนหนี้แรกเริ่ม');
-$objPHPExcel->getActiveSheet()->SetCellValue('G5', 'จำนวนหนี้เดิมล่าสุด');
-$objPHPExcel->getActiveSheet()->SetCellValue('H5', 'จำนวนหนี้ใหม่');
-$objPHPExcel->getActiveSheet()->SetCellValue('I5', 'ผู้ทำรายการ');
-$objPHPExcel->getActiveSheet()->SetCellValue('J5', 'วันเวลาทำรายการ');
-$objPHPExcel->getActiveSheet()->SetCellValue('K5', 'ผู้อนุมัติ');
-$objPHPExcel->getActiveSheet()->SetCellValue('L5', 'วันเวลาอนุมัติ');
-$objPHPExcel->getActiveSheet()->SetCellValue('M5', 'สถานะ');
+$objPHPExcel->getActiveSheet()->SetCellValue('A5', 'เลขที่ CN/DN');
+$objPHPExcel->getActiveSheet()->SetCellValue('B5', 'เลขที่สัญญา');
+$objPHPExcel->getActiveSheet()->SetCellValue('C5', 'ชื่อผู้กู้หลัก/ผู้เช่าซื้อ');
+$objPHPExcel->getActiveSheet()->SetCellValue('D5', 'รหัสประเภทค่าใช้จ่าย');
+$objPHPExcel->getActiveSheet()->SetCellValue('E5', 'รายละเอียดหนี้');
+$objPHPExcel->getActiveSheet()->SetCellValue('F5', 'เลขอ้างอิง');
+$objPHPExcel->getActiveSheet()->SetCellValue('G5', 'จำนวนหนี้แรกเริ่ม');
+$objPHPExcel->getActiveSheet()->SetCellValue('H5', 'จำนวนหนี้เดิมล่าสุด');
+$objPHPExcel->getActiveSheet()->SetCellValue('I5', 'จำนวนหนี้ใหม่');
+$objPHPExcel->getActiveSheet()->SetCellValue('J5', 'ผู้ทำรายการ');
+$objPHPExcel->getActiveSheet()->SetCellValue('K5', 'วันเวลาทำรายการ');
+$objPHPExcel->getActiveSheet()->SetCellValue('L5', 'ผู้อนุมัติ');
+$objPHPExcel->getActiveSheet()->SetCellValue('M5', 'วันเวลาอนุมัติ');
+$objPHPExcel->getActiveSheet()->SetCellValue('N5', 'สถานะ');
 
 $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setWidth(25);
 $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(25);
@@ -116,6 +117,7 @@ $objPHPExcel->getActiveSheet()->getColumnDimension('J')->setWidth(25);
 $objPHPExcel->getActiveSheet()->getColumnDimension('K')->setWidth(25);
 $objPHPExcel->getActiveSheet()->getColumnDimension('L')->setWidth(25);
 $objPHPExcel->getActiveSheet()->getColumnDimension('M')->setWidth(25);
+$objPHPExcel->getActiveSheet()->getColumnDimension('N')->setWidth(25);
 
 $objPHPExcel->getActiveSheet()->getStyle('A5')->getFont()->setBold(true);
 $objPHPExcel->getActiveSheet()->getStyle('B5')->getFont()->setBold(true);
@@ -130,6 +132,7 @@ $objPHPExcel->getActiveSheet()->getStyle('J5')->getFont()->setBold(true);
 $objPHPExcel->getActiveSheet()->getStyle('K5')->getFont()->setBold(true);
 $objPHPExcel->getActiveSheet()->getStyle('L5')->getFont()->setBold(true);
 $objPHPExcel->getActiveSheet()->getStyle('M5')->getFont()->setBold(true);
+$objPHPExcel->getActiveSheet()->getStyle('N5')->getFont()->setBold(true);
 
 	
 $qry = pg_query("SELECT  * FROM account.thcap_dncn_discount_report where \"dcType\" = '2' $condition ");
@@ -137,7 +140,9 @@ $row=pg_num_rows($qry);
 
 $j = 6;
 if($row>0){
-	while($res=pg_fetch_array($qry)){
+	while($res=pg_fetch_array($qry))
+	{
+		$dcNoteID = $res["dcNoteID"]; // รหัส CreditNote หรือ DebitNote
 		$conid = $res["contractID"];	//เลขที่สัญญา		
 		$maincus_fullname = $res["maincus_fullname"]; //-- หาชื่อผู้กู้หลัก
 		$typePayID = $res["typePayID"]; // รหัสประเภทค่าใช้จ่าย
@@ -151,25 +156,27 @@ if($row>0){
 		$appv_fullname=$res["appvName"]; //ชื่อผู้อนุมัติ
 		$appvStamp=$res["appvStamp"]; //วันเวลาที่อนุมัติ	
 		$status = $res["statusname"];//สถานะการอนุมัติ
+		$debtStatus = $res["debtStatus"];//สถานะการจ่าย
 		
 		if($debtStatus == 5)
 		{
 			$status = "อนุัมัติและลดหนี้เป็น 0.00";
 		}
-
-		$objPHPExcel->getActiveSheet()->SetCellValue('A'.$j, $conid);
-		$objPHPExcel->getActiveSheet()->SetCellValue('B'.$j, $maincus_fullname);
-		$objPHPExcel->getActiveSheet()->SetCellValue('C'.$j, $typePayID);
-		$objPHPExcel->getActiveSheet()->SetCellValue('D'.$j, $tpdetail);	
-		$objPHPExcel->getActiveSheet()->SetCellValue('E'.$j, $typePayRefValue);
-		$objPHPExcel->getActiveSheet()->SetCellValue('F'.$j, $netstart);
-		$objPHPExcel->getActiveSheet()->SetCellValue('G'.$j, $netbefore);
-		$objPHPExcel->getActiveSheet()->SetCellValue('H'.$j, $netnow);
-		$objPHPExcel->getActiveSheet()->SetCellValue('I'.$j, $doer_fullname);
-		$objPHPExcel->getActiveSheet()->SetCellValue('J'.$j, $doerStamp);
-		$objPHPExcel->getActiveSheet()->SetCellValue('K'.$j, $appv_fullname);
-		$objPHPExcel->getActiveSheet()->SetCellValue('L'.$j, $appvStamp);
-		$objPHPExcel->getActiveSheet()->SetCellValue('M'.$j, $status);
+		
+		$objPHPExcel->getActiveSheet()->SetCellValue('A'.$j, $dcNoteID);
+		$objPHPExcel->getActiveSheet()->SetCellValue('B'.$j, $conid);
+		$objPHPExcel->getActiveSheet()->SetCellValue('C'.$j, $maincus_fullname);
+		$objPHPExcel->getActiveSheet()->SetCellValue('D'.$j, $typePayID);
+		$objPHPExcel->getActiveSheet()->SetCellValue('E'.$j, $tpdetail);	
+		$objPHPExcel->getActiveSheet()->SetCellValue('F'.$j, $typePayRefValue);
+		$objPHPExcel->getActiveSheet()->SetCellValue('G'.$j, $netstart);
+		$objPHPExcel->getActiveSheet()->SetCellValue('H'.$j, $netbefore);
+		$objPHPExcel->getActiveSheet()->SetCellValue('I'.$j, $netnow);
+		$objPHPExcel->getActiveSheet()->SetCellValue('J'.$j, $doer_fullname);
+		$objPHPExcel->getActiveSheet()->SetCellValue('K'.$j, $doerStamp);
+		$objPHPExcel->getActiveSheet()->SetCellValue('L'.$j, $appv_fullname);
+		$objPHPExcel->getActiveSheet()->SetCellValue('M'.$j, $appvStamp);
+		$objPHPExcel->getActiveSheet()->SetCellValue('N'.$j, $status);
 		$j++;			
 	}		
 }else{

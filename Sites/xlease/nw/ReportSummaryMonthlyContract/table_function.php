@@ -16,7 +16,7 @@
 	}
 	function Create_SQL_Cmd($Contract_Type,$Month,$Year){
 		$Str_Query = " SELECT ";
-		$Str_Query = $Str_Query."\"conStartDate\",";  // วันที่เริ่มสัญญา
+		$Str_Query = $Str_Query."\"conDate\",";  // วันที่ทำสัญญา
 		$Str_Query = $Str_Query."\"conType\","; // ประเภทสัญญา
 		$Str_Query = $Str_Query."\"contractID\","; // เลขที่สัญญา 		
 		$Str_Query = $Str_Query." (select \"full_name\" from \"VSearchCusCorp\" where \"CusID\" = (select ta_array_get(\"thcap_contract_temp\".\"CusIDarray\", '0'))) AS \"CusName\", "; // ชื่อลูกค้า
@@ -38,22 +38,22 @@
 		$Str_Query = $Str_Query." END ";
 		$Str_Query = $Str_Query." END ";
 		$Str_Query = $Str_Query." END AS \"conDown\","; // เงินดาวน์
-		$Str_Query = $Str_Query." cal_rate_or_money('VAT', \"conStartDate\", \"conMinPay\", 2) AS \"conMinPayOutVat\", ";// -- ยอดผ่อนต่องวด ก่อน VAT";
+		$Str_Query = $Str_Query." cal_rate_or_money('VAT', \"conDate\", \"conMinPay\", 2) AS \"conMinPayOutVat\", ";// -- ยอดผ่อนต่องวด ก่อน VAT";
 		$Str_Query = $Str_Query."\"conMinPay\","; // ยอดผ่อนต่องวดรวม VAT
 		$Str_Query = $Str_Query."\"conTerm\","; //จำนวนงวด
 		$Str_Query = $Str_Query."\"conLoanIniRate\", "; // ดอกเบี้ยต่อปี(%)
 		$Str_Query = $Str_Query." CASE WHEN (select sum(\"pricePerUnit\") from \"thcap_asset_biz_detail\" where \"assetDetailID\" in(select \"assetDetailID\" from \"thcap_contract_asset_temp\" where \"contractID\" = \"thcap_contract_temp\".\"contractID\" and \"doerStamp\" = \"thcap_contract_temp\".\"doerStamp\")) IS NOT NULL THEN "; 
-		$Str_Query = $Str_Query." cal_rate_or_money('VAT', \"conStartDate\", (select sum(\"pricePerUnit\") from \"thcap_asset_biz_detail\" where \"assetDetailID\" in(select \"assetDetailID\" from \"thcap_contract_asset_temp\" where \"contractID\" = \"thcap_contract_temp\".\"contractID\" and \"doerStamp\" = \"thcap_contract_temp\".\"doerStamp\")), 2) ";
+		$Str_Query = $Str_Query." cal_rate_or_money('VAT', \"conDate\", (select sum(\"pricePerUnit\") from \"thcap_asset_biz_detail\" where \"assetDetailID\" in(select \"assetDetailID\" from \"thcap_contract_asset_temp\" where \"contractID\" = \"thcap_contract_temp\".\"contractID\" and \"doerStamp\" = \"thcap_contract_temp\".\"doerStamp\")), 2) ";
 		$Str_Query = $Str_Query." END AS \"sumAssetAmtOutVat\", "; // ราคาสินทรัพย์ ก่อน VAT";
 		$Str_Query = $Str_Query." (select sum(\"pricePerUnit\") from \"thcap_asset_biz_detail\" where \"assetDetailID\" in(select \"assetDetailID\" from \"thcap_contract_asset_temp\" where \"contractID\" = \"thcap_contract_temp\".\"contractID\"  and \"doerStamp\" = \"thcap_contract_temp\".\"doerStamp\")) AS \"sumAssetAmt\", "; // ราคาสินทรัพย์ รวม VAT" 
 		$Str_Query = $Str_Query." CASE WHEN \"conFinanceAmount\" IS NOT NULL THEN ";
 		$Str_Query = $Str_Query." CASE WHEN \"conFinAmtExtVat\" IS NOT NULL THEN ";
 		$Str_Query = $Str_Query." \"conFinAmtExtVat\"  ";
 		$Str_Query = $Str_Query." ELSE ";
-		$Str_Query = $Str_Query." cal_rate_or_money('VAT', \"conStartDate\", \"conFinanceAmount\", 2) ";
+		$Str_Query = $Str_Query." cal_rate_or_money('VAT', \"conDate\", \"conFinanceAmount\", 2) ";
 		$Str_Query = $Str_Query." END ";
 		$Str_Query = $Str_Query." ELSE ";
-		$Str_Query = $Str_Query." cal_rate_or_money('VAT', \"conStartDate\", \"conLoanAmt\", 2) ";
+		$Str_Query = $Str_Query." cal_rate_or_money('VAT', \"conDate\", \"conLoanAmt\", 2) ";
 		$Str_Query = $Str_Query." END AS \"conAmtOutVat\", "; // ยอดจัด ก่อน VAT";
 		$Str_Query = $Str_Query." CASE WHEN \"conFinanceAmount\" IS NOT NULL THEN ";
 		$Str_Query = $Str_Query." \"conFinanceAmount\" ";
@@ -75,11 +75,11 @@
 		$Str_Query = $Str_Query." WHERE ";
 		$Str_Query = $Str_Query." (\"conCredit\" IS NULL) "; 
 		$Str_Query = $Str_Query." AND (\"conType\" = '$Contract_Type') ";
-		$Str_Query = $Str_Query." AND ( substring((to_char(\"conStartDate\", 'YYYY-MM-DD')) from 1 for 4) = '$Year' ";  // ปีที่เลือก
-		$Str_Query = $Str_Query." AND  substring((to_char(\"conStartDate\", 'YYYY-MM-DD')) from 6 for 2) = '$Month' )"; 
+		$Str_Query = $Str_Query." AND ( substring((to_char(\"conDate\", 'YYYY-MM-DD')) from 1 for 4) = '$Year' ";  // ปีที่เลือก
+		$Str_Query = $Str_Query." AND  substring((to_char(\"conDate\", 'YYYY-MM-DD')) from 6 for 2) = '$Month' )"; 
 		$Str_Query = $Str_Query." AND (\"Approved\" IS NULL OR \"Approved\" = TRUE) ";
 		$Str_Query = $Str_Query." ORDER BY ";
-		$Str_Query = $Str_Query." \"conStartDate\", \"contractID\" ";
+		$Str_Query = $Str_Query." \"conDate\", \"contractID\" ";
 		
 		return($Str_Query);
 	} 
@@ -122,6 +122,29 @@
 		$Str_Query = $Str_Query." and \"doerStamp\" = '$doer_Stamp')) ";
 		return($Str_Query);
 	}
+	function Create_SQL_Comand_Money_Pledge($Contract_ID){
+	// สร้าง Sql Comamd สำหรับดึงข้อมูลในส่วน ที่เป็นเงินมัดจำ ตามเลขที่สัญญา ที่ส่งมาไว้ในตัวแปร ที่ชื่อ $Contract_ID 
+		$Str_Query = "
+					 	SELECT
+								a.\"contractID\",
+								a.\"typePayID\",
+								b.\"tpDesc\",
+								SUM(a.\"typePayAmt\") AS \"typePayAmt\"
+						FROM
+								\"thcap_temp_otherpay_debt\" a,
+								account.\"thcap_typePay\" b
+						WHERE
+								a.\"typePayID\" = b.\"tpID\" AND
+								a.\"typePayID\" like '%997' AND
+								a.\"debtStatus\" IN('1', '2', '9') AND  /* 1 = อนุมัติ , 2 = จ่ายแล้ว,3 = รออนุมัติ */ 
+								a.\"contractID\" = '".$Contract_ID."'/* ระบุเลขที่สัญญาที่ต้องการ */
+						GROUP BY
+								a.\"contractID\",
+								a.\"typePayID\",
+								b.\"tpDesc\"
+					  ";
+		return($Str_Query);
+	}
 	function Display_number_float($num_in){
 		if(is_null($num_in)){
 			echo ' ';
@@ -139,12 +162,8 @@
 		
 	}
 	function get_Asset_Buy_From($Contract_ID,$doer_Stamp){
-		// echo "<BR>"."get Asset Buy From Called ";
-		// echo "Var In Is ".$Contract_ID.' '.$doer_Stamp.'<BR>';
 		$SQL_Use = Cerate_SQL_Comand_Asset_Buy($Contract_ID,$doer_Stamp);
-		// echo $SQL_Use;
 		$Result = pg_query($SQL_Use);
-		// echo " No. Of Row Is ".pg_num_rows($Result).'<BR>';
 		$Buy_From_List = "";	
 		while($data = pg_fetch_array($Result)){
 			if($Buy_From_List != ""){
@@ -173,13 +192,44 @@
 		
 		return($Tax_Date);   		
 	}
+	function get_text_condition_pay($Contract_Id,$Down_Payment){
+		// สร้าง ข้อความ สำหรับ คอลัมน์ เงื่อนไข เพิ่มเติมค่าใช้จ่าย 
+		// $Contract_Id เลขที่สัญญา
+		// $Down_Payment รับค่า เงินดาวน์
+		 
+		$Txt_Ret =""; // เงินดาวน์
+		if(!(is_null($Down_Payment))){
+			$Txt_Ret = "ดาวน์  ".number_format($Down_Payment,2,".",",");//' ดาวน์   '.Display_number_float($Down_Payment);
+		} 
+		$Str_Money_Pledge = get_text_money_pledge($Contract_Id); // เงินมัดจำ
+		if(($Txt_Ret!="")and($Str_Money_Pledge!="")){
+			$Mid_Str = " , ";
+		}else{
+			$Mid_Str = " ";
+		}
+		$Txt_Ret = $Txt_Ret.$Mid_Str.$Str_Money_Pledge; 
+		
+		return($Txt_Ret);				
+	}
+	function get_text_money_pledge($ContractID){
+		// สร้างข้อความ สำหรับเงินมัดจำ 
+		$Str_Qry = Create_SQL_Comand_Money_Pledge($ContractID);
+		$Result = pg_query($Str_Qry);
+		$Num_Row = pg_num_rows($Result);
+		$Str = "";
+		for($i=0;$i<$Num_Row;$i++){
+			$Data = pg_fetch_array($Result);
+			$Str = $Data['tpDesc'].' '.number_format($Data['typePayAmt'],'2',".",","); 
+		}
+		return($Str);
+	}
 	function Head_Table($Month,$Year){
 		?>
 		<tr style="font-size:11px;font-weight: bold;">
         	<td colspan="19" align="center" bgcolor="#9CF"><?php echo "รายงานสรุปสัญญาประจำเดือน ".get_Month_Name($Month)." ".$Year; ?></td>
     	</tr>
     	<tr style="font-size:11px;font-weight: bold;"> 
-    		<td rowspan="2" align= "center" bgcolor="#FC0" width="50">เริ่มสัญญา</td>
+    		<td rowspan="2" align= "center" bgcolor="#FC0" width="50">วันที่ทำสัญญา</td>
     		<td rowspan="2" align= "center" bgcolor="#FC0" width="100">เลขที่สัญญา</td>
     		<td rowspan="2" align= "center" bgcolor="#FF9" width="150">ชื่อลูกค้า</td>
         	<td rowspan="2" align="center"  bgcolor="#FF9" width="150">เจ้าของเคส</td>
@@ -232,6 +282,9 @@
 				}else{
 					$Row_Color = $Color2;
 				}
+				if($Data['ApprovedText'] == 'รออนุมัติ'){
+					$Row_Color = '#F4FA58';
+				}
 				$Add = Show_Each_Record($Data,$Row_Color); 
 				$Sum_Arr = Add_2_Array($Sum_Arr,$Add);
 			}
@@ -246,8 +299,22 @@
 		$Tax_Date = get_Tax_Date($Data_Set['contractID'],$Data_Set['doerStamp']);
 		?>
 			<TR bgcolor="<?php echo $Row_Color; ?>" style="font-size:11px;" >
-				<TD><?php echo $Data_Set['conStartDate']; ?></TD><!-- วันที่เริ่มสัญญา -->
-				<TD><?php echo $Data_Set['contractID']; ?></TD><!-- เลขที่สัญญา -->
+				<TD><?php echo $Data_Set['conDate']; ?></TD><!-- วันที่ทำสัญญา -->
+				<TD>
+					<u>
+						<a onclick="javascript:popU('../thcap_installments/frm_Index.php?idno=<?php echo $Data_Set['contractID']; ?>'
+													,''
+						 	 						,'toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=980,height=720');" 
+									 				style="cursor:pointer;"> 
+							<font color="blue">	
+								<?php 
+									echo	$Data_Set['contractID']; 
+								?>
+							<font>
+						</a>
+					</u>		 
+					
+				</TD><!-- เลขที่สัญญา -->
 				<TD><?php echo $Data_Set['CusName']; ?></TD><!--ชื่อลูกค้า -->
 				<TD><?php echo $Data_Set['case_owners_name']; ?></TD><!-- เจ้าของเคส -->
 				<TD><?php echo $Data_Set['doerName']; ?></TD><!-- คนทำสัญญา -->
@@ -255,10 +322,10 @@
 				<TD><?php echo $Data_Set['examiner2']; ?></TD><!-- คนตรวจ 2 -->
 				<TD><?php echo $Buy_List;?></TD><!-- ซื้อสินทรัพย์มาจาก -->
 				<TD align="right">
-					<?php 
-						if(!(is_null($Data_Set['conDown']))){ echo "ดาวน์  ";}
-						Display_number_float($Data_Set['conDown']);
-					?></TD><!-- เงินดาวน์รวม VAT -->
+					<?php   
+						$Txt_Cnd_Pay = get_text_condition_pay($Data_Set['contractID'],$Data_Set['conDown']);
+						echo $Txt_Cnd_Pay;
+					?></TD><!-- เงินดาวน์รวม VAT เงินมัดจำ -->
 				<TD align="right"><?php Display_number_float($Data_Set['conMinPayOutVat']); ?></TD><!-- ยอดผ่อนต่องวด ก่อน VAT-->
 				<TD align="right"><?php Display_number_float($Data_Set['conMinPay']); ?></TD><!-- ยอดผ่อนต่องวดรวม VAT -->
 				<TD align="center"><?php Display_number_int($Data_Set['conTerm']); ?></TD><!--จำนวนงวด -->
@@ -268,7 +335,7 @@
 				<TD align="right"><?php Display_number_float($Data_Set['conAmtOutVat']); ?></TD><!-- ยอดจัด ก่อน VAT -->
 				<TD align="right"><?php Display_number_float($Data_Set['conAmt']); ?></TD><!-- ยอดจัด รวม  VAT -->
 				<TD align="center" ><?php echo $Tax_Date; ?></TD><!-- วันที่ในใบกำกับภาษี -->
-				<TD align="center"><?php echo $Data_Set['ApprovedText']; ?></TD><!-- วันที่อนุมัติ -->
+				<TD align="center"><?php echo $Data_Set['ApprovedText']; ?></TD><!-- ข้อความการอนุมัติ -->
 			</TR>
 		
 		<?php
@@ -317,3 +384,8 @@
 		<?php
 	}
 ?>
+<script>
+	function popU(U,N,T) {
+    	newWindow = window.open(U, N, T);
+	}
+</script>

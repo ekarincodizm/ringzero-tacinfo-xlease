@@ -6,8 +6,8 @@ include('class.upload.php');
 ?>
 <meta http-equiv="Content-Type" content="txt/html; charset=utf-8" />
 <?php
-$status=0;
-pg_query("BEGIN WORK");
+ $status=0; 
+ pg_query("BEGIN WORK");	
  $v_title=pg_escape_string($_POST["a_title"]);
  $v_fullname=pg_escape_string($_POST["a_fname"]);
  $v_lname=pg_escape_string($_POST["a_lname"]);
@@ -18,23 +18,43 @@ pg_query("BEGIN WORK");
  $v_office=pg_escape_string($_POST["a_ofiice"]);
  $v_status=pg_escape_string($_POST["a_status"]);
  $v_id=pg_escape_string($_POST["a_id"]);
- $v_email=pg_escape_string($_POST["email"]);
- 
+ $v_email=pg_escape_string($_POST["email"]); 
  $u_system=pg_escape_string($_POST["u_system"]);
- 
-	$user_id = $_SESSION["av_iduser"];
-	$add_date=nowDateTime(); //ดึงข้อมูลวันเวลาจาก server
+ $is_admin_status = pg_escape_string($_POST["is_admin"]);
+ $user_id = $_SESSION["av_iduser"];
+ $add_date=nowDateTime(); //ดึงข้อมูลวันเวลาจาก server
+ $id_usrname_chk = pg_escape_string($_POST["a_id"]);
 
-	$dir_dest = (isset($_GET['dir']) ? $_GET['dir'] : '../nw/upload/sign');
-	$dir_pics = (isset($_GET['pics']) ? $_GET['pics'] : $dir_dest);
-	$files = array();
-	
+ $dir_dest = (isset($_GET['dir']) ? $_GET['dir'] : '../nw/upload/sign');
+ $dir_pics = (isset($_GET['pics']) ? $_GET['pics'] : $dir_dest);
+ $files = array();
+ // ตรวจสอบว่า username ที่ กรอกมาผ่านตัวแปร "$_POST["a_username"]" มีอยู่แล้วในตารางหรือไม่
+ $Sql_Chk = "
+ 				SELECT 
+ 						username
+				FROM 
+						fuser 
+				WHERE 
+						username = '".$v_username."'
+						and (id_user::int <> ".$id_usrname_chk." )
+ 				
+ 			";	
+  $Result = pg_query($Sql_Chk);
+  $Num_Row =pg_num_rows($Result);
+  if($Num_Row > 0)
+  {
+  	$status++;
+  	$Err_Msg = " ไม่สามารถ Update ได้ เนื่องจากมี username เป็น ".$v_username." ของผู้ใช้รายอื่น อยู่ในระบบก่อนแล้ว";	
+  }else{
+  	$Err_Msg = "";
+  }			
 	// แก้ไขบอง XLEASE
 	$in_sql="update fuser SET title='$v_title',fname='$v_fullname',lname='$v_lname',username='$v_username',
                              office_id='$v_office',user_group='$v_gp',status_user='$v_status',user_dep='$v_fd',
-							 email='$v_email', \"isUserTA\" = '$u_system'
+							 email='$v_email', \"isUserTA\" = '$u_system',isadmin = '$is_admin_status'
 					   WHERE id_user='$v_id'  
 		   ";
+	   
 	if($uptemp=pg_query($in_sql)){
 			}else{
 				$status++;
@@ -143,8 +163,9 @@ pg_query("BEGIN WORK");
  else
  {
 	pg_query("ROLLBACK");
-	$status ="error Update  fuser ".$in_sql;
+	$status = ""; 
  }
+ $status = $status.$Err_Msg;
  echo "<div style=\"text-align:center;padding-top:50px\"><b>$status</b><br>
   <input type=\"button\" value=\"กลับ\" onclick=\"location.href='detail_user.php?iduser=$v_id'\"></div>";
 

@@ -24,7 +24,8 @@ $(document).ready(function(){
     
     $("#tb_idno").autocomplete({
         source: "s_cusid.php",
-        minLength:1
+		minLength:1,
+		delay:800
     });
     
     $('#btn_search_idno').click(function(){

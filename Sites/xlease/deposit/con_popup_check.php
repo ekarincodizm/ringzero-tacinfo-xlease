@@ -9,7 +9,7 @@ $id=pg_escape_string($_POST['sid']);
 $_SESSION['check_admin_confirm'] = "";
 $data['success'] = false;
 
-$qry_chk=pg_query("select COUNT(\"id_user\") AS cid from \"fuser\" WHERE \"username\"='$user' AND \"password\"='$pass' AND \"user_group\"='AD' ");
+$qry_chk=pg_query("select COUNT(\"id_user\") AS cid from \"fuser\" WHERE \"username\"='$user' AND \"password\"='$pass' AND \"isadmin\"='1' ");
 if($res_chk=pg_fetch_array($qry_chk)){
     $cid=$res_chk["cid"];
     if($cid > 0){
