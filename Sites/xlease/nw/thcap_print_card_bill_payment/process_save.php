@@ -13,7 +13,8 @@ $contractID = pg_escape_string($_POST["contractID"]);
 $minPayment = pg_escape_string($_POST["minPayment"]);
 $firstDueDate = pg_escape_string($_POST["firstDueDate"]);
 $payDay = pg_escape_string($_POST["payDay"]);
-$note = pg_escape_string($_POST["note"]);
+$note = pg_escape_string($_POST["note"]); // หมายเหตุ (แสดงใน Card Bill Payment)
+$doerNote = pg_escape_string($_POST["doerNote"]); // หมายเหตุ ในการทำรายการ / หมายเหตุรายละเอียดของสัญญา
 
 $CusFullName = checknull($CusFullName);
 $contractID = checknull($contractID);
@@ -21,6 +22,8 @@ $minPayment = checknull($minPayment);
 $firstDueDate = checknull($firstDueDate);
 $payDay = checknull($payDay);
 $note = checknull($note);
+$doerNote = checknull($doerNote);
+
 ?>
 
 <script type="text/javascript">
@@ -39,16 +42,12 @@ function popU(U,N,T) {
 }
 </script>
 
-<form name="form">
-<input type="hidden" name="industry" id="industry" value="<?php echo $industry; ?>">
-</form>
-
 <?php
 pg_query("BEGIN");
 $status = 0;
 
-$sql_add = "insert into \"thcap_print_card_bill_payment\"(\"CusFullName\", \"contractID\", \"minPayment\", \"firstDueDate\", \"payDay\", \"note\", \"doerID\", \"doerStamp\")
-			values($CusFullName, $contractID, $minPayment, $firstDueDate, $payDay, $note, '$user_id', '$add_date')
+$sql_add = "insert into \"thcap_print_card_bill_payment\"(\"CusFullName\", \"contractID\", \"minPayment\", \"firstDueDate\", \"payDay\", \"note\", \"doerID\", \"doerStamp\", \"doerNote\", \"appvStatus\")
+			values($CusFullName, $contractID, $minPayment, $firstDueDate, $payDay, $note, '$user_id', '$add_date', $doerNote, '9')
 			returning \"autoID\" ";
 if($result_add = pg_query($sql_add))
 {
@@ -67,17 +66,15 @@ if($status == 0)
 		$sqlaction = pg_query("INSERT INTO action_log(id_user, action_desc, action_time) VALUES ('$user_id', '(THCAP) พิมพ์ Card Bill Payment', '$add_date')");
 	//ACTIONLOG---
 	
-	echo "<script type=\"text/javascript\">";
-	echo "javascript:popU('print_card_bill_payment_pdf.php?autoID=$autoID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=740');";
-	echo "window.location='frm_Index.php';";
-	echo "</script>";
+	echo "<center><h2><font color=\"#0000FF\">บันทึกสำเร็จ</font></h2></center>";
+	echo "<form method=\"post\" name=\"form1\" action=\"frm_Index.php\">";
+	echo "<center><input type=\"submit\" value=\"ตกลง\" style=\"cursor:pointer;\" /></center></form>";
 }
 else
 {
 	pg_query("ROLLBACK");
 	echo "<center><h2><font color=\"#FF0000\">ผิดพลาด!!</font></h2></center>";
 	echo "<form method=\"post\" name=\"form2\" action=\"frm_Index.php\">";
-	echo "<input type=\"hidden\" name=\"industry\" value=\"$industry\">";
-	echo "<center><input type=\"submit\" value=\"กลับ\"></center></form>";	
+	echo "<center><input type=\"submit\" value=\"กลับ\" style=\"cursor:pointer;\" /></center></form>";
 }
 ?>

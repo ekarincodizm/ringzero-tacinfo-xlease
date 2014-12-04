@@ -1,8 +1,8 @@
 <?php
 include("../../config/config.php");
 
-$contractID = $_GET['contractID'];
-$showall = $_GET['showall'];
+$contractID = pg_escape_string($_GET['contractID']);
+$showall = pg_escape_string($_GET['showall']);
 
 IF($showall == 'true'){ //หากต้องการแสดงสินค้าทั้งหมดของเลขที่สัญญานั้นๆ
 	$q = "	select * from \"thcap_contract_asset\" as a 
@@ -13,8 +13,8 @@ IF($showall == 'true'){ //หากต้องการแสดงสินค
 			order by a.\"assetDetailID\" ";
 }else{ //แสดงสินค้าเฉพาะ brand และ model ที่ต้องการ
 
-$brand = $_GET['brand'];
-$model = $_GET['model'];
+$brand = pg_escape_string($_GET['brand']);
+$model = pg_escape_string($_GET['model']);
 
 if($brand != "" && $model != "")
 {

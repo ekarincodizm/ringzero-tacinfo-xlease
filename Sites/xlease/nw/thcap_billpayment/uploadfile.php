@@ -227,8 +227,6 @@ if ($_FILES["file"]["error"] > 0){
 										//กำหนดค่าสำหรับบันทึกใน finance.thcap_receive_transfer กรณี ref ไม่สมบูรณ์จะไม่บันทึกในนี้
 										$contractID="null";
 										$invoiceID="null";
-										$tref1="null"; 
-										$tref2="null"; 
 										$statusupload=0;
 									}
 								}else{ //กรณีไม่พบใบแจ้งหนี้
@@ -244,17 +242,15 @@ if ($_FILES["file"]["error"] > 0){
 										//กรณีไม่เป็นจริงให้พนักงานตรวจสอบก่อน
 										$contractID="null";
 										$invoiceID="null";
-										$tref1="null"; 
-										$tref2="null"; 
 										$statusupload=0;
 									}
 								}		
 							}else{ //กรณีไม่พบข้อมูล								
 								//กำหนดค่าสำหรับบันทึกใน finance.thcap_receive_transfer กรณี ref ไม่สมบูรณ์จะไม่บันทึกในนี้
-								$tref1="null"; 
-								$tref2="null"; 
+								$contractID="null";
+								$invoiceID="null";
 								$statusupload=0;
-							}					
+							}
 						}
 
 						// เพิ่มข้อมูลลงในตาราง  finance.thcap_receive_billpayment

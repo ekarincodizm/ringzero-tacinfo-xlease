@@ -11,11 +11,15 @@ $qrylevel="SELECT ta_get_user_emplevel('$user_id')";
 if($reslevel=pg_query($qrylevel)){
 	list($emplevel)=pg_fetch_array($reslevel);
 }
+
+// กำหนดชื่อเมนู
+if($action_menu == "see"){$titleMenu = "(THCAP) ดูรายการเงินโอน(การเงิน)";}
+else{$titleMenu = "(THCAP) ยืนยันรายการเงินโอน(การเงิน)";}
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html>
 <head>
-    <title>ยืนยันรายการเงินโอน(การเงิน)</title>
+    <title><?php echo $titleMenu; ?></title>
     <meta http-equiv="Content-Type" content="txt/html; charset=utf-8" />
     <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
     
@@ -43,7 +47,7 @@ if($reslevel=pg_query($qrylevel)){
 			<div style="float:left">&nbsp;</div>
 			<div style="float:right"><input type="button" value="  Close  " onclick="javascript:window.close();" class="ui-button"></div>
 			<div style="clear:both;"></div>
-			<fieldset><legend><B>ยืนยันรายการเงินโอน (การเงิน)</B></legend>
+			<fieldset><legend><B><?php echo $titleMenu; ?></B></legend>
 				<div align="center">
 					<div class="ui-widget">
 						<div id="panel">

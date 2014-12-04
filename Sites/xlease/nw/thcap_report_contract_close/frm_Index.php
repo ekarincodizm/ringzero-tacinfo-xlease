@@ -216,7 +216,7 @@ while($loop_typeContract = pg_fetch_array($qry_typeContract))
 								</td>
 							</tr>
 							<tr>
-								<td colspan="2" align="center"><input type="submit" value="แสดงรายงาน"/></td>
+								<td colspan="2" align="center"><input type="submit" value="แสดงรายงาน" style="cursor:pointer;"/></td>
 							</tr>
 						</table>
 					</center>

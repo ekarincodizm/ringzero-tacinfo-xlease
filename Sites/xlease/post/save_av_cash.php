@@ -113,31 +113,16 @@ if($ss_cusid==1){
 			$status++;
 			$error_check = "มีลูกค้าคนนี้อยู่แล้ว";
 		}
-
-		$in_sql_fa1="insert into \"Fa1\" (\"CusID\",\"A_FIRNAME\",\"A_NAME\",\"A_SIRNAME\") values  
-					('$cus_sn','$fs_firname','$fp_name','$fp_sirname')";
-
-		if($result_fa1=pg_query($in_sql_fa1)){	
-		}else{
-			$status++;
-		}
-
-		$in_fn="insert into \"Fn\" (\"CusID\" , \"N_STATE\" , \"N_IDCARD\") values  
-				('$cus_sn','0',$f_idcard)";
-
-		if($result=pg_query($in_fn)){
-		}else{
-			$status++;
-		}
 		
-		//------ เช็คก่อนว่าลูกค้ามีแล้วหรือยัง
-		$sql_check_idcard_CT = pg_query("select \"N_IDCARD\" from \"Customer_Temp\" where (\"A_NAME\" = '$fp_name' and \"A_SIRNAME\" = '$fp_sirname') or replace(\"N_IDCARD\",' ','') = $f_idcard ");
-		$row_check_idcard_CT = pg_num_rows($sql_check_idcard_CT);
-		if($row_check_idcard_CT > 0)
+		$sql_check_name = pg_query("select * from \"Fn\" where replace(\"N_IDCARD\",' ','') = $f_idcard ");
+		$row_check_name = pg_num_rows($sql_check_name);
+		if($row_check_name > 0)
 		{
 			$status++;
 			$error_check = "มีลูกค้าคนนี้อยู่แล้ว";
 		}
+		//------ จบการเช็คก่อนว่าลูกค้ามีแล้วหรือยัง
+		
 		//------ เช็คก่อนว่ามีลูกค้าคนนี้รอการอนุมัติอยู่แล้วหรือยัง
 		$sql_check_idcard_CT = pg_query("select \"N_IDCARD\" from \"Customer_Temp\" where \"A_NAME\" = '$fp_name' and \"A_SIRNAME\" = '$fp_sirname' and \"CusID\" like 'CT%' ");
 		$row_check_idcard_CT = pg_num_rows($sql_check_idcard_CT);
@@ -163,6 +148,22 @@ if($ss_cusid==1){
 		}else{
 			$status++;
 			$error=$result;
+		}
+
+		$in_sql_fa1="insert into \"Fa1\" (\"CusID\",\"A_FIRNAME\",\"A_NAME\",\"A_SIRNAME\") values  
+					('$cus_sn','$fs_firname','$fp_name','$fp_sirname')";
+
+		if($result_fa1=pg_query($in_sql_fa1)){	
+		}else{
+			$status++;
+		}
+
+		$in_fn="insert into \"Fn\" (\"CusID\" , \"N_STATE\" , \"N_IDCARD\") values  
+				('$cus_sn','0',$f_idcard)";
+
+		if($result=pg_query($in_fn)){
+		}else{
+			$status++;
 		}
 		
 		$pfinal_cusid=$cus_sn;

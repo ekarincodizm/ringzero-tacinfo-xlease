@@ -3,8 +3,41 @@ include("../../config/config.php");
 
 $debtID = pg_escape_string($_GET["debtID"]);
 ?>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="txt/html; charset=utf-8" />
+    <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+    <link type="text/css" rel="stylesheet" href="act.css"></link>
+    
+    <link type="text/css" href="../../jqueryui/css/ui-lightness/jquery-ui-1.8.2.custom.css" rel="stylesheet" />    
+    <script type="text/javascript" src="../../jqueryui/js/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="../../jqueryui/js/jquery-ui-1.8.2.custom.min.js"></script>
+	
 
-<meta http-equiv="Content-Type" content="txt/html; charset=utf-8" />
+<script type="text/javascript">
+$(document).ready(function(){
+    $("#datepicker").datepicker({
+        showOn: 'button',
+        buttonImage: 'calendar.gif',
+        buttonImageOnly: true,
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'yy-mm-dd'
+    });
+});
+</script>
+
+<style type="text/css">
+.ui-datepicker{
+    width:200px;
+    font-family:tahoma;
+    font-size:13px;
+    text-align:center;
+}
+</style>
+
+
+
 
 <script>
 	function check_num(e)
@@ -66,6 +99,7 @@ $debtID = pg_escape_string($_GET["debtID"]);
 			return false;
 		}
 	}
+		
 </script>
 
 <form name="frm1" method="post" action="process_save_transection.php">
@@ -154,6 +188,11 @@ $debtID = pg_escape_string($_GET["debtID"]);
 						<td align="right"><b>จำนวนเงินที่ชำระนายหน้า : </b></td>
 						<td align="left"><input type="textbox" name="payAmt" onkeypress="check_num(event);" /></td>
 					</tr>
+					<tr>
+						<td align="right"><b>วันที่ชำระเงินนายหน้า : </b></td>
+						<td align="left"><input type="text" id="datepicker" name="datepicker" value="<?php echo nowDate(); ?>" size="15"></td>
+					</tr>
+					
 				</table>
 				<br><br>
 				<center>

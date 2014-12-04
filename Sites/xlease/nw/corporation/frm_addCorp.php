@@ -976,6 +976,7 @@ function popU(U,N,T) {
 								<option value="ห้างหุ้นส่วนจำกัด">ห้างหุ้นส่วนจำกัด</option>
 								<option value="ห้างหุ้นส่วนสามัญ">ห้างหุ้นส่วนสามัญ</option>
 								<option value="มูลนิธิ">มูลนิธิ</option>
+								<option value="สถาบัน">สถาบัน</option>
 								<option value="สหกรณ์">สหกรณ์</option>
 								<option value="สมาคม">สมาคม</option>
 								<option value="วัด">วัด</option>

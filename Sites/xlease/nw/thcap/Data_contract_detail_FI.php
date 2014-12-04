@@ -277,6 +277,9 @@ list($lease_fine) = $rs_get_lease_fine;
 	$qry_thcap_get_factoring_buyprice = pg_query("select \"thcap_get_factoring_buyprice\"('$contractID')");
 	$thcap_get_factoring_buyprice = pg_result($qry_thcap_get_factoring_buyprice,0);
 	
+	// หาข้อมูล REF1
+	$qry_REF1 = pg_query("select ta_array1d_get(thcap_encode_invoice_ref('$contractID', '000000IMG-00000'),0)");
+	$REF1 = pg_fetch_result($qry_REF1,0);
 ?>
 	<center>
     <table>
@@ -312,7 +315,7 @@ list($lease_fine) = $rs_get_lease_fine;
     </tr>
 	<tr>
 		<td align="right" bgcolor="#79BCFF"><b>เลขที่สัญญา</b></td>
-		<td bgcolor="#D5EFFD">:</td><td bgcolor="#D5EFFD" colspan="10"><?php echo $contractID; ?>&nbsp&nbsp&nbsp&nbsp&nbsp<?php echo $limitlink; ?></td>
+		<td bgcolor="#D5EFFD">:</td><td bgcolor="#D5EFFD" colspan="10"><?php echo "$contractID <font color=\"red\">(REF1 : $REF1)</font>"; ?>&nbsp&nbsp&nbsp&nbsp&nbsp<?php echo $limitlink; ?></td>
 	</tr>
 	<tr>
 		<td align="right" bgcolor="#79BCFF"><b>เจ้าของเคส</b></td>

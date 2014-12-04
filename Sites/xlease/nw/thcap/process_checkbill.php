@@ -133,13 +133,53 @@ if($num_chk == 0 AND $revTranID != 'bid_1'){ //แสดงว่าอนุม
 			$numbill=pg_num_rows($qrychkbill);
 			if($numbill>0){ //แสดงว่าเป็น billpayment
 				//ตรวจสอบว่ามีเลขที่สัญญาหรือยัง ถ้ายังไม่ต้อง update ส่วนนี้ ให้การเงินตรวจสอบก่อน
-				$resbill=pg_fetch_array($qrychkbill);
-				$contractID=$resbill["contractID"];
+				$resbill = pg_fetch_array($qrychkbill);
+				$contractID = $resbill["contractID"]; // เลขที่สัญญาที่ผูกไว้
 				$amt=$resbill["bankRevAmt"];
-				if($contractID!=""){
+				$bankRevRef1 = $resbill["bankRevRef1"];
+				
+				if($contractID == "") // ถ้ายังไม่ได้ผูกเลขที่สัญญาไว้
+				{
+					$REF1 = $bankRevRef1;
+					$REF1_checknull = checknull($REF1);
+					
+					$qryinv=pg_query("SELECT ta_array1d_get(thcap_decode_invoice_ref($REF1_checknull, null),0) as \"contractID\"");
+					list($REF1_decode) = pg_fetch_array($qryinv);
+					
+					if($REF1_decode != "")
+					{
+						// ตรวจสอบว่ามีเลขที่สัญญาในระบบหรือไม่
+						$qry_checkContract = pg_query("select \"contractID\" from \"thcap_contract\" where \"contractID\" = '$REF1_decode'");
+						$row_checkContract = pg_num_rows($qry_checkContract);
+						
+						if($row_checkContract > 0) // ถ้ามีสัญญาอยู่จริง
+						{
+							$contractID = $REF1_decode;
+						}
+						else // ถ้าไม่มีเลขที่สัญญาดังกล่าวในระบบ
+						{
+							$contractID = "";
+						}
+					}
+				}
+				
+				if($contractID!="")
+				{
+					$contractID_checknull = checknull($contractID);
+					
 					$insacc=",\"appvYID\"='000',\"appvYStamp\"='$curdate',\"appvYStatus\"='1'";
-										
-					$upd="update \"finance\".\"thcap_receive_transfer\" set \"revTranStatus\"='1',\"ststariff\"='0.00',\"balanceAmt\"='$amt' where \"revTranID\"='$resup[revTranID]'";									
+					
+					$upd = "
+							UPDATE
+								\"finance\".\"thcap_receive_transfer\"
+							SET
+								\"revTranStatus\" = '1',
+								\"ststariff\" = '0.00',
+								\"balanceAmt\" = '$amt',
+								\"contractID\" = $contractID_checknull
+							WHERE
+								\"revTranID\" = '$resup[revTranID]'
+							";
 					if($resins=pg_query($upd)){
 					}else{
 						$status++;

@@ -226,31 +226,31 @@
 	function Head_Table($Month,$Year){
 		?>
 		<tr style="font-size:11px;font-weight: bold;">
-        	<td colspan="19" align="center" bgcolor="#9CF"><?php echo "รายงานสรุปสัญญาประจำเดือน ".get_Month_Name($Month)." ".$Year; ?></td>
+        	<td colspan="19" align="center" bgcolor="#a9b5fd"><?php echo "รายงานสรุปสัญญาประจำเดือน ".get_Month_Name($Month)." ".$Year; ?></td>
     	</tr>
     	<tr style="font-size:11px;font-weight: bold;"> 
-    		<td rowspan="2" align= "center" bgcolor="#FC0" width="50">วันที่ทำสัญญา</td>
-    		<td rowspan="2" align= "center" bgcolor="#FC0" width="100">เลขที่สัญญา</td>
+    		<td rowspan="2" align= "center" bgcolor="#ffe787" width="50">วันที่ทำสัญญา</td>
+    		<td rowspan="2" align= "center" bgcolor="#ffe787" width="100">เลขที่สัญญา</td>
     		<td rowspan="2" align= "center" bgcolor="#FF9" width="150">ชื่อลูกค้า</td>
         	<td rowspan="2" align="center"  bgcolor="#FF9" width="150">เจ้าของเคส</td>
         	<td rowspan="2" align="center"  bgcolor="#FF9" width="150">คนทำสัญญา</td>
         	<td rowspan="2" align="center"  bgcolor="#FF9" width="150">คนตรวจ 1</td>
 	        <td rowspan="2" align="center"  bgcolor="#FF9" width="150">คนตรวจ  2</td>
-    	    <td rowspan="2" align="center" bgcolor="#CCF" width="250">ซื้อทรัพย์สินมาจาก</td>
+    	    <td rowspan="2" align="center" bgcolor="#e6cdff" width="250">ซื้อทรัพย์สินมาจาก</td>
         	<td rowspan="2" align="center" bgcolor="#FF9" width="110">เงื่อนไขเพิ่มเติม(ค่าใช้จ่าย)<BR>รวม VAT</td>
-	        <td colspan="2" align="center" bgcolor= "#0F0">ยอดผ่อนต่องวด</td>
+	        <td colspan="2" align="center" bgcolor= "#91fa91">ยอดผ่อนต่องวด</td>
     	    <td rowspan="2" bgcolor="#FF9" align="center"  width = "50">จำนวน<BR>งวด </td>
         	<td rowspan="2" bgcolor="#FF9" align="center" width = "50">ดอกเบี้ย<BR>ต่อปี(%)</td>
-	        <td rowspan="2" bgcolor="#C9F" align="center" width = "95">ราคาทรัพย์สิน<BR>ก่อน VAT</td>
-    	    <td rowspan="2" bgcolor="#FF8080" align="center" width = "95">ราคาทรัพย์สิน<BR>รวม VAT</td>
-        	<td rowspan="2" bgcolor="#C9F" align="center" width = "95">ยอดจัด <BR>ก่อน VAT</td>
-	        <td rowspan="2" bgcolor="#FF8080" align="center" width = "95">ยอดจัด<BR>รวม VAT </td>
-    	    <td rowspan="2" bgcolor="#0F0" align="center" width = "70">วันที่ใน<BR>ใบกำกับภาษี</td>
+	        <td rowspan="2" bgcolor="#e6cdff" align="center" width = "95">ราคาทรัพย์สิน<BR>ก่อน VAT</td>
+    	    <td rowspan="2" bgcolor="#fda9a9" align="center" width = "95">ราคาทรัพย์สิน<BR>รวม VAT</td>
+        	<td rowspan="2" bgcolor="#e6cdff" align="center" width = "95">ยอดจัด <BR>ก่อน VAT</td>
+	        <td rowspan="2" bgcolor="#fda9a9" align="center" width = "95">ยอดจัด<BR>รวม VAT </td>
+    	    <td rowspan="2" bgcolor="#91fa91" align="center" width = "70">วันที่ใน<BR>ใบกำกับภาษี</td>
         	<td bgcolor="#FF9" rowspan="2" width = "50" align="center">สถานะ</td>
        	</tr>
     	<tr style="font-size:11px;font-weight: bold;">
-        	<td bgcolor="#C9F" width="70" align="center">ก่อน VAT</td>
-        	<td bgcolor="#FF8080" width="70" align="center">รวม VAT</td>
+        	<td bgcolor="#e6cdff" width="70" align="center">ก่อน VAT</td>
+        	<td bgcolor="#fda9a9" width="70" align="center">รวม VAT</td>
         </tr>
 		
 		<?php
@@ -273,7 +273,7 @@
 		$Num_Row = pg_num_rows($Result_Show);
 		// echo "No. Of Row Is ".$Num_Row."<BR>"; 
 		if($Num_Row!=0){
-			$i=1; $Color1 = '#00FFFF'; $Color2 = '#00FF99';  
+			$i=1; $Color1 = '#e9ffe9'; $Color2 = '#dbecfd';  
 			$Sum_Arr = array(0.00,0.00,0.00,0.00,0.00,0.00,0.00,0.00);
 			for($i=0;$i<$Num_Row;$i++){
 				$Data = pg_fetch_array($Result_Show);
@@ -355,7 +355,7 @@
 	} 
 	function Show_Summary_Record($Data_In){
 		?>
-		<TR bgcolor="#FC0" style="font-size:11px;font-weight: bold;" >
+		<TR bgcolor="#a9b5fd" style="font-size:11px;font-weight: bold;" >
 			<TD colspan="9" align="right">
 				รวม	
 			</TD>

@@ -32,18 +32,73 @@ include("../../config/config.php");
 			var theMessage = "Please complete the following: \n-----------------------------------\n";
 			var noErrors = theMessage
 			
+			var contractID = document.frm1.contractID.value; // เลขที่สัญญา
+			
 			if (document.frm1.CusFullName.value=="") {
-				theMessage = theMessage + "\n ->  กรุณาระบุ ชื่อ-นามสุกลลูกค้า";
+				theMessage = theMessage + "\n ->  กรุณาระบุ ชื่อ-นามสกุลลูกค้า";
 			}
 			
-			if (document.frm1.contractID.value=="") {
+			if (document.frm1.contractID.value=="") // ถ้าไม่ได้ระบุเลขที่สัญญา
+			{
 				theMessage = theMessage + "\n ->  กรุณาระบุ เลขที่สัญญา";
 			}
-			
-			//ตรวจสอบจำนวนตัวอักษรของเลขที่สัญญาใหม่  15 - 20 ตัวอักษร
-			var stringnum = document.frm1.contractID.value.length;
-			if(stringnum != 15 && stringnum != 20){
-				theMessage = theMessage + "\n ->  เลขที่สัญญาควรจะจำนวน 15 หรือ 20 ตัวอักษรเท่านั้น !";
+			else // ถ้าระบุเลขที่สัญญาแล้ว ให้ตรวจสอบ format
+			{
+				//ตรวจสอบจำนวนตัวอักษรของเลขที่สัญญาใหม่  15 ตัวอักษร
+				var stringnum = contractID.length;
+				
+				if(stringnum != 15) // ถ้าจำนวนตัวอักษรไม่ถูก
+				{
+					theMessage = theMessage + "\n ->  เลขที่สัญญาควรจะจำนวน 15 ตัวอักษรเท่านั้น !";
+				}
+				else // ถ้าจำนวนตัวอักษรถูกต้อง ให้เช็ค format ด้วย XX-XX00-00000
+				{
+					if(!((contractID.substring(0,1)  >= "A" && contractID.substring(0,1) <= "Z"))){ // ตัวที่ 1 ต้องเป็นตัวอักษรอังกฤษพิมพ์ใหญ่เท่านั้น
+						theMessage = theMessage + "\n ->  format เลขที่สัญญา ไม่ถูกต้อง";
+					}
+					else if(!((contractID.substring(1,2)  >= "A" && contractID.substring(1,2) <= "Z"))){ // ตัวที่ 2 ต้องเป็นตัวอักษรอังกฤษพิมพ์ใหญ่เท่านั้น
+						theMessage = theMessage + "\n ->  format เลขที่สัญญา ไม่ถูกต้อง";
+					}
+					else if(contractID.substring(2,3) != "-"){ // ตัวที่ 3 ต้องเป็นเครื่องหมายขีดเท่านั้น
+						theMessage = theMessage + "\n ->  format เลขที่สัญญา ไม่ถูกต้อง";
+					}
+					else if(!((contractID.substring(3,4)  >= "A" && contractID.substring(3,4) <= "Z"))){ // ตัวที่ 4 ต้องเป็นตัวอักษรอังกฤษพิมพ์ใหญ่เท่านั้น
+						theMessage = theMessage + "\n ->  format เลขที่สัญญา ไม่ถูกต้อง";
+					}
+					else if(!((contractID.substring(4,5)  >= "A" && contractID.substring(4,5) <= "Z"))){ // ตัวที่ 5 ต้องเป็นตัวอักษรอังกฤษพิมพ์ใหญ่เท่านั้น
+						theMessage = theMessage + "\n ->  format เลขที่สัญญา ไม่ถูกต้อง";
+					}
+					else if(!((contractID.substring(5,6)  >= "0" && contractID.substring(5,6) <= "9"))){ // ตัวที่ 6 ต้องเป็นตัวเลขเท่านั้น
+						theMessage = theMessage + "\n ->  format เลขที่สัญญา ไม่ถูกต้อง";
+					}
+					else if(!((contractID.substring(6,7)  >= "0" && contractID.substring(6,7) <= "9"))){ // ตัวที่ 7 ต้องเป็นตัวเลขเท่านั้น
+						theMessage = theMessage + "\n ->  format เลขที่สัญญา ไม่ถูกต้อง";
+					}
+					else if(contractID.substring(7,8) != "-"){ // ตัวที่ 8 ต้องเป็นเครื่องหมายขีดเท่านั้น
+						theMessage = theMessage + "\n ->  format เลขที่สัญญา ไม่ถูกต้อง";
+					}
+					else if(!((contractID.substring(8,9)  >= "0" && contractID.substring(8,9) <= "9"))){ // ตัวที่ 9 ต้องเป็นตัวเลขเท่านั้น
+						theMessage = theMessage + "\n ->  format เลขที่สัญญา ไม่ถูกต้อง";
+					}
+					else if(!((contractID.substring(9,10)  >= "0" && contractID.substring(9,10) <= "9"))){ // ตัวที่ 10 ต้องเป็นตัวเลขเท่านั้น
+						theMessage = theMessage + "\n ->  format เลขที่สัญญา ไม่ถูกต้อง";
+					}
+					else if(!((contractID.substring(10,11)  >= "0" && contractID.substring(10,11) <= "9"))){ // ตัวที่ 11 ต้องเป็นตัวเลขเท่านั้น
+						theMessage = theMessage + "\n ->  format เลขที่สัญญา ไม่ถูกต้อง";
+					}
+					else if(!((contractID.substring(11,12)  >= "0" && contractID.substring(11,12) <= "9"))){ // ตัวที่ 12 ต้องเป็นตัวเลขเท่านั้น
+						theMessage = theMessage + "\n ->  format เลขที่สัญญา ไม่ถูกต้อง";
+					}
+					else if(!((contractID.substring(12,13)  >= "0" && contractID.substring(12,13) <= "9"))){ // ตัวที่ 13 ต้องเป็นตัวเลขเท่านั้น
+						theMessage = theMessage + "\n ->  format เลขที่สัญญา ไม่ถูกต้อง";
+					}
+					else if(!((contractID.substring(13,14)  >= "0" && contractID.substring(13,14) <= "9"))){ // ตัวที่ 14 ต้องเป็นตัวเลขเท่านั้น
+						theMessage = theMessage + "\n ->  format เลขที่สัญญา ไม่ถูกต้อง";
+					}
+					else if(!((contractID.substring(14,15)  >= "0" && contractID.substring(14,15) <= "9"))){ // ตัวที่ 15 ต้องเป็นตัวเลขเท่านั้น
+						theMessage = theMessage + "\n ->  format เลขที่สัญญา ไม่ถูกต้อง";
+					}
+				}
 			}
 			
 			if (document.frm1.minPayment.value=="") {
@@ -56,6 +111,10 @@ include("../../config/config.php");
 			
 			if (document.frm1.payDay.value=="") {
 				theMessage = theMessage + "\n ->  กรุณาระบุ จ่ายทุกวันที่";
+			}
+			
+			if (document.frm1.doerNote.value=="") {
+				theMessage = theMessage + "\n ->  กรุณาระบุ หมายเหตุรายละเอียดของสัญญา";
 			}
 			
 			// If no errors, submit the form
@@ -115,7 +174,7 @@ include("../../config/config.php");
 	<h1>(THCAP) พิมพ์ Card Bill Payment</h1>
 	<table>
 		<tr>
-			<td align="right">ชื่อ-นามสุกลลูกค้า <font color="#FF0000">*</font> : </td>
+			<td align="right">ชื่อ-นามสกุลลูกค้า <font color="#FF0000">*</font> : </td>
 			<td align="left"><input type="text" name="CusFullName" size="40" value=""></td>
 		</tr>
 		<tr>
@@ -128,7 +187,7 @@ include("../../config/config.php");
 		</tr>
 		<tr>
 			<td align="right">วันที่ครบกำหนดชำระงวดแรก <font color="#FF0000">*</font> : </td>
-			<td align="left"><input type="text" name="firstDueDate" id="firstDueDate" size="15" value=""></td>
+			<td align="left"><input type="text" name="firstDueDate" id="firstDueDate" size="15" value="" readOnly></td>
 		</tr>
 		<tr>
 			<td align="right">จ่ายทุกวันที่ <font color="#FF0000">*</font> : </td>
@@ -146,15 +205,107 @@ include("../../config/config.php");
 			</td>
 		</tr>
 		<tr>
-			<td align="right">หมายเหตุ : </td>
-			<td align="left"><textarea cols="30" name="note"></textarea></td>
+			<td align="right" valign="top">หมายเหตุ (แสดงใน Card Bill Payment) : </td>
+			<td align="left"><textarea cols="40" name="note"></textarea></td>
+		</tr>
+		<tr>
+			<td align="right" valign="top"> หมายเหตุรายละเอียดของสัญญา <font color="#FF0000">*</font> : </td>
+			<td align="left">
+				<textarea name="doerNote" cols="40" rows="5"></textarea>
+				<br/>
+				<font color="red">*ระบุรายละเอียดของสัญญาหรือทรัพย์สินเพื่อใช้ยืนยันเลขที่สัญญา<br/>เช่น แจ้งทรัพย์สิน ขนาด ที่ตั้ง</font>
+			</td>
 		</tr>
 	</table>
-	<br><br>
-	<input type="submit" name="add" value="ตกลง" onclick="return validate();"> &nbsp;&nbsp;&nbsp;
-	<input type="button" value="เริ่มใหม่" onclick="window.location='frm_Index.php';"> &nbsp;&nbsp;&nbsp;
-	<input type="button" value="ปิด" onclick="javascript:window.close();">
+	<br/>
+	<input type="submit" name="add" value="ตกลง" style="cursor:pointer;" onClick="return validate();"> &nbsp;&nbsp;&nbsp;
+	<input type="button" value="เริ่มใหม่" style="cursor:pointer;" onClick="window.location='frm_Index.php';"> &nbsp;&nbsp;&nbsp;
+	<input type="button" value="ปิด" style="cursor:pointer;" onClick="javascript:window.close();">
 </form>
+
+<br/><br/>
+<table width="90%">
+	<tr>
+		<td>
+			<table width="100%" border="0" cellSpacing="1" cellPadding="3" align="center" bgcolor="#F0F0F0">
+				<tr bgcolor="#FFFFFF">
+					<td colspan="8" align="left" style="font-weight:bold;">รายการที่รออนุมัติ</td>
+				</tr>
+				<tr style="font-weight:bold;" valign="middle" bgcolor="#79BCFF" align="center">
+					<th>ชื่อ-นามสกุลลูกค้า</th>
+					<th>ยอดผ่อนขั้นต่ำ</th>
+					<th>วันที่ครบกำหนดชำระงวดแรก</th>
+					<th>จ่ายทุกวันที่</th>
+					<th>ผู้ทำรายการ</th>
+					<th>วันเวลาที่ทำรายการ</th>
+					<th>รายละเอียด</th>
+				</tr>
+				<?php
+				$qry_wait = pg_query("
+										SELECT
+											a.\"autoID\",
+											a.\"CusFullName\",
+											a.\"contractID\",
+											a.\"minPayment\",
+											a.\"firstDueDate\",
+											a.\"payDay\",
+											b.\"fullname\",
+											a.\"doerStamp\"
+										FROM
+											\"thcap_print_card_bill_payment\" a
+										LEFT JOIN
+											\"Vfuser\" b ON b.\"id_user\" = a.\"doerID\"
+										WHERE
+											a.\"appvStatus\" = '9'
+										ORDER BY
+											a.\"doerStamp\"
+									");
+				$i = 0;
+				while($res_wait = pg_fetch_array($qry_wait))
+				{
+					$i++;
+					$autoID = $res_wait["autoID"]; // ลำดับรายการ
+					$CusFullName = $res_wait["CusFullName"]; // ชื่อลูกค้า
+					$contractID = $res_wait["contractID"]; // เลขที่สัญญา
+					$minPayment = $res_wait["minPayment"]; // ยอดผ่อนขั้นต่ำ
+					$firstDueDate = $res_wait["firstDueDate"]; // วันที่ครบกำหนดชำระงวดแรก
+					$payDay = $res_wait["payDay"]; // จ่ายทุกวันที่
+					$fullname = $res_wait["fullname"]; // รหัสพนักงานที่ทำรายการ
+					$doerStamp = $res_wait["doerStamp"]; // วันเวลาที่ทำรายการ
+					
+					if($i%2==0){
+						echo "<tr class=\"odd\" align=center>";
+					}else{
+						echo "<tr class=\"even\" align=center>";
+					}
+					
+					echo "<td align=\"left\">$CusFullName</td>";
+					echo "<td align=\"right\">".number_format($minPayment,2)."</td>";
+					echo "<td align=\"center\">$firstDueDate</td>";
+					echo "<td align=\"center\">$payDay</td>";
+					echo "<td align=\"left\">$fullname</td>";
+					echo "<td align=\"center\">$doerStamp</td>";
+					echo "<td align=\"center\"><img src=\"../thcap/images/detail.gif\" height=\"19\" width=\"19\" style=\"cursor:pointer;\" onClick=\"javascript:popU('popup_view_detail.php?id=$autoID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=800,height=650')\"></td>";
+					
+					echo "</tr>";
+				}
+				
+				if($i == 0)
+				{
+					echo "<tr><td colspan=\"7\" align=\"center\">--ไม่พบข้อมูล--</td></tr>";
+				}
+				?>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td>
+		<br/><br/>
+		<?php include("frm_history_limit.php"); ?>
+		</td>
+	</tr>
+</table>
+
 </center>
 </body>
 </html>

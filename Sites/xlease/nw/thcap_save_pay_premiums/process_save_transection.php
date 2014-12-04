@@ -11,6 +11,7 @@ $policyNo = pg_escape_string($_POST["policyNo"]); // เลขที่กรม
 $payAmt = pg_escape_string($_POST["payAmt"]); // จำนวนเงินที่ชำระ
 $user_id = $_SESSION["av_iduser"]; // รหัสพนักงาน
 $add_date = nowDateTime(); //ดึงข้อมูลวันเวลาจาก server
+$payDate = pg_escape_string($_POST["datepicker"]); //  วันที่ชำระเงินนายหน้า
 ?>
 
 <script type="text/javascript">
@@ -44,8 +45,8 @@ if($row_chk > 0)
 }
 else
 {
-	$sql_add = "insert into public.\"thcap_pay_insurer\"(\"debtID\", \"insurer_id\", \"policyNo\", \"payAmt\", \"doerID\", \"doerStamp\")
-				values('$debtID', '$insurer_id', '$policyNo', '$payAmt', '$user_id', '$add_date') ";
+	$sql_add = "insert into public.\"thcap_pay_insurer\"(\"debtID\", \"insurer_id\", \"policyNo\", \"payAmt\", \"doerID\", \"doerStamp\" , \"payDate\" )
+				values('$debtID', '$insurer_id', '$policyNo', '$payAmt', '$user_id', '$add_date' , '$payDate' ) ";
 	if($result_add = pg_query($sql_add))
 	{}
 	else

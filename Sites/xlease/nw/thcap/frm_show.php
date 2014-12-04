@@ -172,7 +172,15 @@ function contact_note(revtran){
 }
 </style>
 
-<div align="left"><font color="#777777">* หมายเหตุ กรณีที่มีข้อความว่า "คุณไม่มีสิทธิ์อนุมัติ" หมายถึง คุณไม่มีสิทธื์ ตรวจสอบเพื่ออนุมัติรายการที่ตนเองเป็นผู้เพิ่มหรือแก้ไขรายการ ในธนาคารของวันนั้นๆได้</font></div>
+<?php
+if($action_menu != "see") // ถ้าไม่ได้มาจากเมนู "(THCAP) ดูรายการเงินโอน(การเงิน)"
+{
+?>
+	<div align="left"><font color="#777777">* หมายเหตุ กรณีที่มีข้อความว่า "คุณไม่มีสิทธิ์อนุมัติ" หมายถึง คุณไม่มีสิทธื์ ตรวจสอบเพื่ออนุมัติรายการที่ตนเองเป็นผู้เพิ่มหรือแก้ไขรายการ ในธนาคารของวันนั้นๆได้</font></div>
+<?php
+}
+?>
+
 <table width="100%" border="0" cellSpacing="1" cellPadding="3" bgcolor="#F0F0F0">
 <tr style="font-weight:bold;" valign="top" bgcolor="#79BCFF" align="center">
     <td>วันที่โอน</td>
@@ -238,13 +246,27 @@ if($app==1){ //กรณีบัญชีอนุมัติ
 			}else{ //ถ้าไม่เท่ากันให้แสดงสรุปรวม
 				if($dateRevStamp_old!="")
 				{
-					if($canApprove == "canNot")
-					{ // ถ้าไม่มีสิทธิ์ตรวจสอบอนุมัติรายการ
-						echo "<tr><td colspan=\"8\" align=\"right\"><b>รวม </b></td><td align=\"right\"><b>$sumbank</b></td><td align=center><font color=\"#888888\">คุณไม่มีสิทธิ์อนุมัติ</font></td></tr>";
-					}
-					else
+					if($action_menu == "see") // ถ้ามาจากเมนู "(THCAP) ดูรายการเงินโอน(การเงิน)"
 					{
-						echo "<tr><td colspan=\"8\" align=\"right\"><b>รวม </b></td><td align=\"right\"><b>$sumbank</b></td><td align=center><span onclick=\"javascript:popU('frm_checkbill.php?BID=$BID&app=$app&dateRevStamp=$dateRevStamp_old','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=600')\" style=\"cursor: pointer;\" title=\"ยังไม่ตรวจ\"><font color=\"red\"><u>ตรวจสอบ</u></font></span></td></tr>";
+						if($canApprove == "canNot")
+						{ // ถ้าไม่มีสิทธิ์ตรวจสอบอนุมัติรายการ
+							echo "<tr><td colspan=\"8\" align=\"right\"><b>รวม </b></td><td align=\"right\"><b>$sumbank</b></td><td align=center></td></tr>";
+						}
+						else
+						{
+							echo "<tr><td colspan=\"8\" align=\"right\"><b>รวม </b></td><td align=\"right\"><b>$sumbank</b></td><td align=center></td></tr>";
+						}
+					}
+					else // ถ้าไม่ได้มาจากเมนู "(THCAP) ดูรายการเงินโอน(การเงิน)"
+					{
+						if($canApprove == "canNot")
+						{ // ถ้าไม่มีสิทธิ์ตรวจสอบอนุมัติรายการ
+							echo "<tr><td colspan=\"8\" align=\"right\"><b>รวม </b></td><td align=\"right\"><b>$sumbank</b></td><td align=center><font color=\"#888888\">คุณไม่มีสิทธิ์อนุมัติ</font></td></tr>";
+						}
+						else
+						{
+							echo "<tr><td colspan=\"8\" align=\"right\"><b>รวม </b></td><td align=\"right\"><b>$sumbank</b></td><td align=center><span onclick=\"javascript:popU('frm_checkbill.php?BID=$BID&app=$app&dateRevStamp=$dateRevStamp_old','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=600')\" style=\"cursor: pointer;\" title=\"ยังไม่ตรวจ\"><font color=\"red\"><u>ตรวจสอบ</u></font></span></td></tr>";
+						}
 					}
 					
 					unset($sumbankRevAmt);
@@ -286,13 +308,28 @@ if($app==1){ //กรณีบัญชีอนุมัติ
 			echo "<tr><td height=50 align=center colspan=11><b>---ไม่พบข้อมูล---</b></td></tr>";
 		}else{
 			//แสดงผลรวม record สุดท้ายของแต่ละธนาคาร
-			if($canApprove == "canNot")
-			{ // ถ้าไม่มีสิทธิ์ตรวจสอบอนุมัติรายการ
-				echo "<tr><td colspan=\"8\" align=\"right\"><b>รวม </b></td><td align=\"right\"><b>$sumbank</b></td><td align=center><font color=\"#888888\">คุณไม่มีสิทธิ์อนุมัติ</font></td></tr>";
-			}
-			else
+			
+			if($action_menu == "see") // ถ้ามาจากเมนู "(THCAP) ดูรายการเงินโอน(การเงิน)"
 			{
-				echo "<tr><td colspan=\"8\" align=\"right\"><b>รวม </b></td><td align=\"right\"><b>$sumbank</b></td><td align=center><span onclick=\"javascript:popU('frm_checkbill.php?BID=$BID&app=$app&dateRevStamp=$dateRevStamp','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=600')\" style=\"cursor: pointer;\" title=\"ยังไม่ตรวจ\"><font color=\"red\"><u>ตรวจสอบ</u></font></span></td></tr>";
+				if($canApprove == "canNot")
+				{ // ถ้าไม่มีสิทธิ์ตรวจสอบอนุมัติรายการ
+					echo "<tr><td colspan=\"8\" align=\"right\"><b>รวม </b></td><td align=\"right\"><b>$sumbank</b></td><td align=center></td></tr>";
+				}
+				else
+				{
+					echo "<tr><td colspan=\"8\" align=\"right\"><b>รวม </b></td><td align=\"right\"><b>$sumbank</b></td><td align=center></td></tr>";
+				}
+			}
+			else // ถ้าไม่ได้มาจากเมนู "(THCAP) ดูรายการเงินโอน(การเงิน)"
+			{
+				if($canApprove == "canNot")
+				{ // ถ้าไม่มีสิทธิ์ตรวจสอบอนุมัติรายการ
+					echo "<tr><td colspan=\"8\" align=\"right\"><b>รวม </b></td><td align=\"right\"><b>$sumbank</b></td><td align=center><font color=\"#888888\">คุณไม่มีสิทธิ์อนุมัติ</font></td></tr>";
+				}
+				else
+				{
+					echo "<tr><td colspan=\"8\" align=\"right\"><b>รวม </b></td><td align=\"right\"><b>$sumbank</b></td><td align=center><span onclick=\"javascript:popU('frm_checkbill.php?BID=$BID&app=$app&dateRevStamp=$dateRevStamp','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=600')\" style=\"cursor: pointer;\" title=\"ยังไม่ตรวจ\"><font color=\"red\"><u>ตรวจสอบ</u></font></span></td></tr>";
+				}
 			}
 			
 			unset($sumbankRevAmt);
@@ -337,24 +374,41 @@ if($app==1){ //กรณีบัญชีอนุมัติ
 		</div>
 	</form>
 	<?php
-	if($emplevel<=1){
+	if($emplevel<=1)
+	{
+		if($action_menu != "see") // ถ้าไม่ได้มาจากเมนู "(THCAP) ดูรายการเงินโอน(การเงิน)"
+		{
 	?>
-	<div style="text-align:left;padding-top:10px;"><font color="red"><img src="images/clean.png" width="23" height="23"> หมายถึง ทำรายการล้างข้อมูล กลับไปสถานะตรวจสอบรายการ</font></div>
-	<div style="text-align:left;padding-top:10px;"><font color="red"><img src="images/del.png" width="23" height="23"> หมายถึง  ลบรายการเงินโอน</font></div>	
-	<div style="text-align:left;padding-top:10px;"><font color="red"><img src="images/mix.png" width="24" height="23"> หมายถึง  map เช็คกับใบเสร็จที่ออกไปแล้ว</font></div>
-	<div style="text-align:left;padding-top:10px;"><font color="red"><img src="images/refresh.png" width="23" height="23"> หมายถึง  ยกเลิกรายการเช็คนี้ กลับไปเมนู "ยืนยันนำเช็คเข้าธนาคาร" อีกครั้ง</font></div>
-	<div style="text-align:left;padding-top:10px;"><font color="red"><img src="images/return.gif" width="20" height="20"> หมายถึง  ทำรายการเช็คคืน</font></div>
-	<div style="text-align:left;padding-top:10px;"><font color="red"><img src="images/note_icon.png" width="20" height="20"> หมายถึง  บันทึกข้อความ หมายเหตุ การตรวจสอบการโอนเงิน</font></div>
-	<div style="text-align:left;padding-top:10px;"><font color="red"><img src="images/anonymous_icon.jpg" width="23" height="23"> หมายถึง  ทำรายการว่ารายการนี้ไม่ทราบว่าเป็นเงินของใคร หรือ อาจไม่ใช่เงินของลูกค้า หรือเงินที่ธนาคารโอนมาผิด เมื่อครบกำหนดต้องปิดบัญชีแล้ว โดยการทำรายการดังกล่าวจะมีผลให้เกิด Receive Voucher ณ วันที่รับเงิน โดยเข้าบัญชี เจ้าหนี้ - (211002) เงินพักไม่สามารถระบุชื่อผู้ชำระ หรือเพื่อรอทำคืนกรณีที่ไม่ใช่เงินลูกค้า หรือธนาคารโอนผิด</font></div>
+			<div style="text-align:left;padding-top:10px;"><font color="red"><img src="images/clean.png" width="23" height="23"> หมายถึง ทำรายการล้างข้อมูล กลับไปสถานะตรวจสอบรายการ</font></div>
+			<div style="text-align:left;padding-top:10px;"><font color="red"><img src="images/del.png" width="23" height="23"> หมายถึง  ลบรายการเงินโอน</font></div>	
+			<div style="text-align:left;padding-top:10px;"><font color="red"><img src="images/mix.png" width="24" height="23"> หมายถึง  map เช็คกับใบเสร็จที่ออกไปแล้ว</font></div>
+			<div style="text-align:left;padding-top:10px;"><font color="red"><img src="images/refresh.png" width="23" height="23"> หมายถึง  ยกเลิกรายการเช็คนี้ กลับไปเมนู "ยืนยันนำเช็คเข้าธนาคาร" อีกครั้ง</font></div>
+			<div style="text-align:left;padding-top:10px;"><font color="red"><img src="images/return.gif" width="20" height="20"> หมายถึง  ทำรายการเช็คคืน</font></div>
 	<?php
+		}
 	}
 	?>
+	<div style="text-align:left;padding-top:10px;"><font color="red"><img src="images/note_icon.png" width="20" height="20"> หมายถึง  บันทึกข้อความ หมายเหตุ การตรวจสอบการโอนเงิน</font></div>
+	<div style="text-align:left;padding-top:10px;"><font color="red"><img src="images/anonymous_icon.jpg" width="23" height="23"> หมายถึง  ทำรายการว่ารายการนี้ไม่ทราบว่าเป็นเงินของใคร หรือ อาจไม่ใช่เงินของลูกค้า หรือเงินที่ธนาคารโอนมาผิด เมื่อครบกำหนดต้องปิดบัญชีแล้ว โดยการทำรายการดังกล่าวจะมีผลให้เกิด Receive Voucher ณ วันที่รับเงิน โดยเข้าบัญชี เจ้าหนี้ - (211002) เงินพักไม่สามารถระบุชื่อผู้ชำระ หรือเพื่อรอทำคืนกรณีที่ไม่ใช่เงินลูกค้า หรือธนาคารโอนผิด</font></div>
+	
 	<div style="text-align:left;padding-top:10px;"><font color="red">* รายการที่น่าจะเป็น Chqeue เป็นเพียงการเปรียบเทียบให้อัตโนมัติ ซึ่งอาจถูกหรือไม่ถูกต้อง</font></div>
-	<div style="text-align:left;padding-top:10px;"><font color="red">* หากท่านไม่สามารถทำรายการใดได้ ให้แจ้งผู้ใช้งานท่านอื่นทำรายการแทน เนื่องจากระบบกำหนดไว้ว่า ผู้สร้างรายการจะไม่สามารถตรวจสอบรายการตนเองได้ <br>และหากยังไม่สามารถทำรายการได้อีก ให้ติดต่อฝ่าย IT</font></div>
-	<br>
-		<span onclick="javascript:popU('frm_checkbill.php?revTranID=bid_1&app=2&tranActionID=-1','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=600')" style="cursor: pointer;" title="รับเงินสด RV"><font color="blue"><u>รับเงินสด RV</u></font></span>
-	</br>
 	<?php
+	if($action_menu != "see") // ถ้าไม่ได้มาจากเมนู "(THCAP) ดูรายการเงินโอน(การเงิน)"
+	{
+	?>
+		<div style="text-align:left;padding-top:10px;"><font color="red">* หากท่านไม่สามารถทำรายการใดได้ ให้แจ้งผู้ใช้งานท่านอื่นทำรายการแทน เนื่องจากระบบกำหนดไว้ว่า ผู้สร้างรายการจะไม่สามารถตรวจสอบรายการตนเองได้ <br>และหากยังไม่สามารถทำรายการได้อีก ให้ติดต่อฝ่าย IT</font></div>
+	<?php
+	}
+	
+	if($action_menu != "see") // ถ้าไม่ได้มาจากเมนู "(THCAP) ดูรายการเงินโอน(การเงิน)"
+	{
+	?>
+		<br>
+			<span onclick="javascript:popU('frm_checkbill.php?revTranID=bid_1&app=2&tranActionID=-1','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=600')" style="cursor: pointer;" title="รับเงินสด RV"><font color="blue"><u>รับเงินสด RV</u></font></span>
+		</br>
+	<?php
+	}
+	
 	if($acctype=="" and $app==2){
 		echo "<tr><td colspan=12 align=center height=50><h2>กรุณาเลือกเลขที่บัญชีที่ต้องการทำรายการ</h2></td></tr>";
 	}
@@ -420,7 +474,7 @@ if($app==1){ //กรณีบัญชีอนุมัติ
 						$qry_isAnonymous = pg_query("select \"isAnonymous\" from finance.thcap_receive_transfer where \"revTranID\" = '$revTranID' ");
 						$isAnonymous = pg_result($qry_isAnonymous,0);
 
-						if($resvc['bankRevRef1']!="" and $resvc['bankRevRef2'] !=""){
+						if($resvc[invoiceID] != ""){
 							$txtinvoice="<br><span onclick=\"javascript:popU('Channel_detail_i.php?debtInvID=$resvc[invoiceID]','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=800,height=550')\" style=\"cursor:pointer;color:#228B22;\">(ใบแจ้งหนี้ <u>$resvc[invoiceID]</u>)</span>";
 						}else{
 							$txtinvoice="";
@@ -467,9 +521,19 @@ if($app==1){ //กรณีบัญชีอนุมัติ
 										<input type=\"hidden\" name=\"revTranID\" value=\"$revTranID\">
 										<input type=\"hidden\" name=\"statusLock\" value=\"1\">
 										<input type=\"hidden\" name=\"statusPay\" value=\"revTranID\">
-										<input type=\"hidden\" name=\"ConID\" value=\"$contractID\">
-										<input type=\"submit\" value=\"เลือกใช้รายการนี้\"> $txtamt";
+										<input type=\"hidden\" name=\"ConID\" value=\"$contractID\">";
+										
+										if($action_menu == "see") // ถ้ามาจากเมนู "(THCAP) ดูรายการเงินโอน(การเงิน)"
+										{
+											echo "$txtamt";
+										}
+										else // ถ้าไม่ได้มาจากเมนู "(THCAP) ดูรายการเงินโอน(การเงิน)"
+										{
+											echo "<input type=\"submit\" value=\"เลือกใช้รายการนี้\"> $txtamt";
+										}
+										
 										echo "</td>";
+										
 										echo "<td>";
 										
 										// ตรวจสอบว่า มีการบันทึกรายละเอียดเงินโอนไปแล้วหรือยัง
@@ -485,7 +549,7 @@ if($app==1){ //กรณีบัญชีอนุมัติ
 										}
 										
 										//ตรวจสอบ emplevel ข้อพนักงาน
-										if($emplevel<=1){
+										if($emplevel <= 1 && $action_menu != "see"){
 											//ตรวจสอบก่อนว่าเงินใช้ไปแล้วหรือยัง ถ้าใช้แล้วจะไม่สามารถล้างรายการได้
 											if($bankRevAmt==$balanceAmt){
 												echo "<img src=\"images/clean.png\" width=\"23\" height=\"23\" title=\"ทำรายการล้างข้อมูล กลับไปสถานะตรวจสอบรายการ\" onclick=\"clearapp('$revTranID')\" style=\"cursor:pointer;\">";
@@ -494,13 +558,51 @@ if($app==1){ //กรณีบัญชีอนุมัติ
 										
 										echo "</td>";
 									}else{
-										echo "<td>ไม่สามารถทำรายการได้</td>";
+										if($action_menu == "see") // ถ้ามาจากเมนู "(THCAP) ดูรายการเงินโอน(การเงิน)"
+										{
+											echo "<td></td>";
+										}
+										else // ถ้าไม่ได้มาจากเมนู "(THCAP) ดูรายการเงินโอน(การเงิน)"
+										{
+											echo "<td>ไม่สามารถทำรายการได้</td>";
+										}
+										
+										echo "<td>";
+										
+										// ตรวจสอบว่า มีการบันทึกรายละเอียดเงินโอนไปแล้วหรือยัง
+										$qry_noteDetail = pg_query("select \"auto_id\" from finance.thcap_note_transfer where \"revTranID\" = '$revTranID' ");
+										$row_noteDetail = pg_num_rows($qry_noteDetail);
+										if($row_noteDetail > 0)
+										{ // ถ้าเคยบันทึกแล้ว ให้ใช้รูป icon สมดโน๊ตสีเขียว
+											echo "<img src=\"images/note_icon_done.png\" width=\"20\" height=\"20\" title=\"บันทึกข้อความ\" onclick=\"contact_note('$revTranID')\" style=\"cursor:pointer;\">";
+										}
+										else
+										{ // ถ้ายังไม่เคยบันทึก ให้ใช้รูป icon สมดโน๊ตสีแดง
+											echo "<img src=\"images/note_icon.png\" width=\"20\" height=\"20\" title=\"บันทึกข้อความ\" onclick=\"contact_note('$revTranID')\" style=\"cursor:pointer;\">";
+										}
+										
+										//ตรวจสอบ emplevel ข้อพนักงาน
+										if($emplevel <= 1 && $action_menu != "see"){
+											//ตรวจสอบก่อนว่าเงินใช้ไปแล้วหรือยัง ถ้าใช้แล้วจะไม่สามารถล้างรายการได้
+											if($bankRevAmt==$balanceAmt){
+												echo "<img src=\"images/clean.png\" width=\"23\" height=\"23\" title=\"ทำรายการล้างข้อมูล กลับไปสถานะตรวจสอบรายการ\" onclick=\"clearapp('$revTranID')\" style=\"cursor:pointer;\">";
+											}
+										}
+										
+										echo "</td>";
 									}
 										
 								}else{
 									//กำหนดให้อนุมัติได้เฉพาะคนที่ไม่ได้ทำรายการและคนละคนกับคนอนุมัติคนแรก หรืออนุมัติมัติได้เฉพาะผู้ที่มีึสิทธิ์เท่านั้น (กรณีฝ่ายบัญชีอนุมัติ appvXID จะเป็นค่า null)
 									if(($doerID!=$user_id and $appvXID!=$user_id) || $emplevel<=1){
-										echo "<td><span onclick=\"javascript:popU('frm_checkbill.php?revTranID=$revTranID&app=$app&tranActionID=$tranActionID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=600')\" style=\"cursor: pointer;\" title=\"ยังไม่ตรวจ\"><font color=\"red\"><u>ตรวจสอบ</u></font></span>";										
+										if($action_menu == "see") // ถ้ามาจากเมนู "(THCAP) ดูรายการเงินโอน(การเงิน)"
+										{
+											echo "<td>";
+										}
+										else // ถ้าไม่ได้มาจากเมนู "(THCAP) ดูรายการเงินโอน(การเงิน)"
+										{
+											echo "<td><span onclick=\"javascript:popU('frm_checkbill.php?revTranID=$revTranID&app=$app&tranActionID=$tranActionID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=600')\" style=\"cursor: pointer;\" title=\"ยังไม่ตรวจ\"><font color=\"red\"><u>ตรวจสอบ</u></font></span>";
+										}
 										
 										$qrychq=pg_query("SELECT \"revChqID\", \"bankChqNo\"
 										FROM finance.\"V_thcap_receive_cheque_chqManage\" WHERE \"bankRevResult\" in(1,2) AND \"revChqStatus\"=6 AND \"BID\"='$BID'
@@ -569,8 +671,8 @@ if($app==1){ //กรณีบัญชีอนุมัติ
 										}
 										echo "</td>";
 										echo "<td width=\"60\">";
-										//กรณีที่ยังไ่ม่ได้ตรวจสอบและพนักงานมี emplevel<=1
-										if($revTranStatus=="9" and $emplevel<=1)
+										//กรณีที่ยังไม่ได้ตรวจสอบและพนักงานมี emplevel<=1
+										if($revTranStatus=="9" && $emplevel<=1 && $action_menu != "see")
 										{
 											if($isAnonymous == 0){echo "&nbsp;<img src=\"images/anonymous_icon.jpg\" width=\"23\" height=\"23\" title=\"ไม่ทราบว่าเงินของใคร\" onclick=\"anonymous('$revTranID')\" style=\"cursor:pointer;\">";}
 											echo "&nbsp;<img src=\"images/del.png\" width=\"23\" height=\"23\" title=\"ลบข้อมูล\" onclick=\"delapp('$revTranID')\" style=\"cursor:pointer;\">";
@@ -592,7 +694,30 @@ if($app==1){ //กรณีบัญชีอนุมัติ
 										echo "</td>";
 										
 									}else{
-										echo "<td colspan=\"2\">ไม่สามารถทำรายการได้</td>";
+										if($action_menu == "see") // ถ้าไม่ได้มาจากเมนู "(THCAP) ดูรายการเงินโอน(การเงิน)"
+										{
+											echo "<td></td>";
+										}
+										else
+										{
+											echo "<td>ไม่สามารถทำรายการได้</td>";
+										}
+										
+										echo "<td>";
+										
+										// ตรวจสอบว่า มีการบันทึกรายละเอียดเงินโอนไปแล้วหรือยัง
+										$qry_noteDetail = pg_query("select \"auto_id\" from finance.thcap_note_transfer where \"revTranID\" = '$revTranID' ");
+										$row_noteDetail = pg_num_rows($qry_noteDetail);
+										if($row_noteDetail > 0)
+										{ // ถ้าเคยบันทึกแล้ว ให้ใช้รูป icon สมดโน๊ตสีเขียว
+											echo "<img src=\"images/note_icon_done.png\" width=\"20\" height=\"20\" title=\"บันทึกข้อความ\" onclick=\"contact_note('$revTranID')\" style=\"cursor:pointer;\">";
+										}
+										else
+										{ // ถ้ายังไม่เคยบันทึก ให้ใช้รูป icon สมดโน๊ตสีแดง
+											echo "<img src=\"images/note_icon.png\" width=\"20\" height=\"20\" title=\"บันทึกข้อความ\" onclick=\"contact_note('$revTranID')\" style=\"cursor:pointer;\">";
+										}
+										
+										echo "</td>";
 									}
 								}
 								?>
@@ -628,7 +753,7 @@ if($app==1){ //กรณีบัญชีอนุมัติ
 							<th>วันที่นำเข้า</th>
 							<th>จำนวนเงิน</th>
 						";
-						if($emplevel<=1){
+						if($emplevel<=1 && $action_menu != "see"){ // ถ้า level <=1 และไม่ได้มาจากเมนู "(THCAP) ดูรายการเงินโอน(การเงิน)"
 							echo "<th>map เช็คกับใบเสร็จ</th>";
 							echo "<th>รายการพิเศษ</th>";
 						}
@@ -650,7 +775,7 @@ if($app==1){ //กรณีบัญชีอนุมัติ
 								<td align=right><a onclick=\"javascript:popU('popup-trans-like-contract.php?money=".$reschq2[bankChqAmt]."','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=750,height=650')\" style=\"cursor:pointer;\"  title=\"คลิกเพื่อดูรายละเอียด\"><u>".number_format($reschq2[bankChqAmt],2)."</u></font></td>
 								
 								";
-								if($emplevel<=1){
+								if($emplevel <= 1 && $action_menu != "see"){
 									echo "<td align=center><img src=\"images/mix.png\" width=25 height=24 onclick=\"javascript:popU('popup-mapchq.php?revChqID=$reschq2[revChqID]&bankChqNo=$reschq2[bankChqNo]&contractID=$reschq2[revChqToCCID]','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=750,height=650')\" style=\"cursor:pointer;\"  title=\"map เช็คกับใบเสร็จที่ออกไปแล้ว\"></td>";
 									echo "<td align=center><img src=\"images/refresh.png\" width=24 height=24 onclick=\"returnchq('$reschq2[revChqID]')\" style=\"cursor:pointer;\"  title=\"ย้อนกลับไป ยืนยันนำเช็คเข้าธนาคาร\"></td>";
 								}

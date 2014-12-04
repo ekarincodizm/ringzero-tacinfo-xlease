@@ -1401,6 +1401,7 @@ else
 								<option value="ห้างหุ้นส่วนจำกัด" <?php if($corpType == "ห้างหุ้นส่วนจำกัด"){echo "selected=\"selected\" ";} ?>>ห้างหุ้นส่วนจำกัด</option>
 								<option value="ห้างหุ้นส่วนสามัญ" <?php if($corpType == "ห้างหุ้นส่วนสามัญ"){echo "selected=\"selected\" ";} ?>>ห้างหุ้นส่วนสามัญ</option>
 								<option value="มูลนิธิ" <?php if($corpType == "มูลนิธิ"){echo "selected=\"selected\" ";} ?>>มูลนิธิ</option>
+								<option value="สถาบัน" <?php if($corpType == "สถาบัน"){echo "selected=\"selected\" ";} ?>>สถาบัน</option>
 								<option value="สหกรณ์" <?php if($corpType == "สหกรณ์"){echo "selected=\"selected\" ";} ?>>สหกรณ์</option>
 								<option value="สมาคม" <?php if($corpType == "สมาคม"){echo "selected=\"selected\" ";} ?>>สมาคม</option>
 								<option value="วัด" <?php if($corpType == "วัด"){echo "selected=\"selected\" ";} ?>>วัด</option>

@@ -510,6 +510,7 @@ function popU(U,N,T){
 									elseif($debtStatustxt == "ACTIVE / (ยังไม่ได้จ่าย หรือจ่ายไม่ครบ)")
 									{
 										echo "<tr class=changecolor3 align=\"center\">";
+										$btn_transaction = "<img src=\"../thcap/images/onebit_20.png\" height=\"25\" width=\"25\" style=\"cursor:pointer;\" onclick=\"javascript:popU('popup_transection.php?debtID=$debtIDMain','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=600,height=410')\">";
 									}
 									else
 									{
@@ -572,6 +573,7 @@ function popU(U,N,T){
 									<th>จำนวนหนี้ (บาท)</th>
 									<th>กรมธรรม์เลขที่</th>
 									<th>บริษัทประกันภัย</th>
+									<th>วันที่ชำระเงิน</th>
 									<th>จำนวนเงิน<br/>ที่ชำระนายหน้า</th>
 									<th>ปรับปรุงส่วนเกิน<br/>เข้ารายได้อื่นๆ</th>
 									<th>ผู้บันทึก</th>
@@ -589,7 +591,8 @@ function popU(U,N,T){
 														a.\"insurer_id\",
 														a.\"payAmt\",
 														a.\"doerID\",
-														a.\"doerStamp\"
+														a.\"doerStamp\",
+														a.\"payDate\"
 													FROM
 														\"thcap_pay_insurer\" a,
 														\"thcap_temp_otherpay_debt\" b
@@ -610,6 +613,7 @@ function popU(U,N,T){
 									$payAmt = $resultPay["payAmt"];
 									$doerSaveID = $resultPay["doerID"];
 									$saveStamp = $resultPay["doerStamp"];
+									$payDate = $resultPay["payDate"];
 									
 									// หาชื่อบริษัทประกันภัย
 									$qry_insurer_name = pg_query("select \"insurer_name\" from \"insurer\" where \"insurer_id\" = '$insurer_id' ");
@@ -636,6 +640,7 @@ function popU(U,N,T){
 											<td align=\"right\">".number_format($typePayAmt,2)."</td>
 											<td align=\"center\">$policyNo</td>
 											<td align=\"left\">$insurer_name</td>
+											<td align=\"center\">$payDate</td>
 											<td align=\"right\">".number_format($payAmt,2)."</td>
 											<td align=\"right\">".number_format($typePayAmt - $payAmt,2)."</td>
 											<td align=\"left\">$doerSaveName</td>
@@ -644,13 +649,24 @@ function popU(U,N,T){
 									";
 									$sum_amt += $typePayAmt;
 									$sum_pay += $payAmt;
+									
+									$sum_before_pay += $typePayAmt;
+									$surplus += ($typePayAmt - $payAmt); // ผลรวม ปรับปรุงส่วนเกิน เข้ารายได้อื่นๆ
 								}
 								
 								if($row_pay == 0)
 								{
-									echo "<tr bgcolor=\"#E9F8FE\"><td colspan=9 align=center><b>--ไม่พบรายการบันทึก--</b></td></tr>";
+									echo "<tr bgcolor=\"#E9F8FE\"><td colspan=10 align=center><b>--ไม่พบรายการบันทึก--</b></td></tr>";
 								}
 								?>
+								<tr class="sum">
+									<td colspan="2" align="right">รวม</td>
+									<td align="right"><?php echo number_format($sum_before_pay,2); ?></td>
+									<td colspan="3"></td>
+									<td align="right"><?php echo number_format($sum_pay,2); ?></td>
+									<td align="right"><?php echo number_format($surplus,2); ?></td>
+									<td colspan="2"></td>
+								</tr>
 							</table>
 							
 							<br/><br/><br/>
@@ -666,6 +682,7 @@ function popU(U,N,T){
 									<th>เบี้ยประกันภัย</th>
 									<th>ชำระแล้ว</th>
 									<th>คงค้าง</th>
+									<th>ปรับปรุงส่วนเกิน<br/>เข้ารายได้อื่นๆ</th>
 								</tr>
 								<?php
 								$i=0;
@@ -688,15 +705,19 @@ function popU(U,N,T){
 									// หาจำนวนเงิน
 									$qry_insurer_amt = pg_query("
 																	SELECT
-																		sum(\"payAmt\")
+																		sum(\"payAmt\"),
+																		(select sum(\"typePayAmt\") from \"thcap_temp_otherpay_debt\" where \"debtID\" IN(select \"debtID\" from \"thcap_pay_insurer\" where \"debtID\" IN(select \"debtID\" from \"thcap_temp_otherpay_debt\" where $conditiondate_for_history) and \"insurer_id\" = '$insurer_id')) - sum(\"payAmt\")
 																	FROM
 																		\"thcap_pay_insurer\"
 																	WHERE
 																		\"debtID\" IN(select \"debtID\" from \"thcap_temp_otherpay_debt\" where $conditiondate_for_history) AND
 																		\"insurer_id\" = '$insurer_id'
 																");
-									$insurer_amt = pg_fetch_result($qry_insurer_amt,0);
-									$sum_insurer_amt += $insurer_amt;
+									$insurer_amt = pg_fetch_result($qry_insurer_amt,0); // ชำระแล้ว แต่ละบริษัท
+									$surplus_amt = pg_fetch_result($qry_insurer_amt,1); // ปรับปรุงส่วนเกิน เข้ารายได้อื่นๆ แต่ละบริษัท
+									
+									$sum_insurer_amt += $insurer_amt; // ผลรวม ชำระแล้ว แต่ละบริษัท
+									$sum_surplus_amt += $surplus_amt; // ผลรวม ปรับปรุงส่วนเกิน เข้ารายได้อื่นๆ แต่ละบริษัท
 									
 									// code เดิม สีสลับบรรทัดเลขคู่และคี่
 									$i+=1;
@@ -714,6 +735,7 @@ function popU(U,N,T){
 											<td align=\"center\"></td>
 											<td align=\"right\">".number_format($insurer_amt,2)."</td>
 											<td align=\"center\"></td>
+											<td align=\"right\">".number_format($surplus_amt,2)."</td>
 										</tr>
 									";
 								}
@@ -724,6 +746,7 @@ function popU(U,N,T){
 										<td align=\"right\">".number_format($sum_amt,2)."</td>
 										<td align=\"right\">".number_format($sum_insurer_amt,2)."</td>
 										<td align=\"right\">".number_format($sum_amt - $sum_insurer_amt,2)."</td>
+										<td align=\"right\">".number_format($sum_surplus_amt,2)."</td>
 									</tr>
 								";
 								?>

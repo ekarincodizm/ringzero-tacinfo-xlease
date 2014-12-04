@@ -47,6 +47,25 @@ $id = pg_escape_string($_REQUEST[id]);
 $ta_join_pm_id = pg_escape_string($_POST[ta_join_pm_id]);
 $name = getCusJoin(pg_escape_string($_POST[cus_id]),$f_type,$id); //หาชื่อลูกค้า
 	if(pg_escape_string($_POST[form_name]) == "add"){
+	
+		// ตรวจสอบก่อนว่า มีการทำรายการไปก่อนหน้านี้แล้วหรือยัง
+		$query4 = "
+					SELECT
+						\"carid\"
+					FROM
+						\"VJoinMain\"
+					WHERE
+						\"carid\" = '".pg_escape_string($_POST[car_id])."' AND
+						\"car_license_seq\" = '0' AND
+						\"deleted\" = '0'
+				";
+		$sql_query4 = pg_query($query4);
+		$numrows2 = pg_num_rows($sql_query4);
+				
+		if($numrows2>0){
+			die('มีการทำรายการไปก่อนหน้านี้แล้ว!!<br/>');
+			
+		}
 
 			$ta_join_pm_id = generate_id("TAJM-", "ta_join_main" ,"ta_join_pm_id",date("ymd"),4);
 		//$cpro_name = explode('#',$_POST[cpro_name]);
@@ -72,13 +91,13 @@ $name = getCusJoin(pg_escape_string($_POST[cus_id]),$f_type,$id); //หาชื
 										) 
 							VALUES(
 							           '$ta_join_pm_id',
-									   '$_POST[car_id]',
-									   '$_POST[cus_id]',
-									   '$_POST[car_license]',
-									   '$_POST[idno]',
-									   '$_POST[join_addr]',
+									   '".pg_escape_string($_POST[car_id])."',
+									   '".pg_escape_string($_POST[cus_id])."',
+									   '".pg_escape_string($_POST[car_license])."',
+									   '".pg_escape_string($_POST[idno])."',
+									   '".pg_escape_string($_POST[join_addr])."',
 									   '$start_pay_date',
-									   '$_POST[note]',
+									   '".pg_escape_string($_POST[note])."',
 									   '$info_currentdatetimesql2',
 									   '".$_SESSION["av_iduser"]."',
 									   '1','$name[0]','$name[1]','$name[2]')";

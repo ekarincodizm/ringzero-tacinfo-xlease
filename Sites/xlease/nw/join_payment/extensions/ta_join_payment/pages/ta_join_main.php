@@ -130,38 +130,100 @@ $("#xx2").show();
 	 }
 	 $("#join_addr").val('--------------------');
  }
- function ck(){
+ 
+function ck()
+{
+	var action = '<?php echo pg_escape_string($_REQUEST[action]); ?>'; // รูปแบบการทำรายการ
+	
+	if(document.getElementById("cpro_name").value==''){alert("กรุณาระบุชื่อลูกค้า");return false;}
+	if(document.getElementById("idno").value==''){alert("กรุณาระบุเลขที่สัญญา");document.getElementById("idno").focus();return false;}	
+	if(document.getElementById("car_license").value==''){alert("กรุณาระบุทะเบียนรถยนต์");return false;}	
+	if(document.getElementById("join_addr").value==''){alert("กรุณาระบุที่อยู่");return false;}
+	if(document.getElementById("join_addr").value.length<20){alert("กรุณาระบุที่อยู่ให้ถูกต้อง");return false;}
+	if(document.getElementById("id_card").value==''){alert("กรุณาระบุเลขที่บัตร");return false;}
+	if(document.getElementById("start_pay_date").value==''){alert("กรุณาระบุเดือนที่เริ่มเก็บค่าเข้าร่วม");return false;}
+	if(document.getElementById("start_pay_date").value.length!=10){alert("กรุณาระบุเดือนที่เริ่มเก็บค่าเข้าร่วมให้ถูกต้อง");return false;}
+	if(document.getElementById("note").value==''){alert("กรุณาระบุหมายเหตุ");return false;}
+	
+	var showDetail = '';
+	showDetail = showDetail+'ชื่อลูกค้า : '+document.getElementById("cpro_name").value;
+	showDetail = showDetail+'\r\n'+'ทะเบียนรถยนต์ : '+document.getElementById("car_license").value;
+	showDetail = showDetail+'\r\n'+'เลขสัญญา : '+document.getElementById("idno").value;
+	showDetail = showDetail+'\r\n'+'ข้อมูลบัตร : '+document.getElementById("type_card").value;
+	showDetail = showDetail+'\r\n'+'เลขที่บัตร : '+document.getElementById("id_card").value;
+	showDetail = showDetail+'\r\n'+'ที่อยู่ : '+document.getElementById("join_addr").value;
+	showDetail = showDetail+'\r\n'+'รายละเอียดรถยนต์ : '+document.getElementById("car_brand").value;
+	showDetail = showDetail+'\r\n'+'เลขที่ตัวถัง : '+document.getElementById("id_body").value;
+	showDetail = showDetail+'\r\n'+'วันที่เริ่มชำระเงิน(เช่าซื้อรถ) : '+document.getElementById("start_contract_date").value;
+	showDetail = showDetail+'\r\n'+'จำนวนงวด : '+document.getElementById("car_month").value;
+	showDetail = showDetail+'\r\n'+'เดือนที่เริ่มเก็บค่าเข้าร่วม : '+document.getElementById("start_pay_date").value;
 
-if(document.getElementById("cpro_name").value==''){alert("กรุณาระบุชื่อลูกค้า");return false;}
-else if(document.getElementById("idno").value==''){alert("กรุณาระบุเลขที่สัญญา");document.getElementById("idno").focus();return false;}	
-else if(document.getElementById("car_license").value==''){alert("กรุณาระบุทะเบียนรถยนต์");return false;}	
-else if(document.getElementById("join_addr").value==''){alert("กรุณาระบุที่อยู่");return false;}
-else if(document.getElementById("join_addr").value.length<20){alert("กรุณาระบุที่อยู่ให้ถูกต้อง");return false;}
-else if(document.getElementById("id_card").value==''){alert("กรุณาระบุเลขที่บัตร");return false;}
-else if(document.getElementById("start_pay_date").value==''){alert("กรุณาระบุเดือนที่เริ่มเก็บค่าเข้าร่วม");return false;}
-else if(document.getElementById("start_pay_date").value.length!=10){alert("กรุณาระบุเดือนที่เริ่มเก็บค่าเข้าร่วมให้ถูกต้อง");return false;}
-else if(!document.getElementById("cancel0").checked && document.getElementById("note").value==''){alert("กรุณาระบุเหตุผลในการยกเลิก");return false;}
-else if(!document.getElementById("cancel0").checked && document.getElementById("cancel_datetime").value=='' ){alert("กรุณาระบุวันที่เปลี่ยนสถานะ");return false;}
-else if(document.getElementById("cb1").checked && document.getElementById("idno_new").value=='' ){alert("กรุณาระบุเลขที่สัญญาเช่าซื้อล่าสุดที่จะนำมาปิด"); document.getElementById("idno_new").focus(); return false;}
-
-
+	if(!confirm(showDetail)){return false;}
 }
- function ck2(){
 
-if(document.getElementById("cpro_name").value==''){alert("กรุณาระบุชื่อลูกค้า");return false;}
-else if(document.getElementById("idno").value==''){alert("กรุณาระบุเลขที่สัญญา");document.getElementById("idno").focus();return false;}	
-else if(document.getElementById("car_license").value==''){alert("กรุณาระบุทะเบียนรถยนต์");return false;}	
-else if(document.getElementById("id_card").value==''){alert("กรุณาระบุเลขที่บัตร");return false;}
-else if(document.getElementById("join_addr").value==''){alert("กรุณาระบุที่อยู่");return false;}
-else if(document.getElementById("join_addr").value.length<20){alert("กรุณาระบุที่อยู่ให้ถูกต้อง");return false;}
-else if(document.getElementById("start_pay_date").value==''){alert("กรุณาระบุเดือนที่เริ่มเก็บค่าเข้าร่วม");return false;}
-else if(document.getElementById("start_pay_date").value.length!=10){alert("กรุณาระบุเดือนที่เริ่มเก็บค่าเข้าร่วมให้ถูกต้อง");return false;}
-else if(!document.getElementById("cancel0").checked && document.getElementById("note").value=='' ){alert("กรุณาระบุเหตุผลในการยกเลิก");return false;}
-else if(!document.getElementById("cancel0").checked && document.getElementById("cancel_datetime").value=='' ){alert("กรุณาระบุวันที่เปลี่ยนสถานะ");return false;}
-else if(document.getElementById("cb1").checked && document.getElementById("idno_new").value=='' ){alert("กรุณาระบุเลขที่สัญญาเช่าซื้อล่าสุดที่จะนำมาปิด"); document.getElementById("idno_new").focus(); return false;}
-else if(document.getElementById("note").value==''){alert("กรุณาระบุเหตุผลในการแก้ไข");return false;}
+function ck2()
+{
+	if(document.getElementById("cpro_name").value==''){alert("กรุณาระบุชื่อลูกค้า");return false;}
+	if(document.getElementById("idno").value==''){alert("กรุณาระบุเลขที่สัญญา");document.getElementById("idno").focus();return false;}	
+	if(document.getElementById("car_license").value==''){alert("กรุณาระบุทะเบียนรถยนต์");return false;}	
+	if(document.getElementById("id_card").value==''){alert("กรุณาระบุเลขที่บัตร");return false;}
+	if(document.getElementById("join_addr").value==''){alert("กรุณาระบุที่อยู่");return false;}
+	if(document.getElementById("join_addr").value.length<20){alert("กรุณาระบุที่อยู่ให้ถูกต้อง");return false;}
+	if(document.getElementById("start_pay_date").value==''){alert("กรุณาระบุเดือนที่เริ่มเก็บค่าเข้าร่วม");return false;}
+	if(document.getElementById("start_pay_date").value.length!=10){alert("กรุณาระบุเดือนที่เริ่มเก็บค่าเข้าร่วมให้ถูกต้อง");return false;}
+	
+	if(!document.getElementById("cancel0").checked) // ถ้าไม่ได้เลือก ยังเป็นลูกค้า
+	{
+		if(!document.getElementById("cancel0").checked && document.getElementById("note").value=='' ){alert("กรุณาระบุเหตุผลในการยกเลิก");return false;}
+		if(!document.getElementById("cancel0").checked && document.getElementById("cancel_datetime").value=='' ){alert("กรุณาระบุวันที่เปลี่ยนสถานะ");return false;}
+		if(document.getElementById("cb1").checked && document.getElementById("idno_new").value=='' ){alert("กรุณาระบุเลขที่สัญญาเช่าซื้อล่าสุดที่จะนำมาปิด"); document.getElementById("idno_new").focus(); return false;}
+	}
+	
+	if(document.getElementById("note").value==''){alert("กรุณาระบุเหตุผลในการแก้ไข");return false;}
+	
+	var showDetail = '';
+	var showStatus = '';
+	
+	if(document.getElementById("cancel0").checked)
+	{
+		showStatus = 'ยังเป็นลูกค้า';
+	}
+	else if(document.getElementById("cancel1").checked)
+	{
+		showStatus = 'ถอดป้าย/เปลี่ยนสี';
+	}
+	else if(document.getElementById("cancel2").checked)
+	{
+		showStatus = 'รถยึด';
+	}
+	else if(document.getElementById("cancel3").checked)
+	{
+		showStatus = 'ขายคืน';
+	}
+	else if(document.getElementById("cancel4").checked)
+	{
+		showStatus = 'โอนสิทธิ์';
+	}
+	
+	showDetail = showDetail+'ชื่อลูกค้า : '+document.getElementById("cpro_name").value;
+	showDetail = showDetail+'\r\n'+'ทะเบียนรถยนต์ : '+document.getElementById("car_license").value;
+	showDetail = showDetail+'\r\n'+'เลขสัญญา : '+document.getElementById("idno").value;
+	showDetail = showDetail+'\r\n'+'ข้อมูลบัตร : '+document.getElementById("type_card").value;
+	showDetail = showDetail+'\r\n'+'เลขที่บัตร : '+document.getElementById("id_card").value;
+	showDetail = showDetail+'\r\n'+'ที่อยู่ : '+document.getElementById("join_addr").value;
+	showDetail = showDetail+'\r\n'+'รายละเอียดรถยนต์ : '+document.getElementById("car_brand").value;
+	showDetail = showDetail+'\r\n'+'เลขที่ตัวถัง : '+document.getElementById("id_body").value;
+	showDetail = showDetail+'\r\n'+'วันที่เริ่มชำระเงิน(เช่าซื้อรถ) : '+document.getElementById("start_contract_date").value;
+	showDetail = showDetail+'\r\n'+'จำนวนงวด : '+document.getElementById("car_month").value;
+	showDetail = showDetail+'\r\n'+'เดือนที่เริ่มเก็บค่าเข้าร่วม : '+document.getElementById("start_pay_date").value;
+	showDetail = showDetail+'\r\n'+'สถานะ  : '+showStatus;
+	showDetail = showDetail+'\r\n'+'เลขที่สัญญาเช่าซื้อล่าสุดที่จะนำมาปิด : '+document.getElementById("idno_new").value;
+	showDetail = showDetail+'\r\n'+'วันที่เปลี่ยนสถานะ : '+document.getElementById("cancel_datetime").value;
+
+	if(!confirm(showDetail)){return false;}
 }
-	 </script>
+
+</script>
 
 
         
@@ -243,7 +305,16 @@ else if(document.getElementById("note").value==''){alert("กรุณาระ�
 				}else{//เช็คว่าเคยคีย์แล้วหรือไม่
 				
 
-					$query4 = "SELECT carid FROM \"VJoinMain\" WHERE carid='$car_no' and car_license_seq = '0' ";	
+					$query4 = "
+								SELECT
+									\"carid\"
+								FROM
+									\"VJoinMain\"
+								WHERE
+									\"carid\" = '$car_no' AND
+									\"car_license_seq\" = '0' AND
+									\"deleted\" = '0'
+							";
 					$sql_query4 = pg_query($query4);
 					$numrows2 = pg_num_rows($sql_query4);
 					

@@ -1,14 +1,15 @@
 <?php
 include("../../config/config.php");
 
-$debtID = $_GET["debtID"];
-
+$debtID = pg_escape_string($_GET["debtID"]);
 ?>
+
+<meta http-equiv="Content-Type" content="txt/html; charset=utf-8" />
 
 <div style="width:450px; height:auto; margin-left:auto; margin-right:auto;">
 	<div id="warppage" style="width:450px; height:auto;">
 		<div id="headerpage" style="height:10px; text-align:center"></div>
-		<div class="style1" align="center" id="menu" style="height:30px; padding-left:10px; padding-top:10px; padding-right:10px;">เหตุผลในการขอยกเลิก<hr/></div>
+		<div class="style1" align="center" id="menu" style="height:30px; padding-left:10px; padding-top:10px; padding-right:10px;">เหตุผลในการขอตั้งหนี้<hr/></div>
 		<div style="height:auto; padding-left:10px; padding-right:10px;"><br />
 			<?php
 			$qry_fr=pg_query("select * from \"thcap_temp_otherpay_debt\" where \"debtID\" = '$debtID' ");

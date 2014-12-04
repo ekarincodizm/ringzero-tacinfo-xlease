@@ -150,13 +150,14 @@ class PDF extends ThaiPDF
         $this->SetFont('AngsanaNew','',12);
         $this->SetXY(5,16); 
         $buss_name=iconv('UTF-8','windows-874',"หน้า ".$this->PageNo()."/tp");
-        $this->MultiCell(290,4,$buss_name,0,'R',0);
+        $this->MultiCell(345,4,$buss_name,0,'R',0);
  
     }
  
 }
 
-$pdf=new PDF('L' ,'mm','a4');
+//$pdf=new PDF('L' ,'mm','a4');
+$pdf=new PDF('L' ,'mm','legal');
 $pdf->SetLeftMargin(0);
 $pdf->SetTopMargin(0);
 $pdf->AliasNbPages( 'tp' );
@@ -168,31 +169,31 @@ $page = $pdf->PageNo();
 $pdf->SetFont('AngsanaNew','B',18);
 $pdf->SetXY(5,10);
 $title=iconv('UTF-8','windows-874',"บริษัท ".$_SESSION["session_company_thainame_thcap"]);
-$pdf->MultiCell(290,4,$title,0,'C',0);
+$pdf->MultiCell(345,4,$title,0,'C',0);
 
 $pdf->SetFont('AngsanaNew','',15);
 $pdf->SetXY(5,16);
 $buss_name=iconv('UTF-8','windows-874',"(THCAP) รายงานการตั้งหนี้");
-$pdf->MultiCell(290,4,$buss_name,0,'C',0);
+$pdf->MultiCell(345,4,$buss_name,0,'C',0);
 
 $pdf->SetXY(5,25);
 $buss_name=iconv('UTF-8','windows-874',"$txtcondate $datetext $subWhere $txtSubSelect");
-$pdf->MultiCell(290,4,$buss_name,0,'L',0);
+$pdf->MultiCell(345,4,$buss_name,0,'L',0);
 
 $pdf->SetFont('AngsanaNew','B',12);
 $pdf->SetXY(5,30);
 $buss_name=iconv('UTF-8','windows-874',"*สถานะของหนี้ : สถานะปัจจุบันของหนี้นั้นๆ ขณะเรียกสัญญา ซึ่งอาจไม่ตรงกับครั้งแรกที่ตั้ง");
-$pdf->MultiCell(290,4,$buss_name,0,'L',0);
+$pdf->MultiCell(345,4,$buss_name,0,'L',0);
 
 $pdf->SetFont('AngsanaNew','',12);
 $pdf->SetXY(5,30);
 $buss_name=iconv('UTF-8','windows-874',"วันที่พิมพ์ $nowdate");
-$pdf->MultiCell(290,4,$buss_name,0,'R',0);
+$pdf->MultiCell(345,4,$buss_name,0,'R',0);
 
 $pdf->SetFont('AngsanaNew','',15);
 $pdf->SetXY(5,31);
 $buss_name=iconv('UTF-8','windows-874',"");
-$pdf->MultiCell(290,4,$buss_name,'B','C',0);
+$pdf->MultiCell(345,4,$buss_name,'B','C',0);
 
 $pdf->SetFont('AngsanaNew','',12);
 $pdf->SetXY(5,34);
@@ -251,9 +252,17 @@ $pdf->SetXY(265,34);
 $buss_name=iconv('UTF-8','windows-874',"สถานะของหนี้");
 $pdf->MultiCell(30,8,$buss_name,0,'C',0);
 
+$pdf->SetXY(300,34);
+$buss_name=iconv('UTF-8','windows-874',"วันที่จ่ายครบ");
+$pdf->MultiCell(25,8,$buss_name,0,'C',0);
+
+$pdf->SetXY(325,34);
+$buss_name=iconv('UTF-8','windows-874',"เลขที่ใบเสร็จ");
+$pdf->MultiCell(25,8,$buss_name,0,'C',0);
+
 $pdf->SetXY(5,34);
 $buss_name=iconv('UTF-8','windows-874',"");
-$pdf->MultiCell(290,8,$buss_name,'B','C',0);
+$pdf->MultiCell(345,8,$buss_name,'B','C',0);
 
 //=========================// จบ header ของหน้าแรก
 
@@ -330,12 +339,41 @@ while($resultMain=pg_fetch_array($sql_main)){
 		{
 			$tpDescShow = $res_tpDesc["tpDesc"];
 		}
+		
+		// ถ้าจ่ายครบแล้ว ให้หาวันที่จ่ายครบ และเลขที่ใบเสร็จ
+		if($debtStatus == '2')
+		{
+			$qry_receipt = pg_query("
+										SELECT
+											\"receiptID\",
+											\"receiveDate\"
+										FROM
+											\"thcap_temp_receipt_channel\"
+										WHERE
+											\"receiptID\" IN(select \"receiptID\" from \"thcap_temp_receipt_otherpay\" where \"debtID\" = '$debtIDMain') AND
+											\"receiptID\" NOT IN(select \"receiptID\" from \"thcap_temp_receipt_cancel\" where \"approveStatus\" = '1')
+										GROUP BY
+											\"receiptID\",
+											\"receiveDate\"
+										ORDER BY
+											\"receiveDate\" DESC,
+											\"receiptID\" DESC
+										LIMIT 1
+									");
+			$receiptID = pg_fetch_result($qry_receipt,0); // เลขที่ใบเสร็จ
+			$receiveDate = pg_fetch_result($qry_receipt,1); // วันที่จ่าย
+		}
+		else
+		{
+			$receiptID = "";
+			$receiveDate = "";
+		}
 	}
 	
     $pdf->SetFont('AngsanaNew','B',12);
 	
 	//show only new page
-    if($nub >= 36){
+    if($nub >= 42){
         $nub = 0;
         $cline = 43;
         $pdf->AddPage();
@@ -343,31 +381,31 @@ while($resultMain=pg_fetch_array($sql_main)){
         $pdf->SetFont('AngsanaNew','B',18);
 		$pdf->SetXY(5,10);
 		$title=iconv('UTF-8','windows-874',"บริษัท ".$_SESSION["session_company_thainame_thcap"]);
-		$pdf->MultiCell(290,4,$title,0,'C',0);
+		$pdf->MultiCell(345,4,$title,0,'C',0);
 
 		$pdf->SetFont('AngsanaNew','',15);
 		$pdf->SetXY(5,16);
 		$buss_name=iconv('UTF-8','windows-874',"(THCAP) รายงานการยกเว้นหนี้");
-		$pdf->MultiCell(290,4,$buss_name,0,'C',0);
+		$pdf->MultiCell(345,4,$buss_name,0,'C',0);
 
 		$pdf->SetXY(5,25);
 		$buss_name=iconv('UTF-8','windows-874',"$txtcondate $datetext $subWhere $txtSubSelect");
-		$pdf->MultiCell(290,4,$buss_name,0,'L',0);
+		$pdf->MultiCell(345,4,$buss_name,0,'L',0);
 
 		$pdf->SetFont('AngsanaNew','B',12);
 		$pdf->SetXY(5,30);
 		$buss_name=iconv('UTF-8','windows-874',"*สถานะของหนี้ : สถานะปัจจุบันของหนี้นั้นๆ ขณะเรียกสัญญา ซึ่งอาจไม่ตรงกับครั้งแรกที่ตั้ง");
-		$pdf->MultiCell(290,4,$buss_name,0,'L',0);
+		$pdf->MultiCell(345,4,$buss_name,0,'L',0);
 
 		$pdf->SetFont('AngsanaNew','',12);
 		$pdf->SetXY(5,30);
 		$buss_name=iconv('UTF-8','windows-874',"วันที่พิมพ์ $nowdate");
-		$pdf->MultiCell(290,4,$buss_name,0,'R',0);
+		$pdf->MultiCell(345,4,$buss_name,0,'R',0);
 
 		$pdf->SetFont('AngsanaNew','',15);
 		$pdf->SetXY(5,31);
 		$buss_name=iconv('UTF-8','windows-874',"");
-		$pdf->MultiCell(290,4,$buss_name,'B','C',0);
+		$pdf->MultiCell(345,4,$buss_name,'B','C',0);
 
 		$pdf->SetFont('AngsanaNew','',12);
 		$pdf->SetXY(5,34);
@@ -425,10 +463,18 @@ while($resultMain=pg_fetch_array($sql_main)){
 		$pdf->SetXY(265,34);
 		$buss_name=iconv('UTF-8','windows-874',"สถานะของหนี้");
 		$pdf->MultiCell(30,8,$buss_name,0,'C',0);
+		
+		$pdf->SetXY(300,34);
+		$buss_name=iconv('UTF-8','windows-874',"วันที่จ่ายครบ");
+		$pdf->MultiCell(25,8,$buss_name,0,'C',0);
+
+		$pdf->SetXY(325,34);
+		$buss_name=iconv('UTF-8','windows-874',"เลขที่ใบเสร็จ");
+		$pdf->MultiCell(25,8,$buss_name,0,'C',0);
 
 		$pdf->SetXY(5,34);
 		$buss_name=iconv('UTF-8','windows-874',"");
-		$pdf->MultiCell(290,8,$buss_name,'B','C',0);
+		$pdf->MultiCell(345,8,$buss_name,'B','C',0);
     
 	}
 	
@@ -478,6 +524,14 @@ while($resultMain=pg_fetch_array($sql_main)){
 	$pdf->SetXY(265,$cline);
     $buss_name=iconv('UTF-8','windows-874',"$txtdeb");
     $pdf->MultiCell(30,4,$buss_name,0,'C',0);
+	
+	$pdf->SetXY(300,$cline);
+    $buss_name=iconv('UTF-8','windows-874',"$receiveDate");
+    $pdf->MultiCell(25,4,$buss_name,0,'C',0);
+	
+	$pdf->SetXY(325,$cline);
+    $buss_name=iconv('UTF-8','windows-874',"$receiptID");
+    $pdf->MultiCell(25,4,$buss_name,0,'C',0);
  
     $cline += 7;
     $nub+=2;
@@ -496,31 +550,31 @@ $nub+=1;
         $pdf->SetFont('AngsanaNew','B',18);
         		$pdf->SetXY(5,10);
 		$title=iconv('UTF-8','windows-874',"บริษัท ".$_SESSION["session_company_thainame_thcap"]);
-		$pdf->MultiCell(290,4,$title,0,'C',0);
+		$pdf->MultiCell(345,4,$title,0,'C',0);
 
 		$pdf->SetFont('AngsanaNew','',15);
 		$pdf->SetXY(5,16);
 		$buss_name=iconv('UTF-8','windows-874',"(THCAP) รายงานการยกเว้นหนี้");
-		$pdf->MultiCell(290,4,$buss_name,0,'C',0);
+		$pdf->MultiCell(345,4,$buss_name,0,'C',0);
 
 		$pdf->SetXY(5,25);
 		$buss_name=iconv('UTF-8','windows-874',"$txtcondate $datetext $subWhere $txtSubSelect");
-		$pdf->MultiCell(290,4,$buss_name,0,'L',0);
+		$pdf->MultiCell(345,4,$buss_name,0,'L',0);
 
 		$pdf->SetFont('AngsanaNew','B',12);
 		$pdf->SetXY(5,30);
 		$buss_name=iconv('UTF-8','windows-874',"*สถานะของหนี้ : สถานะปัจจุบันของหนี้นั้นๆ ขณะเรียกสัญญา ซึ่งอาจไม่ตรงกับครั้งแรกที่ตั้ง");
-		$pdf->MultiCell(290,4,$buss_name,0,'L',0);
+		$pdf->MultiCell(345,4,$buss_name,0,'L',0);
 
 		$pdf->SetFont('AngsanaNew','',12);
 		$pdf->SetXY(5,30);
 		$buss_name=iconv('UTF-8','windows-874',"วันที่พิมพ์ $nowdate");
-		$pdf->MultiCell(290,4,$buss_name,0,'R',0);
+		$pdf->MultiCell(345,4,$buss_name,0,'R',0);
 
 		$pdf->SetFont('AngsanaNew','',15);
 		$pdf->SetXY(5,31);
 		$buss_name=iconv('UTF-8','windows-874',"");
-		$pdf->MultiCell(290,4,$buss_name,'B','C',0);
+		$pdf->MultiCell(345,4,$buss_name,'B','C',0);
 
 			$pdf->SetFont('AngsanaNew','',12);
 			$pdf->SetXY(5,34);
@@ -578,10 +632,18 @@ $nub+=1;
 			$pdf->SetXY(265,34);
 			$buss_name=iconv('UTF-8','windows-874',"สถานะของหนี้");
 			$pdf->MultiCell(30,8,$buss_name,0,'C',0);
+			
+			$pdf->SetXY(300,34);
+			$buss_name=iconv('UTF-8','windows-874',"วันที่จ่ายครบ");
+			$pdf->MultiCell(25,8,$buss_name,0,'C',0);
+
+			$pdf->SetXY(325,34);
+			$buss_name=iconv('UTF-8','windows-874',"เลขที่ใบเสร็จ");
+			$pdf->MultiCell(25,8,$buss_name,0,'C',0);
 
 		$pdf->SetXY(5,34);
 		$buss_name=iconv('UTF-8','windows-874',"");
-		$pdf->MultiCell(290,8,$buss_name,'B','C',0);
+		$pdf->MultiCell(345,8,$buss_name,'B','C',0);
 
     }
 
@@ -592,7 +654,7 @@ $pdf->MultiCell(100,4,$buss_name,0,'L',0);
 
 $pdf->SetXY(5,$cline+1);
 $buss_name=iconv('UTF-8','windows-874',"");
-$pdf->MultiCell(290,4,$buss_name,'B','C',0);
+$pdf->MultiCell(345,4,$buss_name,'B','C',0);
 
 
 //###############################################################################################//
@@ -609,26 +671,26 @@ $pdf->MultiCell(50,8,$title,B,'C',0);
 $pdf->SetFont('AngsanaNew','B',18);
 $pdf->SetXY(5,10);
 $title=iconv('UTF-8','windows-874',"บริษัท ".$_SESSION["session_company_thainame_thcap"]);
-$pdf->MultiCell(290,4,$title,0,'C',0);
+$pdf->MultiCell(345,4,$title,0,'C',0);
 
 $pdf->SetFont('AngsanaNew','',15);
 $pdf->SetXY(5,16);
 $buss_name=iconv('UTF-8','windows-874',"(THCAP) รายงานการยกเว้นหนี้");
-$pdf->MultiCell(290,4,$buss_name,0,'C',0);
+$pdf->MultiCell(345,4,$buss_name,0,'C',0);
 
 /*$pdf->SetXY(5,25);
 $buss_name=iconv('UTF-8','windows-874',"$txtcondate $datetext $subWhere $txtSubSelect");
-$pdf->MultiCell(290,4,$buss_name,0,'L',0);*/
+$pdf->MultiCell(345,4,$buss_name,0,'L',0);*/
 
 $pdf->SetFont('AngsanaNew','',12);
 $pdf->SetXY(5,30);
 $buss_name=iconv('UTF-8','windows-874',"วันที่พิมพ์ $nowdate");
-$pdf->MultiCell(290,4,$buss_name,0,'R',0);
+$pdf->MultiCell(345,4,$buss_name,0,'R',0);
 
 $pdf->SetFont('AngsanaNew','',15);
 $pdf->SetXY(5,31);
 $buss_name=iconv('UTF-8','windows-874',"");
-$pdf->MultiCell(290,4,$buss_name,'B','C',0);
+$pdf->MultiCell(345,4,$buss_name,'B','C',0);
 
 $pdf->SetFont('AngsanaNew','',12);
 $pdf->SetXY(5,34);
@@ -680,7 +742,7 @@ $pdf->MultiCell(105,8,$buss_name,0,'C',0);
 
 $pdf->SetXY(5,34);
 $buss_name=iconv('UTF-8','windows-874',"");
-$pdf->MultiCell(290,8,$buss_name,'B','C',0);
+$pdf->MultiCell(345,8,$buss_name,'B','C',0);
 
 //=========================// จบ header ของหน้าแรก
 
@@ -742,26 +804,26 @@ while($res_fr=pg_fetch_array($qry_fr)){
         $pdf->SetFont('AngsanaNew','B',18);
 		$pdf->SetXY(5,10);
 		$title=iconv('UTF-8','windows-874',"บริษัท ".$_SESSION["session_company_thainame_thcap"]);
-		$pdf->MultiCell(290,4,$title,0,'C',0);
+		$pdf->MultiCell(345,4,$title,0,'C',0);
 
 		$pdf->SetFont('AngsanaNew','',15);
 		$pdf->SetXY(5,16);
 		$buss_name=iconv('UTF-8','windows-874',"(THCAP) รายงานการยกเว้นหนี้");
-		$pdf->MultiCell(290,4,$buss_name,0,'C',0);
+		$pdf->MultiCell(345,4,$buss_name,0,'C',0);
 
 		/*$pdf->SetXY(5,25);
 		$buss_name=iconv('UTF-8','windows-874',"$txtcondate $datetext $subWhere $txtSubSelect");
-		$pdf->MultiCell(290,4,$buss_name,0,'L',0);*/
+		$pdf->MultiCell(345,4,$buss_name,0,'L',0);*/
 
 		$pdf->SetFont('AngsanaNew','',12);
 		$pdf->SetXY(5,30);
 		$buss_name=iconv('UTF-8','windows-874',"วันที่พิมพ์ $nowdate");
-		$pdf->MultiCell(290,4,$buss_name,0,'R',0);
+		$pdf->MultiCell(345,4,$buss_name,0,'R',0);
 
 		$pdf->SetFont('AngsanaNew','',15);
 		$pdf->SetXY(5,31);
 		$buss_name=iconv('UTF-8','windows-874',"");
-		$pdf->MultiCell(290,4,$buss_name,'B','C',0);
+		$pdf->MultiCell(345,4,$buss_name,'B','C',0);
 
 		$pdf->SetFont('AngsanaNew','',12);
 		$pdf->SetXY(5,34);
@@ -814,7 +876,7 @@ while($res_fr=pg_fetch_array($qry_fr)){
 
 		$pdf->SetXY(5,34);
 		$buss_name=iconv('UTF-8','windows-874',"");
-		$pdf->MultiCell(290,8,$buss_name,'B','C',0);
+		$pdf->MultiCell(345,8,$buss_name,'B','C',0);
     
 	}
 	
@@ -881,26 +943,26 @@ $nub+=1;
         $pdf->SetFont('AngsanaNew','B',18);
         		$pdf->SetXY(5,10);
 		$title=iconv('UTF-8','windows-874',"บริษัท ".$_SESSION["session_company_thainame_thcap"]);
-		$pdf->MultiCell(290,4,$title,0,'C',0);
+		$pdf->MultiCell(345,4,$title,0,'C',0);
 
 		$pdf->SetFont('AngsanaNew','',15);
 		$pdf->SetXY(5,16);
 		$buss_name=iconv('UTF-8','windows-874',"(THCAP) รายงานการยกเว้นหนี้");
-		$pdf->MultiCell(290,4,$buss_name,0,'C',0);
+		$pdf->MultiCell(345,4,$buss_name,0,'C',0);
 
 		/*$pdf->SetXY(5,25);
 		$buss_name=iconv('UTF-8','windows-874',"$txtcondate $datetext $subWhere $txtSubSelect");
-		$pdf->MultiCell(290,4,$buss_name,0,'L',0);*/
+		$pdf->MultiCell(345,4,$buss_name,0,'L',0);*/
 
 		$pdf->SetFont('AngsanaNew','',12);
 		$pdf->SetXY(5,30);
 		$buss_name=iconv('UTF-8','windows-874',"วันที่พิมพ์ $nowdate");
-		$pdf->MultiCell(290,4,$buss_name,0,'R',0);
+		$pdf->MultiCell(345,4,$buss_name,0,'R',0);
 
 		$pdf->SetFont('AngsanaNew','',15);
 		$pdf->SetXY(5,31);
 		$buss_name=iconv('UTF-8','windows-874',"");
-		$pdf->MultiCell(290,4,$buss_name,'B','C',0);
+		$pdf->MultiCell(345,4,$buss_name,'B','C',0);
 
 			$pdf->SetFont('AngsanaNew','',12);
 			$pdf->SetXY(5,34);
@@ -953,11 +1015,11 @@ $nub+=1;
 
 			$pdf->SetXY(5,34);
 			$buss_name=iconv('UTF-8','windows-874',"");
-			$pdf->MultiCell(290,8,$buss_name,'B','C',0);
+			$pdf->MultiCell(345,8,$buss_name,'B','C',0);
 
 		$pdf->SetXY(5,34);
 		$buss_name=iconv('UTF-8','windows-874',"");
-		$pdf->MultiCell(290,8,$buss_name,'B','C',0);
+		$pdf->MultiCell(345,8,$buss_name,'B','C',0);
 
     }
 
@@ -968,6 +1030,6 @@ $pdf->MultiCell(100,4,$buss_name,0,'L',0);
 
 $pdf->SetXY(5,$cline+1);
 $buss_name=iconv('UTF-8','windows-874',"");
-$pdf->MultiCell(290,4,$buss_name,'B','C',0);
+$pdf->MultiCell(345,4,$buss_name,'B','C',0);
 $pdf->Output();
 ?>

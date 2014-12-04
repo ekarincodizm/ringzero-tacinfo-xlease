@@ -102,7 +102,8 @@ if($res_name=pg_fetch_array($query_name)){
 									<td>เลือก</td>
 									<td>รหัสค่าใช้จ่าย</td>
 									<td>เลขที่สัญญา</td>
-									<td>วันที่ครบกำหนด</td>
+									<td>วันที่ครบกำหนด / วันที่ทำรายการ</td>
+									<td>วันที่นัดลูกค้า</td>
 									<td>ค่าใช้จ่าย</td>
 									<td>จำนวนเงิน</td>
 									<td>ยอดคงเหลือ ที่ยังไม่มีใบเสร็จ</td>
@@ -114,9 +115,10 @@ if($res_name=pg_fetch_array($query_name)){
 														\"IDCarTax\",
 														\"IDNO\",
 														\"TaxDueDate\",
+														\"ApointmentDate\",
 														\"CusAmt\",
 														\"TypeDep\",
-														\"CusAmt\" - (select case when sum(\"O_MONEY\") is not null then sum(\"O_MONEY\") else 0.00 end from \"FOtherpay\" where \"RefAnyID\" = \"CarTaxDue\".\"IDCarTax\") AS \"Balance\"
+														\"CusAmt\" - (select case when sum(\"O_MONEY\") is not null then sum(\"O_MONEY\") else 0.00 end from \"FOtherpay\" where \"RefAnyID\" = \"CarTaxDue\".\"IDCarTax\" and \"Cancel\" = false) AS \"Balance\"
 													FROM
 														carregis.\"CarTaxDue\"
 													WHERE
@@ -132,7 +134,8 @@ if($res_name=pg_fetch_array($query_name)){
 									$i++;
 									$IDCarTax = $resvc['IDCarTax'];
 									$IDNO = $resvc['IDNO'];
-									$TaxDueDate = $resvc['TaxDueDate'];
+									$TaxDueDate = $resvc['TaxDueDate']; // วันที่ครบกำหนด/วันที่ทำรายการ
+									$ApointmentDate = $resvc['ApointmentDate']; // วันที่นัดลูกค้า
 									$CusAmt = $resvc['CusAmt'];
 									$TypeDep = $resvc['TypeDep'];
 									$Balance = $resvc['Balance'];
@@ -140,16 +143,29 @@ if($res_name=pg_fetch_array($query_name)){
 									$query_name=pg_query("select \"TName\" from \"TypePay\" WHERE \"TypeID\"='$TypeDep'");
 									$TName = pg_fetch_result($query_name,0);
 									
+									//ตรวจสอบว่าอยู่ระหว่างการขออนุมัติหรือไม่
+									$qry_wait_app=pg_query("select \"IDCarTax\" from carregis.\"CarTaxDue_reserve\" WHERE \"IDCarTax\" = '$IDCarTax' AND \"Approved\"='9' ");
+									$nub_wait_app = pg_num_rows($qry_wait_app);
+									if($nub_wait_app > 0)
+									{
+										$canSelect = "title=\"อยู่ระหว่างรอการอนุมัติยกเลิก\" disabled";
+									}
+									else
+									{
+										$canSelect = "";
+									}
+									
 									if($i%2==0){
 										echo "<tr class=\"odd\" align=\"left\">";
 									}else{
 										echo "<tr class=\"even\" align=\"left\">";
 									}
 								?>
-									<td align="center"><input type="radio" name="chk" id="chk<?php echo $i; ?>" value="<?php echo $IDCarTax; ?>"></td>
+									<td align="center"><input type="radio" name="chk" id="chk<?php echo $i; ?>" value="<?php echo $IDCarTax; ?>" <?php echo $canSelect; ?> ></td>
 									<td align="center"><?php echo $IDCarTax; ?></td>
 									<td align="center"><?php echo $IDNO; ?></td>
 									<td align="center"><?php echo $TaxDueDate; ?></td>
+									<td align="center"><?php echo $ApointmentDate; ?></td>
 									<td align="center"><?php echo $TName; ?></td>
 									<td align="right"><?php echo number_format($CusAmt,2); ?></td>
 									<td align="right"><?php echo number_format($Balance,2); ?></td>

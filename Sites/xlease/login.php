@@ -1,6 +1,8 @@
 <?php
 session_start();
 include("company.php");
+include("ldap.php");
+
 $comp = pg_escape_string($_POST['comp']);
 if(!empty($comp)){
     foreach($company as $v){
@@ -127,11 +129,38 @@ if($num_user == 0){
 					}else{
 						$status++;
 					}
-					if($status == 0){
+					
+					if($status == 0)
+					{
 						pg_query("COMMIT");
-					}else{
+						
+						//================== ส่งรหัสผ่านไป อัพเดทที่ LDAP Server ==================
+							$ldapconn = connect_ldap(); // Database Connection (LDAP)
+							if (isset($ldapconn)) {
+								
+								$userdn = search_ldap_user_entry_from_uid($ldapconn, $username);
+								if (isset($userdn)) {
+									$pwd_mod = change_ldap_user_password($ldapconn, $userdn, $passSend);
+									if ($pwd_mod) {
+										//echo "Password Changed";
+									} else {
+										$error = ldap_error($ldapconn);
+									}
+								} else {
+									$error = ldap_error($ldapconn);
+								}
+							}
+							
+							// Database Connection (Postgres)
+							$conn_string = "host=". $_SESSION["session_company_server"] ." port=5432 dbname=". $_SESSION["session_company_dbname"] ." user=". $_SESSION["session_company_dbuser"] ." password=". $_SESSION["session_company_dbpass"] ."";
+							$db_connect = pg_connect($conn_string) or die("Can't Connect !");
+						//================== จบการส่งรหัสผ่านไป อัพเดทที่ LDAP Server ==================
+					}
+					else
+					{
 						pg_query("ROLLBACK");	
 					}
+					
 					header("Refresh: 0; url=nw/annoucement/frm_show.php");
 					exit();
 				}

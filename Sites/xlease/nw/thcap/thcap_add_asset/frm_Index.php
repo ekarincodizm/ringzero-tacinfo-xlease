@@ -13,10 +13,19 @@ include("../../../config/config.php");
 <script type="text/javascript">
 function operation_start(){
 		var typeid = $("#cbx_pick_type").val();
-		
+		if (typeid == '13' || typeid == '37' || typeid == '50' || typeid == '51' || typeid == '66' || typeid == '69' 
+		|| typeid == '82' || typeid == '84' || typeid == '85' || typeid == '86' || typeid == '89' || typeid == '90'
+		|| typeid == '91' || typeid == '93' || typeid == '94' || typeid == '95' || typeid == '96' || typeid == '97')
+		{
+			typeidText = 'car';
+		}
+		else
+		{
+			typeidText = typeid;
+		}
 
 		$.ajax({
-			url:"add_asset_for_sales_"+typeid+".php",
+			url:"add_asset_for_sales_"+typeidText+".php",
 			type:"HEAD",
 			error: function()
 			{
@@ -24,7 +33,7 @@ function operation_start(){
 			},
 			success: function()
 			{
-				$("#space1").load("tb_asset_"+typeid+".php?astype="+typeid);	
+				$("#space1").load("tb_asset_"+typeidText+".php?astype="+typeid+"&astypeText"+typeidText);
 			}
 		});
 		
@@ -33,7 +42,7 @@ function operation_start(){
 </head>
 <?php
 //ดึงข้อมูลประเภทสินทรัพย์
-	$qry_astype = pg_query("SELECT * FROM thcap_asset_biz_astype where \"astypeStatus\" = '1'");
+	$qry_astype = pg_query("SELECT * FROM thcap_asset_biz_astype where \"astypeStatus\" = '1' order by \"astypeName\" ");
 ?>
 <body>
 <div align="center">
@@ -52,11 +61,12 @@ function operation_start(){
 							
 							
 							//หาจำนวนรายละเอียดที่รออนุมัติของแต่ละประเภทสินทรัพย์
-							$qry_fasset = pg_query("SELECT *
+							$qry_fasset = pg_query("SELECT \"assetDetailID\"
 													FROM thcap_asset_biz_detail a
 													WHERE a.\"astypeID\" = '$astypeid' AND a.\"assetDetailID\" NOT IN (
 																		select \"assetDetailID\" from \"thcap_asset_biz_detail_central\" 
-																		where \"statusapp\" in('1','0'))");
+																		where \"statusapp\" in('1','0') and \"add_or_edit\" = '0' )   ");
+																		
 							$rows_fasset = pg_num_rows($qry_fasset);
 							if($rows_fasset > 0){
 								$numwait = "( $rows_fasset )";

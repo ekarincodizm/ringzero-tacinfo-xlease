@@ -1,8 +1,8 @@
 <?php
 include("../../config/config.php");
 
-$contractID = $_GET["idno"];
-if($contractID == ""){$contractID = $_POST["contractID_text"];}
+$contractID = pg_escape_string($_GET["idno"]);
+if($contractID == ""){$contractID = pg_escape_string($_POST["contractID_text"]);}
 
 
 $sqlchkcon = pg_query("select \"contractID\",\"conType\" from thcap_mg_contract where \"contractID\" = '$contractID'");

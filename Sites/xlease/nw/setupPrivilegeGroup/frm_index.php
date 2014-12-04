@@ -2,13 +2,13 @@
 session_start();
 $_SESSION["av_iduser"];
 include("../../config/config.php");
-$value  = $_POST['value'];
+$value  = pg_escape_string($_POST['value']);
 if($value == "post"){
-	$ad_idmenu = $_POST['ad_idmenu'];
-	$a_gp = $_POST['a_gp'];
+	$ad_idmenu = pg_escape_string($_POST['ad_idmenu']);
+	$a_gp = pg_escape_string($_POST['a_gp']);
 }else{
-	$ad_idmenu = $_GET['ad_idmenu'];
-	$a_gp = $_GET['a_gp'];
+	$ad_idmenu = pg_escape_string($_GET['ad_idmenu']);
+	$a_gp = pg_escape_string($_GET['a_gp']);
 }
 
 if( empty($_SESSION["av_iduser"]) ){
@@ -117,11 +117,12 @@ function checkdata() {
 		}
 		?>
     </select>
-	กลุ่มผู้ใช้ :
+	<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;กลุ่มผู้ใช้ :
 	<select name="a_gp" id="a_gp" onChange="this.form.submit();">
 		<option value="" <?php if($a_gp == ""){ echo "selected";}?>>-----ทั้งหมด-----</option>
 		<?php
-		$qry_gpuser=pg_query("select * from department");
+		$qry_gpuser=pg_query("select dep_id , dep_name from department order by dep_name");
 		while($resg=pg_fetch_array($qry_gpuser)){
 		?>
 		  <option value="<?php echo $resg["dep_id"]; ?>" <?php if($a_gp == $resg["dep_id"]){ echo "selected";}?>><?php echo $resg["dep_name"]; ?></option>
@@ -129,7 +130,7 @@ function checkdata() {
 		 }
 		?>  
 	</select>
-	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="" onclick="window.close();">x ปิดหน้านี้</a>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="" onclick="window.close();">x ปิดหน้านี้</a>
   <hr />
 </div>
 </form>

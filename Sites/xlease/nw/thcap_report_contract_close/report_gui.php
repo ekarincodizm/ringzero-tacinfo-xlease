@@ -56,17 +56,17 @@ $ym = pg_escape_string($_GET["ym"]); // ปีของเดือน
 if($selectTime == "y")
 {
 	$selectTimeText = "วันที่ปิดบัญชี ประจำปี $yy";
-	$selectWhere .= " AND \"thcap_checkcontractcloseddate\"(\"contractID\")::text like '$yy-%' ";
+	$selectWhere .= " AND \"thcap_get_all_date_absclose\"(\"contractID\")::text like '$yy-%' ";
 }
 elseif($selectTime == "m")
 {
 	$selectTimeText = "วันที่ปิดบัญชี ประจำเดือน $mm ปี $ym";
-	$selectWhere .= " AND \"thcap_checkcontractcloseddate\"(\"contractID\")::text like '$ym-$mm-%' ";
+	$selectWhere .= " AND \"thcap_get_all_date_absclose\"(\"contractID\")::text like '$ym-$mm-%' ";
 }
 elseif($selectTime == "d")
 {
 	$selectTimeText = "วันที่ปิดบัญชี ประจำวันที่ $focusDate";
-	$selectWhere .= " AND \"thcap_checkcontractcloseddate\"(\"contractID\") = '$focusDate' ";
+	$selectWhere .= " AND \"thcap_get_all_date_absclose\"(\"contractID\") = '$focusDate' ";
 }
 else
 {
@@ -83,19 +83,21 @@ else
 			</tr>
 			<tr bgcolor="#79BCFF">
 				<th>รายการ</th>
+				<th>ประเภทสินเชื่อ</th>
 				<th>เลขที่สัญญา</th>
 				<th>วันที่ปิดบัญชี</th>
 			</tr>
 			<?php
-			$qry_contract = pg_query("SELECT \"contractID\", \"thcap_checkcontractcloseddate\"(\"contractID\") as \"closeDate\"
+			$qry_contract = pg_query("SELECT \"conType\", \"contractID\", \"thcap_get_all_date_absclose\"(\"contractID\") as \"closeDate\"
 									FROM \"thcap_contract\"
-									WHERE \"thcap_checkcontractcloseddate\"(\"contractID\") is not null $selectWhere $whereContype
-									ORDER BY \"thcap_checkcontractcloseddate\"(\"contractID\"), \"contractID\" ");
+									WHERE \"thcap_get_all_date_absclose\"(\"contractID\") is not null $selectWhere $whereContype
+									ORDER BY \"conType\", \"thcap_get_all_date_absclose\"(\"contractID\"), \"contractID\" ");
 			$i = 0;
 			while($res_contract = pg_fetch_array($qry_contract))
 			{
 				$i++;
 				
+				$conType = $res_contract["conType"];
 				$contractID = $res_contract["contractID"];
 				$closeDate = $res_contract["closeDate"];
 				
@@ -106,6 +108,7 @@ else
 				}
 				
 				echo "<td align=\"center\">".number_format($i,0)."</td>";
+				echo "<td align=\"center\">$conType</td>";
 				echo "<td align=\"center\" onClick=\"popU('../thcap_installments/frm_Index.php?idno=$contractID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1200,height=700')\"><font color=\"#0000FF\" style=\"cursor:pointer;\"><u>$contractID</u></font></td>";
 				echo "<td align=\"center\">$closeDate</td>";
 				echo "</tr>";
@@ -114,13 +117,13 @@ else
 			if($i > 0)
 			{
 				echo "<tr bgcolor=\"#FFCCCC\">";
-				echo "<td colspan=\"3\" align=\"left\"><b>รวม ".number_format($i,0)." รายการ</b></td>";
+				echo "<td colspan=\"4\" align=\"left\"><b>รวม ".number_format($i,0)." รายการ</b></td>";
 				echo "</tr>";
 			}
 			else
 			{
 				echo "<tr bgcolor=\"#FFCCCC\">";
-				echo "<td colspan=\"3\" align=\"center\"><b>-- ไม่พบข้อมูล --</b></td>";
+				echo "<td colspan=\"4\" align=\"center\"><b>-- ไม่พบข้อมูล --</b></td>";
 				echo "</tr>";
 			}
 			?>

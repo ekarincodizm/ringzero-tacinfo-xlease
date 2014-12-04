@@ -37,7 +37,7 @@ $showPic = pg_fetch_result($sql_showPic,0);
 						  //echo "ประเภทสัญญาย่อย  : <img src=\"../upload/consubtype_icon/$conSubType_iconpath\" width=\"180\" height=\35\" >";
 							$imgtexttype="<img src=\"../upload/consubtype_icon/$conSubType_iconpath\" width=\"180\" height=\35\" >";
 
-							$realize="<a onclick=\"javascript:popU('frm_Realize.php?idno=$contractID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1330,height=760')\" style=\"cursor:pointer;\"><font color=\"#0000FF\"><u>(THCAP) แสดงรับรู้รายได้เช่าซื้อ-เช่าทางการเงิน</u></font></a>";
+							$realize="<a onclick=\"javascript:popU('../thcap_installments/frm_Realize.php?idno=$contractID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1330,height=760')\" style=\"cursor:pointer;\"><font color=\"#0000FF\"><u>(THCAP) แสดงรับรู้รายได้เช่าซื้อ-เช่าทางการเงิน</u></font></a>";
 						}
 						else
 						{ // ถ้าไม่พบไฟล์
@@ -287,6 +287,10 @@ list($lease_fine) = $rs_get_lease_fine;
 	$cal_rate_money_conMinPay = pg_fetch_result($qry_cal_rate_money_conMintPay,0);
 	$conMinPayExtVat = $cal_rate_money_conMinPay ;
 	
+	
+	// หาข้อมูล REF1
+	$qry_REF1 = pg_query("select ta_array1d_get(thcap_encode_invoice_ref('$contractID', '000000IMG-00000'),0)");
+	$REF1 = pg_fetch_result($qry_REF1,0);
 ?>
 	<center>
     <table>	
@@ -326,7 +330,7 @@ list($lease_fine) = $rs_get_lease_fine;
 	</tr>
 	<tr>
 		<td align="right" bgcolor="#79BCFF"><b>เลขที่สัญญา</b></td>
-		<td bgcolor="#D5EFFD">:</td><td bgcolor="#D5EFFD" colspan="10"><?php echo $contractID; ?>&nbsp&nbsp&nbsp&nbsp&nbsp<?php echo $limitlink; ?></td>
+		<td bgcolor="#D5EFFD">:</td><td bgcolor="#D5EFFD" colspan="10"><?php echo "$contractID <font color=\"red\">(REF1 : $REF1)</font>"; ?>&nbsp&nbsp&nbsp&nbsp&nbsp<?php echo $limitlink; ?></td>
 	</tr>
 	<tr>
 		<td align="right" bgcolor="#79BCFF"><b>เจ้าของเคส</b></td>

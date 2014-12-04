@@ -304,6 +304,10 @@ $cur_path = redirect($_SERVER['PHP_SELF'],'nw/thcap');
 		$conPLCurRate = pg_result($qry_conPLCurRate,0);
 	}
 	
+	
+	// หาข้อมูล REF1
+	$qry_REF1 = pg_query("select ta_array1d_get(thcap_encode_invoice_ref('$contractID', '000000IMG-00000'),0)");
+	$REF1 = pg_fetch_result($qry_REF1,0);
 ?>
 	<center>
     <table>
@@ -358,7 +362,7 @@ $cur_path = redirect($_SERVER['PHP_SELF'],'nw/thcap');
 		
 		<!--เพิ่ม ช่อง ค่าที่ปรึกษากิจการร่วมค้าต่องวด -->	
         <?php	if($creditType1=="JOINT_VENTURE"){ ?>
-		<td bgcolor="#D5EFFD">:</td><td bgcolor="#D5EFFD" colspan="4"><?php echo $contractID; ?>&nbsp&nbsp&nbsp&nbsp&nbsp<?php echo $limitlink; ?></td>
+		<td bgcolor="#D5EFFD">:</td><td bgcolor="#D5EFFD" colspan="4"><?php echo "$contractID <font color=\"red\">(REF1 : $REF1)</font>"; ?>&nbsp&nbsp&nbsp&nbsp&nbsp<?php echo $limitlink; ?></td>
 		<td align="right" bgcolor="#79BCFF"><b>ค่าที่ปรึกษากิจการร่วมค้าต่องวด</b></td><td bgcolor="#D5EFFD">:</td>
 		<td bgcolor="#D5EFFD" colspan="4">
 		<?php IF($conMonthlyAdviserFee!="")
@@ -367,7 +371,7 @@ $cur_path = redirect($_SERVER['PHP_SELF'],'nw/thcap');
 		}?></td>	
 		<?php } 
 		else { ?>
-		<td bgcolor="#D5EFFD">:</td><td bgcolor="#D5EFFD" colspan="10"><?php echo $contractID; ?>&nbsp&nbsp&nbsp&nbsp&nbsp<?php echo $limitlink; ?></td>
+		<td bgcolor="#D5EFFD">:</td><td bgcolor="#D5EFFD" colspan="10"><?php echo "$contractID <font color=\"red\">(REF1 : $REF1)</font>"; ?>&nbsp&nbsp&nbsp&nbsp&nbsp<?php echo $limitlink; ?></td>
 		<?php } ?>
 	</tr>
 	<tr>

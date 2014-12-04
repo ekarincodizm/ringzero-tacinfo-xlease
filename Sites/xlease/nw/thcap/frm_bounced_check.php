@@ -1,4 +1,4 @@
-﻿	<?php	//แสดงรายการว่า ในวันนั้น มีรายการการเช็คเด้งเท่าไร
+	<?php	//แสดงรายการว่า ในวันนั้น มีรายการการเช็คเด้งเท่าไร
 	$qrybadchq=pg_query("select \"revChqID\",\"bankChqNo\",\"revChqDate\",\"BankName\",\"bankOutBranch\",\"revChqToCCID\",\"bankChqAmt\"
 						,\"revChqStatus\",\"bankChqDate\",\"chqSubmitTimes\",\"giveTakerID\",\"giveTakerDate\",\"chqKeeperID\"
 						from finance.\"V_thcap_receive_cheque_keeper_cheManage\" 
@@ -24,7 +24,7 @@
 							<td align=\"center\">ผู้นำเช็คเข้าธนาคาร</td>
 							<td align=\"center\">ยอดเช็ค</td>
 						";	
-						if($emplevel<=1){							
+						if($emplevel<=1 && $action_menu != "see"){ // ถ้า level <=1 และไม่ได้มาจากเมนู "(THCAP) ดูรายการเงินโอน(การเงิน)"
 							echo "<td align=\"center\">รายการพิเศษ</td>";
 						}
 						echo "</tr>";
@@ -66,7 +66,7 @@
 							<td align="center"><?php echo $givetakerName; ?></td>
 							<td align="right"><?php echo number_format($bankChqAmt,2); ?></td>
 							<?php 
-							if($emplevel<=1){						
+							if($emplevel<=1 && $action_menu != "see"){ // ถ้า level <=1 และไม่ได้มาจากเมนู "(THCAP) ดูรายการเงินโอน(การเงิน)"
 								echo "<td align=center><img src=\"images/refresh.png\" width=24 height=24 onclick=\"returnchq_bounced('$revChqID')\" style=\"cursor:pointer;\"  title=\"ย้อนกลับไป ยืนยันนำเช็คเข้าธนาคาร\"></td>";
 							}
 							?>

@@ -1,12 +1,23 @@
 <?php
 session_start();
 include("../config/config.php");
+include("../nw/function/checknull.php");
 
 $typeid = pg_escape_string($_POST['id']);
 $tname = pg_escape_string($_POST['tname']);
 $uservat = pg_escape_string($_POST['uservat']);
 $typerec = pg_escape_string($_POST['typerec']);
 $typepay = pg_escape_string($_POST['typepay']);
+
+// ตรวจสอบค่าว่าง
+$typeid_checknull = checknull($typeid);
+$tname_checknull = checknull($tname);
+$uservat_checknull = checknull($uservat);
+$typerec_checknull = checknull($typerec);
+$typepay_checknull = checknull($typepay);
+
+$id_user = $_SESSION["av_iduser"]; // รับ id ผู้ใช้
+$logs_any_time = nowDateTime(); // วันที่ปัจจุบัน
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html>
@@ -29,12 +40,72 @@ $typepay = pg_escape_string($_POST['typepay']);
 
 <?php
     
-    $in_sql="UPDATE \"TypePay\" SET \"TName\"='$tname',\"UseVat\"='$uservat',\"TypeRec\"='$typerec',\"TypeDep\"='$typepay' WHERE \"TypeID\" = '$typeid' ";    
-    if($result=pg_query($in_sql)){
-          echo "บันทึกเรียบร้อยแล้ว"; 
-    }else{
-          echo "ไม่สามารถบันทึกได้";
-    }
+    pg_query("BEGIN");
+	$status = 0;
+	
+	// ตรวจสอบ Concurrency
+	$qry_chk_TypeID = pg_query("select * from \"TypePay_Request\" where \"TypeID\" = '$typeid' and \"appvStatus\" = '9'");
+	$row_chk_TypeID = pg_num_rows($qry_chk_TypeID);
+	if($row_chk_TypeID > 0)
+	{
+		$status++;
+		echo "มี TypeID = '$typeid' รออนุมัติอยู่แล้ว<br/>";
+	}
+	else
+	{
+		// ตรวจสอบ Concurrency
+		$qry_chk_TName = pg_query("select * from \"TypePay_Request\" where \"TName\" = '$tname' and \"appvStatus\" = '9'");
+		$row_chk_TName = pg_num_rows($qry_chk_TName);
+		if($row_chk_TName > 0)
+		{
+			$status++;
+			echo "มี TName = '$tname' รออนุมัติอยู่แล้ว<br/>";
+		}
+		else
+		{
+			$in_sql = "
+						INSERT INTO \"TypePay_Request\"(
+							\"TypeID\",
+							\"TName\",
+							\"UseVat\",
+							\"TypeRec\",
+							\"TypeDep\",
+							\"ActionRequest\",
+							\"doerID\",
+							\"doerStamp\",
+							\"appvStatus\"
+						)
+						VALUES(
+							$typeid_checknull,
+							$tname_checknull,
+							$uservat_checknull,
+							$typerec_checknull,
+							$typepay_checknull,
+							'U',
+							'$id_user',
+							'$logs_any_time',
+							'9'
+						)
+					";    
+			if($result=pg_query($in_sql)){
+			}else{
+				$status++;
+			}
+		}
+	}
+	
+	if($status == 0){
+		pg_query("COMMIT");
+		
+		//ACTIONLOG
+			if($sqlaction = pg_query("INSERT INTO action_log(id_user, action_desc, action_time) VALUES ('$id_user', 'ระบบ TypePay', '$logs_any_time')")); else $status++;
+		//ACTIONLOG---
+		
+		echo "บันทึกเรียบร้อยแล้ว"; 
+	}else{
+		pg_query("ROLLBACK");
+		echo "ไม่สามารถบันทึกได้";
+	}
 
 ?>
 

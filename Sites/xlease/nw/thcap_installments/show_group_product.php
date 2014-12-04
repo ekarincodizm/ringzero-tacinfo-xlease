@@ -52,7 +52,7 @@ if($qr)
 						<td align=\"center\">".$rs['brand_name']."</td>
 						<td align=\"center\">".$rs['model_name']."</td>
 						<td align=\"center\">".number_format($sum_itm,0,'.',',')."</td>
-						<td align=\"center\"><img src=\"images/detail.gif\" width=\"19\" height=\"19\" onclick=\"javascript:popU('show_list_product.php?contractID=$contractID&brand=".$rs['brand_name']."&model=".$rs['model_name']."','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1024,height=700')\" style=\"cursor:pointer;\" /></td>
+						<td align=\"center\"><img src=\"images/detail.gif\" width=\"19\" height=\"19\" onclick=\"javascript:popU('../thcap_installments/show_list_product.php?contractID=$contractID&brand=".$rs['brand_name']."&model=".$rs['model_name']."','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1024,height=700')\" style=\"cursor:pointer;\" /></td>
 					</tr>
 					";
 				}

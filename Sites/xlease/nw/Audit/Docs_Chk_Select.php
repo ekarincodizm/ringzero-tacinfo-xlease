@@ -22,7 +22,7 @@
 <?php	
 	// Start Create Hyper Link For  ใบสรุปการโทรตรวจสอบเครดิตลูกค้า และเงื่อนไขของสินเชื่อ
 	$Ref_Doc_Name = "2.    ใบสรุปการโทรตรวจสอบเครดิตลูกค้า และเงื่อนไขของสินเชื่อ (THCAP-FORM-CR-0047)";
-	$File_Name = "thcap_cr_0047_contract_type.php";
+	$File_Name = "./Doc_CR0047/thcap_cr_0047_customer_define.php";
 	show_Line_Link_To_Check_Document($Ref_Doc_Name,$File_Name);
 	// End Create Hyper Link For  ใบสรุปการโทรตรวจสอบเครดิตลูกค้า และเงื่อนไขของสินเชื่อ
 ?>
@@ -38,7 +38,7 @@
 <?php
 	// Start Create Hyper Link For  แบบประเมินการให้บริการ (สำหรับผู้จัดจำหน่าย)  
 	$Ref_Doc_Name = "4.    แบบประเมินการให้บริการ (สำหรับผู้จัดจำหน่าย)  (THCAP-FORM-CR-0089 Rev.001 (20140724))";
-	$File_Name = "thcap_cr_0089_customer_define.php";
+	$File_Name = "./Docs_CR0089/thcap_cr_0089_customer_define.php";
 	show_Line_Link_To_Check_Document($Ref_Doc_Name,$File_Name);
 	// End Create Hyper Link For  แบบประเมินการให้บริการ (สำหรับผู้จัดจำหน่าย)
 ?>

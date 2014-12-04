@@ -8,6 +8,12 @@ include("../../pChart/class/pImage.class.php");
 
 $autoID = pg_escape_string($_GET["autoID"]); // ลำดับรายการ PK ในตาราง
 
+$doerID = $_SESSION["av_iduser"];
+$nowDateTime = nowDateTime(); //ดึงข้อมูลวันเวลาจาก server
+
+pg_query("BEGIN");
+$status = 0;
+
 // หาข้อมูลของ Card
 $qry_data = pg_query("select * from \"thcap_print_card_bill_payment\" where \"autoID\" = '$autoID' ");
 $res_data = pg_fetch_array($qry_data);
@@ -183,5 +189,39 @@ $pdf->AddPage();
 	$pdf->MultiCell(160,2.5,$textShow,0,'L',0); // หมายเหตุ
 //---------- จบหมายเหตุ
 
-$pdf->Output(); //open pdf
+//==================== เก็บประวัติการพิมพ์ ====================
+$sql_log = "
+			INSERT INTO \"thcap_print_card_bill_payment_reprint\"(
+				\"cardID\",
+				\"printTime\",
+				\"doerID\",
+				\"doerStamp\",
+				\"doerNote\"
+			)
+			VALUES(
+				'$autoID',
+				(select count(\"cardID\") from \"thcap_print_card_bill_payment_reprint\" where \"cardID\" = '$autoID') + 1,
+				'$doerID',
+				'$nowDateTime',
+				'reprint จากประวัติการอนุมัติ'
+			)
+		";
+if($result_log = pg_query($sql_log)){
+}
+else{
+	$status++;
+}
+
+if($status == 0)
+{
+	pg_query("COMMIT");
+	$pdf->Output(); //open pdf
+}
+else
+{
+	pg_query("ROLLBACK");
+	echo "<center><h2><font color=\"#FF0000\">error!! can not save log</font></h2></center>";
+}
+
+//$pdf->Output(); //open pdf
 ?>

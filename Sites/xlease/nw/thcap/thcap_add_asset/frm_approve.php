@@ -1,5 +1,6 @@
 <?php
-include("../../../config/config.php");
+	include("../../../config/config.php"); 
+	include("Load_Num_Wait_Approve.php");
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -11,13 +12,25 @@ include("../../../config/config.php");
 <script type="text/javascript" src="../../../jqueryui/js/jquery-1.4.2.min.js"></script>
 <script type="text/javascript" src="../../../jqueryui/js/jquery-ui-1.8.2.custom.min.js"></script>   
 <script type="text/javascript">
-$(document).ready(function(){$("#space1").load("app_asset_for_sales_0.php?astype=");	});
+// $(document).ready(function(){$("#space1").load("");	});
 function operation_start(){
 		
 		var typeid = $("#cbx_pick_type").val();
-		
+		//if(typeid in [13,37,50,51,66,69,82,84,85,86,89,90,91,93,94,95,96,97])
+		var txt_file_replace
+		if(
+		   (typeid==13)||(typeid==37)||(typeid==50)||(typeid==51)||(typeid==66)||
+		   (typeid==69)||(typeid==82)||(typeid==84)||(typeid==85)||(typeid==86)||
+		   (typeid==89)||(typeid==90)||(typeid==91)||(typeid==93)||(typeid==94)||
+		   (typeid==95)||(typeid==96)||(typeid==97)
+		  ) 	
+		{
+			txt_file_replace = "car";
+		}else{
+			txt_file_replace = typeid;
+		}
 		$.ajax({
-			url:"app_asset_for_sales_"+typeid+".php",
+			url:"app_asset_for_sales_"+txt_file_replace+".php",
 			type:"HEAD",
 			error: function()
 			{
@@ -26,7 +39,7 @@ function operation_start(){
 			success: function()
 			{
 				if (typeid>0){
-				$("#space1").load("app_asset_for_sales_"+typeid+".php?astype="+typeid);	
+				$("#space1").load("app_asset_for_sales_"+txt_file_replace+".php?astype="+typeid);	
 				} else{
 				$("#space1").load("app_asset_for_sales_0.php?astype=");
 				}
@@ -38,7 +51,17 @@ function operation_start(){
 </head>
 <?php
 //ดึงข้อมูลประเภทสินทรัพย์
-	$qry_astype = pg_query("SELECT * FROM thcap_asset_biz_astype where \"astypeStatus\" = '1'");
+	$Str_Query = "
+					SELECT 
+							* 
+					FROM 
+							\"thcap_asset_biz_astype\"
+					where 
+							\"astypeStatus\" = '1'
+					ORDER By
+							\"astypeName\" ASC		
+				 ";
+	$qry_astype = pg_query($Str_Query); 
 ?>
 <body>
 <div align="center">
@@ -49,24 +72,18 @@ function operation_start(){
             <legend><b>เลือกประเภทสินทรัพย์</b></legend>
             <div style="margin:15px 0px; text-align:center;">
                 <span style="display:inline-block">เลือกประเภท : </span>
-                <select name="cbx_pick_type" id="cbx_pick_type" style="display:inline-block;" onchange="operation_start();" >
-						<option value="0">--------- เลือกประเภท ---------</option>
+                
+                <select name="cbx_pick_type" id="cbx_pick_type" style="display:inline-block;" onchange="operation_start();" > 
+					<option value="0">--------- เลือกประเภท ---------</option>  
 							
 					<?php 	
+							
 							while($re_astype = pg_fetch_array($qry_astype)){					
 							$astypeid = $re_astype["astypeID"]; //รหัสประเภท
 							$astypeName = $re_astype["astypeName"]; //ชื่อประเภท
-							
+													
+							$rows_fasset = Load_Num_Wait_For_Approve($astypeid);
 							//หาจำนวนรายละเอียดที่รออนุมัติของแต่ละประเภทสินทรัพย์
-							$qry_fasset = pg_query("
-									SELECT *
-									FROM thcap_asset_biz_detail a 
-									LEFT JOIN (	select * from \"thcap_asset_biz_detail_central\" d1
-												left join \"thcap_asset_biz_detail_10_temp\" d2
-												on d1.\"ascenID\" = d2.\"ascenID\" ) d ON a.\"assetDetailID\" = d.\"assetDetailID\"
-									WHERE d.\"statusapp\" = '0' AND a.\"astypeID\" = '$astypeid'
-								  ");
-							$rows_fasset = pg_num_rows($qry_fasset);
 							if($rows_fasset > 0){
 								$numwait = "( $rows_fasset )";
 								$colorbg = "style=\"color:red\"";
@@ -77,9 +94,9 @@ function operation_start(){
 							
 							
 							
-						echo "<option value=\"$astypeid\" $colorbg>$astypeName $numwait</option>";
+							echo "<option value=\"$astypeid\" $colorbg>$astypeName $numwait </option>";
 							} ?>	
-                </select>
+                 </select> 
 
             </div>
         </fieldset>

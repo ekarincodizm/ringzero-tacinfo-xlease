@@ -395,7 +395,8 @@ if($chk_con_type == "FACTORING" && $conCredit == "")
 	$qry_FACTORING = "select thcap_process_preapprove_factoring($contractID, $conType, $conCompany, $conLoanAmt, $conguaranteeamt,
 							$conFacFee, $conLoanIniRate, $conInvoicePeriod, $conTerm, $conMinPay, $conPenaltyRate, $conDate, $conStartDate,
 							$conFirstDue, $conRepeatDueDay, $conCreditRefValue, $textCus, $A_NO, $A_SUBNO, $A_SOI, $A_RD, $A_TUM, $A_AUM, $A_PRO,
-							$A_POST, $A_BUILDING, $A_ROOM, $A_FLOOR, $A_VILLAGE, $tableMinPay, '$user_id', $textBillFA, $conGuaranteeAmtForCredit, $conFineRate, '$calculateticket')";
+							$A_POST, $A_BUILDING, $A_ROOM, $A_FLOOR, $A_VILLAGE, $tableMinPay, '$user_id', $textBillFA, $conGuaranteeAmtForCredit,
+							$conFineRate, '$calculateticket', $case_owners_id_checknull)";
 
 	$query_FACTORING = pg_query($qry_FACTORING);
 	if($query_FACTORING)

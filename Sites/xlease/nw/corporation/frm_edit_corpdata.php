@@ -128,7 +128,7 @@ function emty()
 		echo "<td>$trade_name</td>";
 		echo "<td align=\"center\"><a onclick=\"javascript:popU('frm_viewcorp_detail.php?corp_regis=$corp_regis','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=950,height=700')\" style=\"cursor:pointer;\"><img src=\"images/detail.gif\" width=\"19\" height=\"19\" border=\"0\" style=\"cursor:pointer;\"></a></td>";
 		//echo "<td align=\"center\"><a onclick=\"javascript:popU('page_edit_corpdata.php?corpID=$corpID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=950,height=700')\" style=\"cursor:pointer;\"><img src=\"images/edit.png\" width=\"19\" height=\"19\" border=\"0\" style=\"cursor:pointer;\"></a></td>";
-		echo "<td align=\"center\"><a onclick=\"javascript:popU('frm_EditCorpAll.php?corpID=$corpID&editcorp=2','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=950,height=700')\" style=\"cursor:pointer;\"><img src=\"images/edit.png\" width=\"19\" height=\"19\" border=\"0\" style=\"cursor:pointer;\"></a></td>";
+		echo "<td align=\"center\"><a onclick=\"javascript:popU('frm_EditCorpAll.php?corpID=$corpID&editcorp=2','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1100,height=700')\" style=\"cursor:pointer;\"><img src=\"images/edit.png\" width=\"19\" height=\"19\" border=\"0\" style=\"cursor:pointer;\"></a></td>";
 		echo "</tr>";
 	}
 	if($numrows==0){

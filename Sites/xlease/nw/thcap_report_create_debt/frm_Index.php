@@ -181,6 +181,8 @@ $(document).ready(function(){
 			$('#a8').css('background-color', '#79BCFF');
 			$('#a9').css('background-color', '#79BCFF');
 			$('#a10').css('background-color', '#79BCFF');
+			$('#a11').css('background-color', '#79BCFF');
+			$('#a12').css('background-color', '#79BCFF');
 		}); 
 		$('#a2').click( function(){   
 			$('#a1').css('background-color', '#79BCFF');   
@@ -193,6 +195,8 @@ $(document).ready(function(){
 			$('#a8').css('background-color', '#79BCFF');
 			$('#a9').css('background-color', '#79BCFF');
 			$('#a10').css('background-color', '#79BCFF');
+			$('#a11').css('background-color', '#79BCFF');
+			$('#a12').css('background-color', '#79BCFF');
 		}); 
 		$('#a3').click( function(){   
 			$('#a1').css('background-color', '#79BCFF');   
@@ -204,6 +208,9 @@ $(document).ready(function(){
 			$('#a7').css('background-color', '#79BCFF'); 
 			$('#a8').css('background-color', '#79BCFF');
 			$('#a9').css('background-color', '#79BCFF');
+			$('#a10').css('background-color', '#79BCFF');
+			$('#a11').css('background-color', '#79BCFF');
+			$('#a12').css('background-color', '#79BCFF');
 		}); 
 		$('#a4').click( function(){   
 			$('#a1').css('background-color', '#79BCFF');   
@@ -216,6 +223,8 @@ $(document).ready(function(){
 			$('#a8').css('background-color', '#79BCFF');
 			$('#a9').css('background-color', '#79BCFF');
 			$('#a10').css('background-color', '#79BCFF');
+			$('#a11').css('background-color', '#79BCFF');
+			$('#a12').css('background-color', '#79BCFF');
 		}); 
 		$('#a5').click( function(){   
 			$('#a1').css('background-color', '#79BCFF');   
@@ -228,6 +237,8 @@ $(document).ready(function(){
 			$('#a8').css('background-color', '#79BCFF');
 			$('#a9').css('background-color', '#79BCFF');
 			$('#a10').css('background-color', '#79BCFF');
+			$('#a11').css('background-color', '#79BCFF');
+			$('#a12').css('background-color', '#79BCFF');
 		}); 
 		$('#a6').click( function(){   
 			$('#a1').css('background-color', '#79BCFF');   
@@ -240,6 +251,8 @@ $(document).ready(function(){
 			$('#a8').css('background-color', '#79BCFF');
 			$('#a9').css('background-color', '#79BCFF');
 			$('#a10').css('background-color', '#79BCFF');
+			$('#a11').css('background-color', '#79BCFF');
+			$('#a12').css('background-color', '#79BCFF');
 		}); 
 		$('#a7').click( function(){   
 			$('#a1').css('background-color', '#79BCFF');   
@@ -252,6 +265,8 @@ $(document).ready(function(){
 			$('#a8').css('background-color', '#79BCFF');
 			$('#a9').css('background-color', '#79BCFF');
 			$('#a10').css('background-color', '#79BCFF');
+			$('#a11').css('background-color', '#79BCFF');
+			$('#a12').css('background-color', '#79BCFF');
 		});
 		$('#a9').click( function(){   
 			$('#a1').css('background-color', '#79BCFF');   
@@ -264,6 +279,8 @@ $(document).ready(function(){
 			$('#a8').css('background-color', '#79BCFF');
 			$('#a9').css('background-color', '#ff6600');
 			$('#a10').css('background-color', '#79BCFF');
+			$('#a11').css('background-color', '#79BCFF');
+			$('#a12').css('background-color', '#79BCFF');
 		});
 		$('#a10').click( function(){   
 			$('#a1').css('background-color', '#79BCFF');   
@@ -276,6 +293,36 @@ $(document).ready(function(){
 			$('#a8').css('background-color', '#79BCFF');
 			$('#a9').css('background-color', '#79BCFF');
 			$('#a10').css('background-color', '#ff6600');
+			$('#a11').css('background-color', '#79BCFF');
+			$('#a12').css('background-color', '#79BCFF');
+		});
+		$('#a11').click( function(){   
+			$('#a1').css('background-color', '#79BCFF');   
+			$('#a2').css('background-color', '#79BCFF'); 
+			$('#a3').css('background-color', '#79BCFF'); 
+			$('#a4').css('background-color', '#79BCFF'); 
+			$('#a5').css('background-color', '#79BCFF'); 
+			$('#a6').css('background-color', '#79BCFF'); 
+			$('#a7').css('background-color', '#79BCFF'); 
+			$('#a8').css('background-color', '#79BCFF');
+			$('#a9').css('background-color', '#79BCFF');
+			$('#a10').css('background-color', '#79BCFF');
+			$('#a11').css('background-color', '#ff6600');
+			$('#a12').css('background-color', '#79BCFF');
+		});
+		$('#a12').click( function(){   
+			$('#a1').css('background-color', '#79BCFF');   
+			$('#a2').css('background-color', '#79BCFF'); 
+			$('#a3').css('background-color', '#79BCFF'); 
+			$('#a4').css('background-color', '#79BCFF'); 
+			$('#a5').css('background-color', '#79BCFF'); 
+			$('#a6').css('background-color', '#79BCFF'); 
+			$('#a7').css('background-color', '#79BCFF'); 
+			$('#a8').css('background-color', '#79BCFF');
+			$('#a9').css('background-color', '#79BCFF');
+			$('#a10').css('background-color', '#79BCFF');
+			$('#a11').css('background-color', '#79BCFF');
+			$('#a12').css('background-color', '#ff6600');
 		});
     });
 });
@@ -320,7 +367,7 @@ function popU(U,N,T){
     <tr>
         <td>
 			<div style="text-align:center"><h2>(THCAP) รายงานการตั้งหนี้</h2></div>       
-			<div style="float:right"><input type="button" value="  Close  " onclick="window.close();"></div>
+			<div style="float:right"><input type="button" value="  Close  " onClick="window.close();" style="cursor:pointer;"></div>
 			<div style="clear:both;"></div>
 			<fieldset><legend><B>รายงานการตั้งหนี้</B></legend>
 				<div align="center">
@@ -411,7 +458,7 @@ function popU(U,N,T){
 										<input type="checkbox" name="chkbox1" value="10" <?php if($chkbox1 == 10){echo "checked";} ?> />แสดงรายการที่ยกเลิก  
 										<input type="checkbox" name="chkbox2" value="20" <?php if($chkbox2 == 20){echo "checked";} ?> />แสดงรายการที่ยกเว้นหนี้
 										<br/>
-										<input type="submit" id="btn00" value="เริ่มค้น"/>
+										<input type="submit" id="btn00" style="cursor:pointer;" value="เริ่มค้น"/>
 									</td>
 								</tr>
 							</table>
@@ -453,13 +500,15 @@ function popU(U,N,T){
 									<th id="a1" class="sort-text" style="cursor:pointer;" width="120">เลขที่สัญญา</th>
 									<th id="a2" class="sort-text" style="cursor:pointer;" width="80">รหัสประเภท<br>ค่าใช้จ่าย</th>
 									<th id="a9" class="sort-text" style="cursor:pointer;" width="80">รายละเอียด<br>ค่าใช้จ่าย</th>
-									<th id="a3" class="sort-number" style="cursor:pointer;" width="100">ค่าอ้างอิง<br>ของค่าใช้จ่าย</th>
-									<th id="a4" class="sort-text" style="cursor:pointer;background-color:#ff6600;" width="100">วันที่หนี้มีผล</th>
+									<th id="a3" class="sort-number" style="cursor:pointer;" width="80">ค่าอ้างอิง<br>ของค่าใช้จ่าย</th>
+									<th id="a4" class="sort-text" style="cursor:pointer;background-color:#ff6600;" width="80">วันที่หนี้มีผล</th>
 									<th id="a5" class="sort-number" style="cursor:pointer;" width="100">จำนวนหนี้ (บาท)</th>
 									<th id="a6" class="sort-text" style="cursor:pointer;">ผู้ขอตั้งหนี้</th>
 									<th id="a7" class="sort-text" style="cursor:pointer;">วันเวลาขอตั้งหนี้</th>
 									<th id="a8" class="sort-text">รายละเอียด</th>
 									<th id="a10" class="sort-text" style="cursor:pointer;">สถานะ</th>
+									<th id="a11" class="sort-text" style="cursor:pointer;">วันที่จ่ายครบ</th>
+									<th id="a12" class="sort-text" style="cursor:pointer;">เลขที่ใบเสร็จ</th>
 								</tr>
 								</thead>
 								<?php
@@ -506,35 +555,52 @@ function popU(U,N,T){
 									
 								}
 								
-								// หารายละเอียดค่าใช้จ่ายนั้นๆ
+									// หารายละเอียดค่าใช้จ่ายนั้นๆ
+									$qry_tpDesc = pg_query("select \"tpDesc\" from account.\"thcap_typePay\" where \"tpID\" = '$typePayID' ");
+									$tpDescShow = pg_fetch_result($qry_tpDesc,0);
 								
-								$qry_tpDesc = pg_query("select * from account.\"thcap_typePay\" where \"tpID\" = '$typePayID' ");
-								while($res_tpDesc = pg_fetch_array($qry_tpDesc))
-								{
-									$tpDescShow = $res_tpDesc["tpDesc"];
-								}
-									
-									// code เดิม สีสลับบรรทัดเลขคู่และคี่
-									/*
-									$i+=1;
-									if($i%2==0){
-										echo "<tr class=\"odd\" align=\"center\">";
-									}else{
-										echo "<tr class=\"even\" align=\"center\">";
+									// ถ้าจ่ายครบแล้ว ให้หาวันที่จ่ายครบ และเลขที่ใบเสร็จ
+									if($debtStatus == '2')
+									{
+										$qry_receipt = pg_query("
+																	SELECT
+																		\"receiptID\",
+																		\"receiveDate\"
+																	FROM
+																		\"thcap_temp_receipt_channel\"
+																	WHERE
+																		\"receiptID\" IN(select \"receiptID\" from \"thcap_temp_receipt_otherpay\" where \"debtID\" = '$debtIDMain') AND
+																		\"receiptID\" NOT IN(select \"receiptID\" from \"thcap_temp_receipt_cancel\" where \"approveStatus\" = '1')
+																	GROUP BY
+																		\"receiptID\",
+																		\"receiveDate\"
+																	ORDER BY
+																		\"receiveDate\" DESC,
+																		\"receiptID\" DESC
+																	LIMIT 1
+																");
+										$receiptID = pg_fetch_result($qry_receipt,0); // เลขที่ใบเสร็จ
+										$receiveDate = pg_fetch_result($qry_receipt,1); // วันที่จ่าย
 									}
-									*/
+									else
+									{
+										$receiptID = "";
+										$receiveDate = "";
+									}
 									
-									// code ใหม่ สีเปลี่ยนไปตามสถานะ
+									// สีเปลี่ยนไปตามสถานะ
 									if($debtStatustxt == "ยกเลิก" or $debtStatustxt == "waive รายการ (ยกเว้นหนี้)"){
-									echo "<tr class=changecolor1 align=\"center\">";
+										echo "<tr class=changecolor1 align=\"center\">";
 									}elseif($debtStatustxt == "จ่ายครบแล้ว"){
-									echo "<tr class=changecolor2 align=\"center\">";
+										echo "<tr class=changecolor2 align=\"center\">";
 									}elseif($debtStatustxt == "ACTIVE / (ยังไม่ได้จ่าย หรือจ่ายไม่ครบ)"){
-									echo "<tr class=changecolor3 align=\"center\">";
+										echo "<tr class=changecolor3 align=\"center\">";
+									}else{
+										echo "<tr align=\"center\">";
 									}
 									
 									echo "
-										<td>$contractID</td>
+										<td><span onclick=\"javascript:popU('../thcap_installments/frm_Index.php?show=1&idno=$contractID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1100,height=700')\" style=\"cursor:pointer;\"><font color=\"blue\"><u>$contractID</u></font></span></td>
 										<td>$typePayID</td>
 										<td align=\"left\">$tpDescShow</td>
 										<td>$typePayRefValue</td>
@@ -544,6 +610,8 @@ function popU(U,N,T){
 										<td>$doerStamp</td>
 										<td><a href=\"#\" onclick=\"javascript:popU('detail_create.php?debtID=$debtIDMain','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=600,height=410')\"><img src=\"images/detail.gif\"></a></td>
 										<td>$debtStatustxt</td>
+										<td>$receiveDate</td>
+										<td><span onclick=\"javascript:popU('../thcap/Channel_detail.php?receiptID=$receiptID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=900,height=700')\" style=\"cursor:pointer;\"><font color=\"blue\"><u>$receiptID</u></font></span></td>
 										</tr>
 									";
 									$sum_amt+=$typePayAmt;
@@ -554,11 +622,11 @@ function popU(U,N,T){
 							<table width="1050" border="0" cellSpacing="1" cellPadding="3" bgcolor="#F0F0F0">
 							<?php
 							if($numrow_main == 0){
-								echo "<tr><td colspan=9 bgcolor=\"#E9F8FE\" align=center height=50><b>-ไม่พบรายการตั้งหนี้-</b></td></tr>";
+								echo "<tr><td bgcolor=\"#E9F8FE\" align=center height=50><b>-ไม่พบรายการตั้งหนี้-</b></td></tr>";
 							}else{	
 								echo "<tr>
-								<td class=\"sum\" align=right width=\"508\"><b>รวมเงิน</b></td><td align=right class=\"sum\" width=\"100\"><b>".number_format($sum_amt,2)."</b>
-								<td colspan=3 class=\"sum\" align=right></td></tr>";
+								<td class=\"sum\" align=right width=\"520\"><b>รวมเงิน</b></td><td align=right class=\"sum\" width=\"100\"><b>".number_format($sum_amt,2)."</b>
+								<td class=\"sum\" align=right></td></tr>";
 							}
 						?>
 							</table>
@@ -587,7 +655,7 @@ function popU(U,N,T){
 			$qry_fr=pg_query("	select a.*,to_char(a.\"doerStamp\", 'yyyy-mm-dd HH24:MI:SS') as \"doerStamp1\",date(a.\"doerStamp\") as doerstamp2,b.\"fullname\"
 								from \"thcap_temp_otherpay_debt\" a
 								left join \"Vfuser\" b on a.\"doerID\"=b.\"id_user\"
-								where a.\"debtStatus\" = '9' order by a.\"doerStamp\" , a.\"debtID\" ");
+								where a.\"debtStatus\" = '9' and a.\"ShowAppvStatus\"='1' order by a.\"doerStamp\" , a.\"debtID\" ");
 			$nub=pg_num_rows($qry_fr);
 			while($res_fr=pg_fetch_array($qry_fr)){
 				$debtID=$res_fr["debtID"];
@@ -666,7 +734,7 @@ function popU(U,N,T){
 					}
 				}
 			?>
-				<td><span onclick="javascript:popU('../thcap_installments/frm_Index.php?show=1&idno=<?php echo $contractID?>','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1100,height=800')" style="cursor:pointer;"><font color="red"><u><?php echo $contractID;?></u></font></span></td>
+				<td><span onclick="javascript:popU('../thcap_installments/frm_Index.php?show=1&idno=<?php echo $contractID?>','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1100,height=700')" style="cursor:pointer;"><font color="red"><u><?php echo $contractID;?></u></font></span></td>
 				<td><?php echo $typePayID; ?></td>
 				<td align="left"><?php echo $tpDescShow; ?></td>
 				<td><?php echo $typePayRefValue; ?></td>
@@ -675,7 +743,7 @@ function popU(U,N,T){
 				<td align="left"><?php echo $fullnameuser; ?></td>
 				<td><?php echo $doerStamp; ?></td>
 				<!-- <td align="left"><?php echo $remark; ?></td> -->
-				<td><?php echo "<a href=\"#\" onclick=\"javascript:popU('detail_debt.php?debtID=$debtID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=500,height=400')\"><u>ดูเหตุผล</u></a>"; ?></td>
+				<td><?php echo "<span style=\"cursor:pointer;\" onClick=\"javascript:popU('detail_debt.php?debtID=$debtID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=500,height=400')\"><u>ดูเหตุผล</u></span>"; ?></td>
 			</tr>
 			<?php
 			} //end while

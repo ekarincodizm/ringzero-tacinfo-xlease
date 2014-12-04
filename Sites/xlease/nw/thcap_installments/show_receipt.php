@@ -1,7 +1,7 @@
 <?php
 include("../../config/config.php");
 
-$assetID = $_GET['assetID'];
+$assetID = pg_escape_string($_GET['assetID']);
 
 $q1 = "select \"receiptNumber\",\"PurchaseOrder\" from \"thcap_asset_biz\" where \"assetID\"='$assetID'";
 $qr1 = pg_query($q1);

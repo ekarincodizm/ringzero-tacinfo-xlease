@@ -68,7 +68,8 @@ $receiptTypeName = pg_escape_string($_GET["receiptTypeName"]);
 											WHERE
 												\"RefAnyID\" IS NULL AND
 												\"Cancel\" = FALSE AND
-												\"O_Type\" = '$receiptTypeID'
+												\"O_Type\" = '$receiptTypeID' AND
+												\"O_DATE\" >= '2013-01-01'
 											ORDER BY
 												\"IDNO\",
 												\"O_DATE\"

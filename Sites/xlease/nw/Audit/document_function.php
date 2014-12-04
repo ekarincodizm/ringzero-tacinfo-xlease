@@ -315,7 +315,29 @@
 									(\"thcap_audit_check_cr0046\".\"appvTimes\" = ".$Time_Chk.")";
 		
 		return($Sql_Show_Notice);
-	}// End function Create_SQL_Comand_For_Show_Notice
+	}// End function Create_SQL_Comand_For_Show_Notice 
+	function Compute_Score_For_CR_0089($Docs_ID)
+	{ // หาค่าคะแนนรวมการประเมินเป็น เปอร์เซ็นต์
+		$Str_Get_Compute = 	"
+								SELECT 
+										\"Value\"
+								FROM 
+										\"thcap_audit_docs_detail\"
+								WHERE 
+										(\"Docs_ID\" = '".$Docs_ID."') AND
+										(\"Element_Type\" = 'radio')	
+								
+							";
+		$Result = pg_query($Str_Get_Compute); 
+		$Sum_Score = 0;
+		while($Data = pg_fetch_array($Result))
+		{
+			$Compute_Score = explode('#',$Data[0]);// ดึงคะแนนจากรายการที่ถูกเลือกในแต่่ละข้อ
+			$Sum_Score+=$Compute_Score[0];	
+		} 
+		$Scor_Percen = ($Sum_Score * 100 )/25;
+		return($Scor_Percen); 
+	} // End function Compute_Score_For_CR_0089($Docs_ID)
 	function Disable_Element_From_H_To_W()
 	{   // ทำให้ Element ในข้อ H to W ไม่สามารถ Click ได้
 		?>
@@ -453,6 +475,44 @@
 		$Data = pg_fetch_array($Result);
 		return($Data);
 	}// End Function Get_notice_cr0046_to_show
+	
+	function Get_Value_From_Text_Area($Docs_ID,$Element_Name,$Element_ID)
+	{
+		$Sql = 	"
+					SELECT
+							\"Value\"
+					FROM
+							\"thcap_audit_docs_detail\"
+					WHERE
+							(\"Docs_ID\" = '".$Docs_ID."') and
+							(\"Element_Name\" = '".$Element_Name."') and
+							(\"Element_ID\"   = '".$Element_ID."')	and
+							(\"Element_Type\")= 'textarea'			 
+				";
+			
+		$Result = pg_query($Sql);
+		$Data = pg_fetch_array($Result);
+		return($Data[0]);	
+		
+	}
+	function get_cr0089_save_by()
+	{
+		$Docs_Id = pg_escape_string($_GET["Docs_ID"]); 
+		$Str_Get = 	"
+						SELECT 
+								\"Value\"
+						FROM 
+								thcap_audit_docs_detail
+						WHERE 	
+								(\"Docs_ID\" = '".$Docs_Id."') And
+								(\"Element_ID\" = 'Save_By') And
+								(\"Doc_Type\" = 'CR0089')	
+						
+					";
+		$Result = pg_query($Str_Get);
+		$Data = pg_fetch_array($Result);
+		return($Data[0]);					
+	}
 	function Head_Table_Of_Check_Doc()
 	{  // หัวตาราง 
 		?>
@@ -501,7 +561,6 @@
 				<TH>วันเวลาที่ประเมิน</TH>
 				<TH>หมายเหตุ</TH>
 				<TH>คะแนนที่ได้</TH>
-				<TH>Col-9</TH>
 			</TR>
 		
 		<?php
@@ -729,6 +788,31 @@
 					
 		return($Str_Fst);	
 	}
+	
+	function Create_String_For_Load_Document_type_CR0089($Rcd_Need)
+	{   // สร้าง Sql Comand สำหรับดึงข้อมูลมาแสดงสามารถระบุ ประเภทเอกสารได้
+		$Str_Fst = "
+						SELECT 
+								thcap_audit_docs_detail.\"Docs_ID\", 
+								thcap_audit_docs_main.\"Contract_ID\", 
+								thcap_audit_docs_main.\"AppvTime\", 
+								thcap_audit_docs_detail.\"Value\",
+								thcap_audit_docs_main.\"AppvStamp\"	
+						FROM 
+								\"thcap_audit_docs_main\",
+								\"thcap_audit_docs_detail\"
+						WHERE 
+								(thcap_audit_docs_main.\"auto_ID\" = thcap_audit_docs_detail.\"main_autoID\") and 		
+								(thcap_audit_docs_detail.\"Doc_Type\" = 'CR0089') and
+								(thcap_audit_docs_detail.\"Element_Name\" = 'Valuator_Name')
+      					ORDER By
+      							thcap_audit_docs_main.\"auto_ID\"  DESC		
+						LIMIT 	".$Rcd_Need."
+					";
+					
+					
+		return($Str_Fst);	
+	}
 	 
 	
 	function Row_Table_Of_cr_0046($Rcd_Need)
@@ -810,6 +894,80 @@
 		}			
 		
 	}// End function Row_Table_Of_cr_0046
+	
+	function Row_Table_Of_cr_0089($Rcd_Need)
+	{
+		$Sql_Cmd_Row_Show = Create_String_For_Load_Document_type_CR0089($Rcd_Need); 
+		// echo $Sql_Cmd_Row_Show;
+		$Result = pg_query($Sql_Cmd_Row_Show);
+		$Num_Row = pg_num_rows($Result);
+		// echo 'No. Of Row Is '.$Num_Row;
+		$i = 1;
+		while($Data = pg_fetch_array($Result)){
+			// echo $i.''.$Data[0].'  '.$Data[1].' '.$Data[2].' '.$Data[3].' '.$Data[4].'<BR>';	
+			//print_r($Data);
+			 
+		 	
+			if($i%2==0) // กำหนด รูปแบบการแสดงข้อมูลของ แถว ในตาราง
+			{
+				$Class_Type = "odd";	
+			}else
+			{
+				$Class_Type = "even";
+			}
+			$Score_Percent = Compute_Score_For_CR_0089($Data[0]); // คำนวณค่าการประเมินผล
+			?>
+				<TR class="<?php echo $Class_Type; ?>">
+					<TD align = "center">
+						<?php
+							echo $i;
+						?>
+					</TD>
+					<TD align="center">
+						<?php
+							// echo $Data[0]; // เลขที่เอกสาร
+							Show_Line_Link_Display_Service_Check($Data[0],$Data[1],$Score_Percent);		
+						?>
+					</TD>
+					<TD>
+						<?php
+							echo $Data[1]; // ลูกค้าหรือผู้จัดจำหน่าย
+						?>
+					</TD>
+					<TD align="center" >
+						<?php
+							echo $Data[2]; // ตรวจสอบครั้งที่
+						?>
+					</TD>
+					<TD>
+						<?php
+							echo $Data[3]; // ผู้ประเมิน
+						?>
+					</TD>
+					<TD align="center">
+						<?php
+							echo $Data[4]; // วันเวลาที่ประเมืน
+						?>
+					</TD>
+					<TD align="center" >
+						<!-- Link หมายเหตุ -->
+						<?php
+							Show_Line_Link_To_Display_cr0089_Note($Data[1],$Data[2],$Data[0]);
+						?>							
+					</TD>
+					<TD align="center">
+						<?php
+							echo $Score_Percent.'%';
+						?>
+					</TD>
+					
+				</TR>
+			<?php
+			$i++;
+		}
+		
+	}// End function Row_Table_Of_cr_0089
+	
 	function show_doc_msg($Str_Show,$Font_Size){
 	// แสดงข้อความตรงกลางในเอกสาร	
 		?>
@@ -822,6 +980,20 @@
 		</DIV>
 		<?php
 		
+	}
+	
+	function show_doc_msg_2_part($msg1,$msg2)
+	{	// แสดง 2 ข้อความตรงกลาง
+		?>
+			<DIV align="center"> 
+				<H2>
+					<?php
+						echo $msg1.'<BR>';
+						echo $msg2.'<BR>';
+					?>
+				</H2>
+			</DIV>
+		<?php
 	}
 	
 	function show_Image_Link_Display_Docs_Detail_cr0046($Doc_ID)
@@ -882,6 +1054,26 @@
 		<?php	
 	}// End Of show_Line_Link_To_Check_Document_2
 	
+	function show_Line_Link_To_Check_Document_3($Txt_Doc,$File_Name)
+	{   // สร้าง Link สำหรับการ เปิด Window
+		?>  
+			<a onclick="javascript:popU('<?php echo $File_Name; ?>',
+										'',
+										'toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=540,height=230')" 
+						style="cursor:pointer;">
+						<font color = "blue">
+							<u> 
+									<?php 
+										echo $Txt_Doc; 
+									?>
+							</u>		
+						</font>	
+							
+							
+			</a>
+		<?php	
+	}// End Of show_Line_Link_To_Check_Document_3
+	
 	function Show_Line_Link_Display_Contract_installments_By_ContractID($ContractID)// แสดงตารรางการผ่อนชำระ ของแต่ละสัญญา
 	{
 		$Url_Open = "../thcap_installments/frm_Index.php?show=1&idno=".$ContractID;
@@ -890,13 +1082,38 @@
 	}
 	
 	function Show_Line_Link_Display_Approve_Note($Data_show)
-	{   // ทำข้อมูลไว้สำหรับสร้าง การ Link
+	{   // ทำข้อมูลไว้สำหรับสร้าง การ Link เอกสาร CR0046
 		// Define ค่า Parameter (เลขที่เอกสาร,เลขที่สัญญา) 
 		$Parameter_For_Search = "Docs_ID=".$Data_show['Docs_ID']."&"."Contract_ID=".$Data_show[1];
 		// Define File Name กับ Parameter
 		$File_Name = "Show_Notice.php?".$Parameter_For_Search;
 		show_Line_Link_To_Check_Document_2('หมายเหตุ',$File_Name);		
 	}	
+	
+	function Show_Line_Link_Display_Service_Check($Docs_ID,$Customer,$Score)
+	{	// สร้าง Link ไปยังส่วนประเมินผลการบริการ สำหรับเอกสาร CR0089
+		$New_Custname = explode('#',$Customer);
+		$Parameter_For_Search = "Docs_ID=".$Docs_ID.'&'.
+								'Cust_Name1='.$New_Custname[0].
+								'&Cust_Name2='.$New_Custname[1].
+								'&Pur_Pose=Show'.
+								'&Score='.$Score;
+		$File_And_Paramenter = 'Show_thcap_cr0089.php?'.$Parameter_For_Search;
+	 	show_Line_Link_To_Check_Document($Docs_ID, $File_And_Paramenter);
+		
+	}
+	function Show_Line_Link_To_Display_cr0089_Note($Customer,$AppvTime,$Doc_No)
+	{	// สร้าง Link ไปยังส่วนประเมินผลการบริการ สำหรับเอกสาร CR0089
+		
+		$New_Cust = explode('#',$Customer);
+		$Parameter_For_Search = "Cust_0=".$New_Cust[0]."&"
+								."Cust_1=".$New_Cust[1]."&"
+								."AppvTime=".$AppvTime."&"
+								."Doc_No=".$Doc_No;
+		$File_Name = "Show_Notice_cr0089.php?".$Parameter_For_Search;
+		show_Line_Link_To_Check_Document_3('หมายเหตุ',$File_Name);
+	}
+	
 ?>
 <script>
 	function Chk_Input_Data(Contract_Type,Contract_ID)
@@ -1600,6 +1817,248 @@
 		return Chk_Status;
 	}// End Of function Chk_Input_Data_cr_0046  
 	
+	function Chk_Input_Data_cr_0047()
+	{  // ตรวจสอบการนำเข้าข้อมูลลูกค้า  ในหน้าจอสำหรับรับ รับชื่อลูกค้า ของเอกสาร CR_0047
+		var val_chk = document.getElementById('Dealer_Name').value;
+		
+		if(val_chk==null || val_chk==""){
+			alert('กรุณานำเข้า ชื่อลูกค้าที่ต้องการตรวจสอบเครดิต')
+			return false;	
+		}else{
+			return true;
+		}
+	} // End Of function Chk_Input_Data_cr_0047()
+	
+	function Chk_Input_Data_cr_0047_Detail()
+	{ // ตรวจสอบการนำเข้ารายละเอียดการตรวจสอบข้อมูล ของเอกสาร CR00047
+		
+		alert('Chk Input CR0047');
+		
+		var Chk_Status = true;
+		var Err_Msg_P1 = "";
+		
+		// ตรวจสอบการนำเข้าข้อมูลในหน้าที่ 1 การเกี่ยวข้อง ของผู้ขอสินเชื่อ
+		var Chk1 = document.getElementById('Borrower').checked;
+		var Chk2 = document.getElementById('Co-Borrower').checked;
+		var Chk3 = document.getElementById('Other_Concern').checked
+		if(!(Chk1||Chk2||Chk3))
+		{
+			Err_Msg_P1 = 'เกี่ยวข้องเป็น '+'\n\r';
+			Chk_Status = false;
+		}
+		if(Chk3 && document.getElementById('Other_Conern').value == "")
+		{
+			 
+			Chk_Status = false;
+			Err_Msg_P1 = Err_Msg_P1 + 'กรุณากรอก เกี่ยวข้อง อื่น ๆ  '+'\n\r';
+		}
+		
+		
+		// ตรวจสอบการนำเข้าข้อมูลในหน้าที่ 1 ข้อมูลผู้ที่ถูกตรวจสอบ
+		var Chk1 = document.getElementById('Give_Self').checked;
+		var Chk2 = document.getElementById('Give_RealName').checked;
+		var Chk3 = document.getElementById('Give_2Time_Contact').checked;
+		if(!(Chk1||Chk2||Chk3))
+		{
+			
+			Err_Msg_P1 = Err_Msg_P1 + 'เลือกผู้ให้ข้อมูล  '+'\n\r';
+			Chk_Status = false;
+		} 
+		if(Chk2 && document.getElementById('Give_RealName').value =="")
+		{
+			Err_Msg_P1 = Err_Msg_P1 + 'ชื่อจริง ของผู้ให้ข้อมูล'+'\n\r';
+		}
+		// ตรวจสอบการนำเข้าข้อมูลในหน้าที่ 1 ปัจจุบันอาศัยที่
+		if(document.getElementById('Txt_Address').value == "")
+		{  
+			Err_Msg_P1 = Err_Msg_P1 + 'ปัจจุบันอาศัยที่'+'\n\r'; 
+			
+		}
+		// ตรวจสอบการนำเข้าข้อมูลในหน้าที่ 1 ที่พักปัจจุบันในเอกสาร
+		var Chk1 = document.getElementById('Ad_Same').checked;
+		var Chk2 = document.getElementById('Ad_Diff').checked;
+		if(!(Chk1||Chk2))
+		{
+			Err_Msg_P1 = Err_Msg_P1 + 'ที่พักปัจจุบันในเอกสาร '+ '\n\r';
+		}
+		// ตรวจสอบการนำเข้าข้อมูลในหน้าที่ 1 สถานะกรรมสิทธิ์
+		var Chk1 = document.getElementById('Is_Owner').checked;
+		var Chk2 = document.getElementById('Rent').checked;
+		if(!(Chk1||Chk2))
+		{
+			Err_Msg_P1 = Err_Msg_P1 + 'สถานะกรรมสิทธิ์ '+ '\n\r';
+		} 
+		
+		if(Chk2 && document.getElementById('House_Rent').value == "")
+		{
+			Err_Msg_P1 = Err_Msg_P1 + 'ส่วนสถานะกรรมสิทธิ์  ถ้าเลือก เช่่าเดือนละ แล้ว นำเข้าค่าเข่า ';
+		}
+		// ตรวจสอบการนำเข้าข้อมูลในหน้าที่ 1 ที่พักอาศัยอื่น
+		var Chk1 = document.getElementById('Have_Address').checked;
+		var Chk2 = document.getElementById('No_Address').checked;
+		var Chk3 = document.getElementById('UnDisclosed_Address').checked;
+		if(!(Chk1||Chk2||Chk3))
+		{
+			
+			Err_Msg_P1 = Err_Msg_P1 + 'ที่พักอาศัยอื่น'+'\n\r';
+			Chk_Status = false;
+		}
+		if(Chk1 && document.getElementById('Txt_Address').value =="")
+		{
+			Err_Msg_P1 = Err_Msg_P1 + 'ส่วนที่พักอาศัยอื่น ถ้าเลือก มี แล้วนำเข้าที่อยู่'+'\n\r';
+		}
+		// ตรวจสบการนำเข้าข้อมูลในหน้าที่ 1 พักอาศัยที่ที่พักปัจจุบันมาแล้ว
+		var Chk1 = document.getElementById('A_Half_Yrs').checked;
+		var Chk2 = document.getElementById('A_One_Yrs').checked;
+		var Chk3 = document.getElementById('A_Define').checked;
+		if(!(Chk1||Chk2||Chk3))
+		{
+			
+			Err_Msg_P1 = Err_Msg_P1 + 'พักอาศัยที่ที่พักปัจจุบันมาแล้ว'+'\n\r';
+			Chk_Status = false;
+		}
+		if(Chk3 && document.getElementById('Long_Live').value =="" )
+		{
+			Err_Msg_P1 = Err_Msg_P1 + 'ส่วน พักอาศัยที่ที่พักปัจจุบันมาแล้ว กรอกจำนวนปี'+'\n\r';
+		}
+		// ตรวจสอบการนำเข้าข้อมูลในหน้าที่ 1 สาเหตุที่ขอสินเชื่อ /เข่าทรัพย์สิน
+		var txt_Chk = document.getElementById('Txt_Borrow_Cnd').value; 
+		txt_Chk = txt_Chk.trim();
+		if(txt_Chk.length == 0)
+		{
+			Err_Msg_P1 = Err_Msg_P1 + 'สาเหตุที่ขอสินเชื่อ /เข่าทรัพย์สิน' + '\n\r';
+		}
+		// ตรวจสอบข้อมูลการนำเข้าข้อมูลในหน้าที่ 1 ท่านได้ขอสินเชื่อกับสถาบันการเงินอื่นจากสาเหตุข้างต้น
+		var Chk1 = document.getElementById('Other_Req_Have').checked;
+		var Chk2 = document.getElementById('Other_Req_No').checked;
+		if(!(Chk1||Chk2))
+		{
+			Err_Msg_P1 = Err_Msg_P1 + 'ท่านได้ขอสินเชื่อกับสถาบันการเงินอื่นจากสาเหตุข้างต้น'+ '\n\r';
+		} 
+		var txt_Chk1 = document.getElementById('Txt_Num_Req').value;
+		txt_Chk1 = txt_Chk1.trim();
+		var txt_Chk2 = document.getElementById('Txt_Other_Req').value;
+		txt_Chk2 = txt_Chk2.trim();
+		if(Chk1 &&((txt_Chk1.length == 0) ||(txt_Chk2.length ==0)))
+		{
+			Err_Msg_P1 = Err_Msg_P1+"นำเข้ารายละเอียดการขอสินเชื่อ จากสถาบันการเงินอื่น ";
+		}
+		// ตรวจสอบการนำเข้าข้อมูลในหน้าที่ 1  ภายใน 1 ปี ที่ผ่านมา มีใช้สินเชื่อนอกระบบหรือหรือไม่
+		var Chk1 = document.getElementById('loan_1_have').checked;
+		var Chk2 = document.getElementById('loan_1_nohave').checked;
+		if(!(Chk1||Chk2))
+		{
+			Err_Msg_P1 = Err_Msg_P1 + 'ภายใน 1 ปี ที่ผ่านมา มีใช้สินเชื่อนอกระบบหรือหรือไม่ '+ '\n\r';
+		} 
+		var txt_Chk1 = document.getElementById('Num_Outlaw_Loan').value;
+		txt_Chk1 = txt_Chk1.trim();
+		var txt_Chk2 = document.getElementById('Rate_Outlaw_Loan').value;
+		txt_Chk2 = txt_Chk2.trim();
+		if(Chk1 &&((txt_Chk1.length == 0) ||(txt_Chk2.length ==0)))
+		{
+			Err_Msg_P1 = Err_Msg_P1+"นำเข้ารายละเอียดการขอสินเชื่อ นอกระบบ ";
+		}
+		// ตรวจสอบการนำเข้าข้อมูลในหน้าที่ 1 ข้อมูลด้านอาชีพ (เป็นพนักงำนประจำ หรือ ประกอบกิจการส่วนตัว)
+		var Chk1 = document.getElementById('Job_Employee').checked;
+		var Chk2 = document.getElementById('Job_Business').checked;
+		if(!(Chk1||Chk2))
+		{
+			Err_Msg_P1 = Err_Msg_P1 + 'ข้อมูลด้านอาชีพ (เป็นพนักงำนประจำ หรือ ประกอบกิจการส่วนตัว) '+ '\n\r';
+		}
+		
+		// เริ่มการตรวจสอบข้อมูลในหน้าที่ 1 กรณีที่ เลือก ข้อมูลด้านอาชีพเป็น พนักงานประจำ
+		var Err_Msg_P1_Job_Employee = "";
+		if(Chk1) // กรณีที่ Click พนักงานประจำ
+		{
+			// textbox สำหรับ โดยทำงานอยู่ที่
+			var txt_Chk = document.getElementById('Txt_Comp_Name').value;
+			txt_Chk = txt_Chk.trim();
+			if(txt_Chk.length == 0)
+			{
+				Err_Msg_P1_Job_Employee = Err_Msg_P1_Job_Employee + 'กรุณากรอก โดยทำงานอยู่ที่'+'\n\r';
+			}
+			// textbox สำหรับ ตำแหน่ง
+			var txt_Chk = document.getElementById('Txt_Comp_Range').value;
+			txt_Chk = txt_Chk.trim();
+			if(txt_Chk.length == 0)
+			{
+				Err_Msg_P1_Job_Employee = Err_Msg_P1_Job_Employee + 'กรุณากรอก ตำแหน่ง'+'\n\r';
+			}
+			
+			
+			// radio สำหรับอายุงาน
+			
+			var Chk1 = document.getElementById('Lower_Half_Yrs').checked;
+			var Chk2 = document.getElementById('Lower_One_Yrs').checked;
+			var Chk3 = document.getElementById('Lower_Two_Yrs').checked;
+			var Chk4 = document.getElementById('Define_Yrs').checked;
+			if(!(Chk1||Chk2||Chk3||Chk4))
+			{
+				Err_Msg_P1_Job_Employee = Err_Msg_P1_Job_Employee + 'กรุณาเลือกอายุงาน'+'\n\r';
+			}
+			// textbox สำหรับกรอกอายุงาน
+			var txt_Chk = document.getElementById('Txt_Yr_Define').value;
+			txt_Chk = txt_Chk.trim();
+			if(Chk4 && (txt_Chk.length==0))
+			{
+				Err_Msg_P1_Job_Employee = Err_Msg_P1_Job_Employee +'กรุณากรอกอายุงาน'+'\n\r';
+			}
+			// radio สำหรับความพึงพอใจในงานปัจจุบัน
+			var Chk1 = document.getElementById('Job_Not_OK').checked;
+			var Chk2 = document.getElementById('Job_OK').checked;
+			if(!(Chk1||Chk2))
+			{
+				Err_Msg_P1_Job_Employee = Err_Msg_P1_Job_Employee + 'กรุณาเลือกความพึงพอใจในงาานปัจจุบัน'+'\n\r';
+			}
+			// textbox สำหรับ รายได้เงินเดือนไม่รวมค่่าคอมมิชชั่น ค่่าล่วงเวลาและโบนัส	
+			var txt_Chk = document.getElementById('Txt_Salary').value;
+			txt_Chk = txt_Chk.trim();
+			if(txt_Chk.length==0)
+			{
+				Err_Msg_P1_Job_Employee = Err_Msg_P1_Job_Employee +'กรุณากรอกเงินเดือน'+'\n\r';
+			}
+			// textbox สำหรับ ข้อมูลกิจการที่ท่านทำงาน เปิดมาแล้ว ... ปี	
+			var txt_Chk = document.getElementById('Txt_Yr_Long_1').value;
+			txt_Chk = txt_Chk.trim();
+			if(txt_Chk.length==0)
+			{
+				Err_Msg_P1_Job_Employee = Err_Msg_P1_Job_Employee +'กรุณากรอกข้อมูลกิจการที่ทำงานเปิดมาแล้วกี่ปี'+'\n\r';
+			}
+			// textbox สำหรับ ข้อมูลกิจการที่ท่านทำงาน มีพนักงาน ... ปี	
+			var txt_Chk = document.getElementById('Txt_Num_Employee_1').value;
+			txt_Chk = txt_Chk.trim();
+			if(txt_Chk.length==0)
+			{
+				Err_Msg_P1_Job_Employee = Err_Msg_P1_Job_Employee +'กรุณากรอกข้อมูลกิจการที่ทำงานมีพนักงานกี่คน'+'\n\r';
+			}
+			
+			
+			
+			
+
+			
+			if(Err_Msg_P1_Job_Employee.length > 0)
+			{
+				Err_Msg_P1_Job_Employee = "ถ้าเลือกข้อมูลด้านอาชีพ เป็นพนักงานประจำ "+'\n\r'+Err_Msg_P1_Job_Employee;
+			} 		
+			
+			Err_Msg_P1 = Err_Msg_P1 +  Err_Msg_P1_Job_Employee; 
+			
+			
+			
+			
+			
+		}
+		// สิ้นสุดการตรวจสอบข้อมูลในหน้าที่ 1 กรณีที่ เลือก ข้อมูลด้านอาชีพเป็น พนักงานประจำ
+		
+		
+		
+		if(Err_Msg_P1.length > 0 )
+		{
+			alert('ส่วนหน้าที่ 1 กรุณานำเข้าข้อมูลในส่วนของ '+'\n\r'+Err_Msg_P1);
+		}	
+		
+	} // End Of function Chk_Input_Data_cr_0047_Detail()
 	function Chk_Input_Data_cr_0089_type_1()
 	{
 		
@@ -1613,8 +2072,7 @@
 		}
 	}
 	function Chk_Input_Data_cr_0089_type_2()
-	{
-		
+	{   // ตรวจสอบการนำเข้าข้อมูล สำหรับ เอกสาร(CR0089) แบบประเมินการให้บริการสำหรับผู้จัดจำหน่าย
 		
 		var Chk_Status = true;
 		var Err_Msg = "";
@@ -1647,7 +2105,7 @@
 			Chk_Status = false;
 		}
 		
-		
+		// ตรวจสอบการเลือกในหัวข้อ ที่ 1 สามารถติดต่อ ประสานได้ง่าย
 		var Chk_Choice_Excellent = document.getElementById('C1_Excellent').checked; //สถานะ การ Check ใน ช่อง  ดีเยี่ยม  
 		var Chk_Choice_Good = document.getElementById('C1_Good').checked; // สพานะการ Check ในช่อง ดี
 		var Chk_Choice_Middle = document.getElementById('C1_Middle').checked; // สถานะการ Check ในช่อง ปานกลาง
@@ -1660,6 +2118,7 @@
 			Chk_Status = false;
 		}
 		
+		// ตรวจสอบการเลือกในหัวข้อ ที่ 2 ระยะเวลาการให้บริการ รวดเร็ว เป็นไปตามเวลาที่ตกลง
 		var Chk_Choice_Excellent = document.getElementById('C2_Excellent').checked; //สถานะ การ Check ใน ช่อง  ดีเยี่ยม  
 		var Chk_Choice_Good = document.getElementById('C2_Good').checked; // สพานะการ Check ในช่อง ดี
 		var Chk_Choice_Middle = document.getElementById('C2_Middle').checked; // สถานะการ Check ในช่อง ปานกลาง
@@ -1672,6 +2131,7 @@
 			Chk_Status = false;
 		}
 		
+		// ตรวจสอบการเลือกในหัวข้อ ที่ 3 ความสุภาพ ไมตรีจิต จิตบริการ
 		var Chk_Choice_Excellent = document.getElementById('C3_Excellent').checked; //สถานะ การ Check ใน ช่อง  ดีเยี่ยม  
 		var Chk_Choice_Good = document.getElementById('C3_Good').checked; // สพานะการ Check ในช่อง ดี
 		var Chk_Choice_Middle = document.getElementById('C3_Middle').checked; // สถานะการ Check ในช่อง ปานกลาง
@@ -1684,6 +2144,7 @@
 			Chk_Status = false;
 		}
 		
+		// ตรวจสอบการเลือกในหัวข้อ ที่ 4  ความกระตือรือร้น ช่วยติดตามงาน  
 		var Chk_Choice_Excellent = document.getElementById('C4_Excellent').checked; //สถานะ การ Check ใน ช่อง  ดีเยี่ยม  
 		var Chk_Choice_Good = document.getElementById('C4_Good').checked; // สพานะการ Check ในช่อง ดี
 		var Chk_Choice_Middle = document.getElementById('C4_Middle').checked; // สถานะการ Check ในช่อง ปานกลาง
@@ -1696,6 +2157,7 @@
 			Chk_Status = false;
 		}
 		
+		// ตรวจสอบการเลือกในหัวข้อ ที่ 5 ความรับผิดชอบ 
 		var Chk_Choice_Excellent = document.getElementById('C5_Excellent').checked; //สถานะ การ Check ใน ช่อง  ดีเยี่ยม  
 		var Chk_Choice_Good = document.getElementById('C5_Good').checked; // สพานะการ Check ในช่อง ดี
 		var Chk_Choice_Middle = document.getElementById('C5_Middle').checked; // สถานะการ Check ในช่อง ปานกลาง
@@ -1716,16 +2178,52 @@
 		if(Chk_Status)
 		{
 			if(confirm("ต้องการบันทึกข้อมูลหรือไม่"))
-			{
+			{  // กรณีที่ยืนยันเพื่อการบันทึกข้อมูล
 				Create_Array_For_Save_Doc_cr0089();
 			}
 		}
 	}
-		
+	
+	function check_num(e)
+	{ // ให้พิมพ์ได้เฉพาะตัวเลขและจุด
+    var key;
+    if(window.event)
+	{
+        key = window.event.keyCode; // IE
+		if(key <= 57 && key != 33 && key != 34 && key != 35 && key != 36 && key != 37 && key != 38 && key != 39 && key != 40 && key != 41 && key != 42
+			&& key != 43 && key != 44 && key != 45 && key != 47)
+		{
+			// ถ้าเป็นตัวเลขหรือจุดสามารถพิมพ์ได้
+		}
+		else
+		{
+			window.event.returnValue = false;
+		}
+    }
+	else
+	{
+        key = e.which; // Firefox       
+		if(key <= 57 && key != 33 && key != 34 && key != 35 && key != 36 && key != 37 && key != 38 && key != 39 && key != 40 && key != 41 && key != 42
+			&& key != 43 && key != 44 && key != 45 && key != 47)
+		{
+			// ถ้าเป็นตัวเลขหรือจุดสามารถพิมพ์ได้
+		}
+		else
+		{
+			key = e.preventDefault();
+		}
+	}
+	}
+	
+	function Clear_CR0047_Employee_End_Date_Value()
+	{
+		document.getElementById('Emp_End_Date').value = "";
+	}
+	
 	function Create_Array_For_Save_Doc_cr0046(){
 
-		var elem = document.getElementById('frmMain').elements;
-		var Send_Array = [];
+		var elem = document.getElementById('frmMain').elements; // รับค่าทุก Element ที่อยู่ใน Form
+		var Send_Array = []; // เพื่อเก็บรวม ค่า Element ก่อนการนำไปยันทึก
 
 		for(var i =0;i<elem.length;i++)
 		{
@@ -1748,30 +2246,150 @@
 	}
 	
 	function  Create_Array_For_Save_Doc_cr0089()
-	{   alert("Create Array 0089 Called");
-		// เก็บเอกสาร cr0089 ลงฐานข้อมูล เก็นข้อมูล จาก Form ที่ ID = "frm1"
+	{   // เก็บเอกสาร cr0089 ลงฐานข้อมูล เก็นข้อมูล จาก Form ที่ ID = "frm1"
+		
 		var elem = document.getElementById('frm1').elements;
 		var Send_Array = [];
-		// alert("No"+elem.length);
+		
 		for(var i =0;i<elem.length;i++)
 		{
 			str = elem[i].type+"|"+elem[i].name+"|"+elem[i].id+"|"+elem[i].value+"|"+elem[i].checked;
-			//alert(str);
-			Send_Array.push(str);
+			Send_Array.push(str); // นำเข้า ค่าตัวแปร str เพื่อเตรียมข้อมูลก่อนการประมวลผลเพื่อบันทึก
 		}
 		
-		$.post( "save_thcap_Audit_Docs_All.php",{data: Send_Array,doctype:'cr0089'})
-		.done(function( data ) {
-			 alert( "Data Loaded: " + data );
-		});
+		$.post( "save_thcap_Audit_Docs_All.php",
+				{data: Send_Array,doctype:'CR0089'},
+				function(data){
+					alert(data);
+					window.history.back() // window.close();
+				}
+		)
+		// End Of $.post 
+		//.done(function( data ) {
+		//	 alert( "Data Loaded: " + data );
+		//});
 	
 		
 		
 	}
+	function Disable_All_Element_CR0047_Job_Set_Input()
+	{
+	   alert('Disable All Element');	
+	   // กำหนดให้ไม่สามารถ นำเข้าข้อมูลได้ในส่วนของ "พนักงานประจำ"
+	   
+	   document.getElementById("Txt_Comp_Name").readOnly = true;
+	   document.getElementById("Txt_Comp_Name").value = "";
+	   document.getElementById("Txt_Comp_Range").readOnly = true;
+	   document.getElementById("Txt_Comp_Range").value = "";
+	   document.getElementById("Lower_Half_Yrs").disabled = true;
+	   document.getElementById("Lower_Half_Yrs").checked = false;
+	   document.getElementById("Lower_One_Yrs").disabled = true;
+	   document.getElementById("Lower_One_Yrs").checked = false;
+	   document.getElementById("Lower_One_Yrs").disabled = true;
+	   document.getElementById("Lower_One_Yrs").checked = false;
+	   document.getElementById("Lower_Two_Yrs").disabled = true;
+	   document.getElementById("Lower_Two_Yrs").checked = false;
+	   document.getElementById("Define_Yrs").disabled = true;
+	   document.getElementById("Define_Yrs").checked = false;
+	   document.getElementById("Txt_Yr_Define").readOnly = true;
+	   document.getElementById("Txt_Yr_Define").value = "";
+	   document.getElementById("Job_Not_OK").disabled = true;
+	   document.getElementById("Job_Not_OK").checked = false;
+	   document.getElementById("Job_OK").disabled = true;
+	   document.getElementById("Job_OK").checked = false;
+	   document.getElementById("Txt_Salary").readOnly = true;
+	   document.getElementById("Txt_Salary").value = "";
+	   document.getElementById("Txt_Yr_Long_1").readOnly = true;
+	   document.getElementById("Txt_Yr_Long_1").value = "";
+	   document.getElementById("Txt_Num_Employee_1").readOnly = true;
+	   document.getElementById("Txt_Num_Employee_1").value = "";	
+	   
+	   //กำหนดให้ไม่สามาาถ นำเข้าข้อมูลได้ในส่วนของ "กิจการส่วนตัว"
+	   document.getElementById("Business_Owner_Job").readOnly = true;
+	   document.getElementById("Business_Owner_Job").value = "";
+	   document.getElementById("Txt_Num_Employee_2").readOnly = true;
+	   document.getElementById("Txt_Num_Employee_2").value = "";
+	   document.getElementById("Txt_All_Pay_Per_Month").readOnly = true;
+	   document.getElementById("Txt_All_Pay_Per_Month").value = "";
+	   
+	   document.getElementById("Lower_Half_Yrs_2").disabled = true;
+	   document.getElementById("Lower_Half_Yrs_2").checked = false;
+	   document.getElementById("Lower_One_Yrs_2").checked = false;
+	   document.getElementById("Lower_One_Yrs_2").disabled = true;
+	  
+	   document.getElementById("Lower_Two_Yrs_2").checked = false;
+	   document.getElementById("Lower_Two_Yrs_2").disabled = true;
+	   document.getElementById("Lower_Two_Yrs").checked = false;
+	   document.getElementById("Lower_Two_Yrs").disabled = true;
+	   document.getElementById("Txt_Yrs_Define").checked = false;
+	   document.getElementById("Txt_Yrs_Define").disabled = true;
+	   document.getElementById("Txt_Yrs_Input").readOnly = true;
+	   document.getElementById("Txt_Yrs_Input").value = "";
+	   document.getElementById("Txt_Month_Income").readOnly = true;
+	   document.getElementById("Txt_Month_Income").value = "";
+	   document.getElementById("Txt_Month_NetIncome").readOnly = true;
+	   document.getElementById("Txt_Month_NetIncome").value = "";
+	   document.getElementById("Same").checked = false;
+	   document.getElementById("Same").disabled = true;
+	   document.getElementById("Different").checked = false;
+	   document.getElementById("Different").disabled = true;
+	   document.getElementById("Hire_Office").checked = false;
+	   document.getElementById("Hire_Office").disabled = true;
+	   document.getElementById("Month_Rental").readOnly = true;
+	   document.getElementById("Month_Rental").value = "";
+	   document.getElementById("Office_Owner_NoPay").checked = false;
+	   document.getElementById("Office_Owner_NoPay").disabled = true;
+	   document.getElementById("Office_Owner_Pay").checked = false;
+	   document.getElementById("Office_Owner_Pay").disabled = true;
+	   document.getElementById("Balance_Value").readOnly = true;
+	   document.getElementById("Balance_Value").value = "";
+	   document.getElementById("Install_Ment").readOnly = true;
+	   document.getElementById("Install_Ment").value = "";
+	   document.getElementById("Cust_Regular").readOnly = true;
+	   document.getElementById("Cust_Regular").value = "";
+	   document.getElementById("Cust_Jorn").readOnly = true;
+	   document.getElementById("Cust_Jorn").value = "";
+	   document.getElementById("Txt_Lost_Effect").readOnly = true;
+	   document.getElementById("Txt_Lost_Effect").value = "";
+	   document.getElementById("Txt_Num_Car").readOnly = true;
+	   document.getElementById("Txt_Num_Car").value = "";
+	   document.getElementById("Txt_Address_2").readOnly = true;
+	   document.getElementById("Txt_Address_2").value = "";
+	  
+	   document.getElementById("Txt_Long_Define").readOnly = true;
+	   document.getElementById('Txt_Long_Define').value = ""; 		
+	}
 	
 	
+	function Disable_Element_And_Clear_Value(Elm_ID)
+	{
+		document.getElementById(Elm_ID).readOnly = true;
+		document.getElementById(Elm_ID).value = "";
+	}
 	
-	
+	function Disable_CR0047_Other_Concern()
+	{  // ทำกับเอกสาร CR0047
+		document.getElementById("Other_Conern").readOnly = true; // ไม่สามารถกรอกข้อมูลได้
+		document.getElementById("Other_Conern").value = ""; // ล้างข้อมูล
+	}
+	function Disable_CR0047_Text_Give_By()
+	{	// ทำกับ เอกสาร CR0047 ผู้ให้ข้อมูล
+		document.getElementById("Give_RealName").readOnly = true; // ไม่สามารถกรอกข้อมูลได้
+		document.getElementById("Give_RealName").value = ""; // ล้างข้อมูล
+		document.getElementById("Give_Relation").readOnly = true; // ไม่สามารถกรอกข้อมูลได้
+		document.getElementById("Give_Relation").value = ""; // ล้างข้อมูล 
+		
+	}
+	function Disable_CR0047_Text_House_Rent()
+	{
+		document.getElementById("House_Rent").readOnly = true;
+		document.getElementById("House_Rent").value = "";
+	}
+	function Disable_CR0047_txt_Address()
+	{
+		document.getElementById("Txt_Address").readOnly = true;
+		document.getElementById("Txt_Address").value = "";
+	}
 	function Display_Docs_cr_0046(Doc_ID)
 	{ // แสดงข้อมูลเอกสาร cr_0046
 		
@@ -1779,6 +2397,29 @@
 		var mi_t = 'toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=980,height=720';
 		popU(mi_u,'',mi_t);
 		
+	} 
+	
+	function Enable_Element(Elm_ID)
+	{    
+		document.getElementById(Elm_ID).readOnly = false;
+	}
+	function Enable_CR0047_Other_Concern()
+	{ // ทำกับเอกสาร CR0047
+	  	document.getElementById("Other_Conern").readOnly = false; // สามารถกรอกข้อมูลได้
+		
+	}
+	function Enalbe_CR0047_Text_Give_By()
+	{  // ทำกับเอกสาร CR0047 ผู้ให้ข้อมูล
+		document.getElementById("Give_RealName").readOnly = false; // กรอกข้อมูลได้
+		document.getElementById("Give_Relation").readOnly = false; // กรอกข้อมูลได้
+	}
+	function Enalbe_CR0047_Text_House_Rent()
+	{
+		document.getElementById("House_Rent").readOnly = false;
+	}
+	function Enable_CR0047_txt_Address()
+	{
+		document.getElementById("Txt_Address").readOnly = false;
 	}
 	function popU(U,N,T) {
     	newWindow = window.open(U, N, T);
@@ -1887,6 +2528,175 @@
 		document.getElementById("Check_W_2").disabled=true;
 		document.getElementById("Check_W_2").checked=false;
 	}
+	
+	function Process_CR0047_Staff_Clck()
+	{ // ทำงานกับเอกสาร CR0047 รองรับการ คลิกปุ่ม พนักงานประจำ
+		alert('Process_CR0047_Staff_Clck');
+		
+	// กำหนดให้ไม่สามารถ นำเข้าข้อมูลได้ในส่วนของ "พนักงานประจำ"
+	   
+	   document.getElementById("Txt_Comp_Name").readOnly = false;
+	   document.getElementById("Txt_Comp_Range").readOnly = false;
+	   document.getElementById("Lower_Half_Yrs").disabled = false;
+	   document.getElementById("Lower_One_Yrs").disabled = false;
+	   document.getElementById("Lower_Two_Yrs").disabled = false;
+	   document.getElementById("Define_Yrs").disabled = false;
+	   document.getElementById("Txt_Yr_Define").readOnly = false;
+	   document.getElementById("Job_Not_OK").disabled = false;
+	   document.getElementById("Job_OK").disabled = false;
+	   document.getElementById("Txt_Salary").readOnly = false;
+	   document.getElementById("Txt_Yr_Long_1").readOnly = false;
+	   document.getElementById("Txt_Num_Employee_1").readOnly = false;
+	   
+	   
+	   //กำหนดให้ไม่สามาาถ นำเข้าข้อมูลได้ในส่วนของ "กิจการส่วนตัว"
+	   document.getElementById("Business_Owner_Job").readOnly = true;
+	   document.getElementById("Business_Owner_Job").value = "";
+	   document.getElementById("Txt_Num_Employee_2").readOnly = true;
+	   document.getElementById("Txt_Num_Employee_2").value = "";
+	   document.getElementById("Txt_All_Pay_Per_Month").readOnly = true;
+	   document.getElementById("Txt_All_Pay_Per_Month").value = "";
+	   
+	   document.getElementById("Lower_Half_Yrs_2").disabled = true;
+	   document.getElementById("Lower_Half_Yrs_2").checked = false;
+	   document.getElementById("Lower_One_Yrs_2").checked = false;
+	   document.getElementById("Lower_One_Yrs_2").disabled = true;
+	  
+	   document.getElementById("Lower_Two_Yrs_2").checked = false;
+	   document.getElementById("Lower_Two_Yrs_2").disabled = true;
+	   document.getElementById("Txt_Yrs_Define").checked = false;
+	   document.getElementById("Txt_Yrs_Define").disabled = true;
+	   document.getElementById("Txt_Yrs_Input").readOnly = true;
+	   document.getElementById("Txt_Yrs_Input").value = "";
+	   document.getElementById("Txt_Month_Income").readOnly = true;
+	   document.getElementById("Txt_Month_Income").value = "";
+	   document.getElementById("Txt_Month_NetIncome").readOnly = true;
+	   document.getElementById("Txt_Month_NetIncome").value = "";
+	   document.getElementById("Same").checked = false;
+	   document.getElementById("Same").disabled = true;
+	   document.getElementById("Different").checked = false;
+	   document.getElementById("Different").disabled = true;
+	   document.getElementById("Hire_Office").checked = false;
+	   document.getElementById("Hire_Office").disabled = true;
+	   document.getElementById("Month_Rental").readOnly = true;
+	   document.getElementById("Month_Rental").value = "";
+	   document.getElementById("Office_Owner_NoPay").checked = false;
+	   document.getElementById("Office_Owner_NoPay").disabled = true;
+	   document.getElementById("Office_Owner_Pay").checked = false;
+	   document.getElementById("Office_Owner_Pay").disabled = true;
+	   document.getElementById("Balance_Value").readOnly = true;
+	   document.getElementById("Balance_Value").value = "";
+	   document.getElementById("Install_Ment").readOnly = true;
+	   document.getElementById("Install_Ment").value = "";
+	   document.getElementById("Cust_Regular").readOnly = true;
+	   document.getElementById("Cust_Regular").value = "";
+	   document.getElementById("Cust_Jorn").readOnly = true;
+	   document.getElementById("Cust_Jorn").value = "";
+	   document.getElementById("Txt_Lost_Effect").readOnly = true;
+	   document.getElementById("Txt_Lost_Effect").value = "";
+	   document.getElementById("Txt_Num_Car").readOnly = true;
+	   document.getElementById("Txt_Num_Car").value = "";
+	   document.getElementById("Txt_Address_2").readOnly = true;
+	   document.getElementById("Txt_Address_2").value = "";
+	  
+	   
+		
+		
+		
+	}
+	
+	function Process_CR0047_Business_Owner()
+	{ // ทำงานกับเอกสาร CR0048 รองรับการ คลิกปุ่ม กิจการส่วนตัว	
+	   alert('Process_CR0047_Business_Owner'); 	
+	   
+	   // กำหนดให้ไม่สามารถ นำเข้าข้อมูลได้ในส่วนของ "พนักงานประจำ"
+	   
+	   document.getElementById("Txt_Comp_Name").readOnly = true;
+	   document.getElementById("Txt_Comp_Name").value = "";
+	   document.getElementById("Txt_Comp_Range").readOnly = true;
+	   document.getElementById("Txt_Comp_Range").value = "";
+	   document.getElementById("Lower_Half_Yrs").disabled = true;
+	   document.getElementById("Lower_Half_Yrs").checked = false;
+	   document.getElementById("Lower_One_Yrs").disabled = true;
+	   document.getElementById("Lower_One_Yrs").checked = false;
+	   document.getElementById("Lower_One_Yrs").disabled = true;
+	   document.getElementById("Lower_One_Yrs").checked = false;
+	   document.getElementById("Lower_Two_Yrs").disabled = true;
+	   document.getElementById("Lower_Two_Yrs").checked = false;
+	   document.getElementById("Define_Yrs").disabled = true;
+	   document.getElementById("Define_Yrs").checked = false;
+	   document.getElementById("Txt_Yr_Define").readOnly = true;
+	   document.getElementById("Txt_Yr_Define").value = "";
+	   document.getElementById("Job_Not_OK").disabled = true;
+	   document.getElementById("Job_Not_OK").checked = false;
+	   document.getElementById("Job_OK").disabled = true;
+	   document.getElementById("Job_OK").checked = false;
+	   document.getElementById("Txt_Salary").readOnly = true;
+	   document.getElementById("Txt_Salary").value = "";
+	   document.getElementById("Txt_Yr_Long_1").readOnly = true;
+	   document.getElementById("Txt_Yr_Long_1").value = "";
+	   document.getElementById("Txt_Num_Employee_1").readOnly = true;
+	   document.getElementById("Txt_Num_Employee_1").value = "";	
+	   
+	   //กำหนดให้สามาาถ นำเข้าข้อมูลได้ในส่วนของ "กิจการส่วนตัว"
+	   document.getElementById("Business_Owner_Job").readOnly = false;
+	   // document.getElementById("Business_Owner_Job").value = "";
+	   document.getElementById("Txt_Num_Employee_2").readOnly = false;
+	   // document.getElementById("Txt_Num_Employee_2").value = "";
+	   document.getElementById("Txt_All_Pay_Per_Month").readOnly = false;
+	   //document.getElementById("Txt_All_Pay_Per_Month").value = "";
+	   
+	   document.getElementById("Lower_Half_Yrs_2").disabled = false;
+	   //document.getElementById("Lower_Half_Yrs_2").checked = false;
+	   //document.getElementById("Lower_One_Yrs_2").checked = false;
+	   document.getElementById("Lower_One_Yrs_2").disabled = false;
+	  
+	   // document.getElementById("Lower_Two_Yrs_2").checked = false;
+	   document.getElementById("Lower_Two_Yrs_2").disabled = false;
+	   // document.getElementById("Lower_Two_Yrs").checked = false;
+	   document.getElementById("Lower_Two_Yrs").disabled = false;
+	   //document.getElementById("Txt_Yrs_Define").checked = false;
+	   document.getElementById("Txt_Yrs_Define").disabled = false;
+	   document.getElementById("Txt_Yrs_Input").readOnly = false;
+	   //document.getElementById("Txt_Yrs_Input").value = "";
+	   document.getElementById("Txt_Month_Income").readOnly = false;
+	   //document.getElementById("Txt_Month_Income").value = "";
+	   document.getElementById("Txt_Month_NetIncome").readOnly = false;
+	   //document.getElementById("Txt_Month_NetIncome").value = "";
+	   //document.getElementById("Same").checked = false;
+	   document.getElementById("Same").disabled = false;
+	   //document.getElementById("Different").checked = false;
+	   document.getElementById("Different").disabled = false;
+	   //document.getElementById("Hire_Office").checked = false;
+	   document.getElementById("Hire_Office").disabled = false;
+	   document.getElementById("Month_Rental").readOnly = false;
+	   //document.getElementById("Month_Rental").value = "";
+	   //document.getElementById("Office_Owner_NoPay").checked = false;
+	   document.getElementById("Office_Owner_NoPay").disabled = false;
+	   //document.getElementById("Office_Owner_Pay").checked = false;
+	   document.getElementById("Office_Owner_Pay").disabled = false;
+	   document.getElementById("Balance_Value").readOnly = false;
+	   //document.getElementById("Balance_Value").value = "";
+	   document.getElementById("Install_Ment").readOnly = false;
+	   //document.getElementById("Install_Ment").value = "";
+	   document.getElementById("Cust_Regular").readOnly = false;
+	   //document.getElementById("Cust_Regular").value = "";
+	   document.getElementById("Cust_Jorn").readOnly = false;
+	   //document.getElementById("Cust_Jorn").value = "";
+	   document.getElementById("Txt_Lost_Effect").readOnly = false;
+	   //document.getElementById("Txt_Lost_Effect").value = "";
+	   document.getElementById("Txt_Num_Car").readOnly = false;
+	   //document.getElementById("Txt_Num_Car").value = "";
+	   document.getElementById("Txt_Address_2").readOnly = false;
+	   //document.getElementById("Txt_Address_2").value = "";
+	   
+	   
+	}
+	function test()
+	{
+		alert('test');
+	}
+	
 	
 	
 	

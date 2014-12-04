@@ -1,7 +1,7 @@
 <?php
 include("../../../config/config.php");
 
-$ascenID = $_GET["ascenID"];
+$ascenID = pg_escape_string($_GET["ascenID"]);
 $qry_sel = pg_query("SELECT \"noteapp\" FROM \"thcap_asset_biz_detail_central\" where \"ascenID\" = '$ascenID'");
 list($note) = pg_fetch_array($qry_sel);
 

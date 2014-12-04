@@ -2,15 +2,15 @@
 session_start();
 $_SESSION["av_iduser"];
 include("../../config/config.php");
-$value  = $_POST['value'];
+$value  = pg_escape_string($_POST['value']);
 if($value == "post"){
-	$ad_annId = $_POST['ad_annId'];
-	$a_gp = $_POST['a_gp'];
+	$ad_annId = pg_escape_string($_POST['ad_annId']);
+	$a_gp = pg_escape_string($_POST['a_gp']);
 	
 	
 }else{
-	$ad_annId = $_GET['ad_annId'];
-	$a_gp = $_GET['a_gp'];
+	$ad_annId =  pg_escape_string($_GET['ad_annId']);
+	$a_gp = pg_escape_string($_GET['a_gp']);
 }
 
 if( empty($_SESSION["av_iduser"]) ){
@@ -133,7 +133,7 @@ $(document).ready(function(){
 	<select name="ad_annId" id="ad_annId" onChange="this.form.submit();">  
 		<option value="" <?php if($ad_annId == ""){ echo "selected";}?>>-------------------เลือก-------------------</option><?php
 		//แสดงเฉพาะเมนูที่ใช้งาน
-		$qry_menu=pg_query("select * from \"nw_annoucement\" where \"statusApprove\"='FALSE' order by \"keyDate\" DESC");
+		$qry_menu=pg_query("select \"annId\",\"annTitle\",\"keyDate\" from \"nw_annoucement\" where \"statusApprove\"='FALSE' order by \"keyDate\" DESC");
 		while($res=pg_fetch_array($qry_menu)){
 			$annId=$res["annId"];
 			$annTitle=str_replaceout($res["annTitle"]);
@@ -153,7 +153,7 @@ $(document).ready(function(){
 	<select name="a_gp" id="a_gp" onChange="this.form.submit();">
 		<option value="" <?php if($a_gp == ""){ echo "selected";}?>>-----ทั้งหมด-----</option>
 		<?php
-		$qry_gpuser=pg_query("select * from department");
+		$qry_gpuser=pg_query("select \"dep_id\",\"dep_name\" from department Order by \"dep_name\" ASC ");
 		while($resg=pg_fetch_array($qry_gpuser)){
 		?>
 		  <option value="<?php echo $resg["dep_id"]; ?>" <?php if($a_gp == $resg["dep_id"]){ echo "selected";}?>><?php echo $resg["dep_name"]; ?></option>
@@ -169,7 +169,7 @@ $(document).ready(function(){
 <div class="style1" id="menu" style="height:30px; padding-left:10px; padding-top:0px; padding-right:10px;">
 <?php 
 if($ad_annId != ""){
-	$newbie_seesql=pg_query("select * from \"nw_annouceuser_newbie\" where \"annId\"='$ad_annId' and \"statusAccept\" = '0'");
+	$newbie_seesql=pg_query("select \"dep_id\"  from \"nw_annouceuser_newbie\" where \"annId\"='$ad_annId' and \"statusAccept\" = '0'");
 		$newbie_seere=pg_fetch_array($newbie_seesql);
 		$depid = $newbie_seere['dep_id'];
 		if(pg_num_rows($newbie_seesql) > 0){ $chknewemp = "checked";}
@@ -182,7 +182,7 @@ if($ad_annId != ""){
 		<select name="newempdep" id="newempdep" >
 		<option value="" <?php if($newempdep == ""){ echo "selected";}?>>-----ทั้งหมด-----</option>
 		<?php
-		$qry_gpuser1=pg_query("select * from department");
+		$qry_gpuser1=pg_query("select \"dep_id\",\"dep_name\" from department");
 		while($resg1=pg_fetch_array($qry_gpuser1)){
 		?>
 		  <option value="<?php echo $resg1["dep_id"]; ?>" <?php if($depid == $resg1["dep_id"]){echo "selected";} ?>><?php echo $resg1["dep_name"]; ?></option>
@@ -201,9 +201,15 @@ if(pg_num_rows($newbie_seesql) > 0){echo "<script type='text/javascript'>shownew
  <div class="style5" style="width:auto;  padding-left:10px;">
   <?php
   if($a_gp==""){
-	$qry_user=pg_query("select * from \"Vfuser\" order by user_group,status_user desc");
+  	$qry_user=pg_query("select 
+  								\"id_user\",\"username\",\"fullname\",\"nickname\",\"user_group\",\"office_id\"
+  						from 
+  							\"Vfuser\" WHERE resign_date IS NULL order by user_group,status_user desc");
   }else{
-	$qry_user=pg_query("select * from \"Vfuser\" where \"user_group\"='$a_gp' order by user_group,status_user desc");
+	$qry_user=pg_query("select 
+								\"id_user\",\"username\",\"fullname\",\"nickname\",\"user_group\",\"office_id\"
+						from 
+							\"Vfuser\" where \"user_group\"='$a_gp' and resign_date IS NULL  order by user_group,status_user desc");
   } 
   ?>
   <table width="778" border="0" style="background-color:#EEEDCC;">
@@ -235,7 +241,7 @@ if(pg_num_rows($newbie_seesql) > 0){echo "<script type='text/javascript'>shownew
 	<?php
 	//หาว่า user นี้ใช้งานประกาศ นี้หรือไม่โดย
 	if($ad_annId != ""){
-		$list_menu=pg_query("select * from \"nw_annouceuser\" where \"id_user\"='$id_user' and \"annId\"='$ad_annId' and \"statusAccept\"!='0' ");
+		$list_menu=pg_query("select \"annuserId\" from \"nw_annouceuser\" where \"id_user\"='$id_user' and \"annId\"='$ad_annId' and \"statusAccept\"!='0' ");
 		$num_list=pg_num_rows($list_menu);
 		if($num_list>0){
 			$status_use="t";

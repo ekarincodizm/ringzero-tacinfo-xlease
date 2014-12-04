@@ -1,6 +1,8 @@
 <?php
 session_start();
 include("../../config/config.php");
+include("../function/checknull.php");
+
 $id_user = $_SESSION["av_iduser"];
 $revTranID=$_GET["revTranID"];
 $tranActionID=$_GET["tranActionID"];
@@ -27,6 +29,10 @@ if($app==1){ //กรณีบัญชีอนุมัติ
 	$num_chk=pg_num_rows($qrycheck);
 	$txtapp="การเงิน";
 }
+
+// หาความเป็นระดับบริหาร
+$qry_isadmin = pg_query("select \"isadmin\" from \"fuser\" where \"id_user\" = '$id_user'");
+$isadmin = pg_fetch_result($qry_isadmin,0);
 
 if($num_chk == 0 AND $revTranID != 'bid_1'){ //แสดงว่าอนุมัติไปก่อนหน้านี้แล้ว
 	echo "<meta http-equiv=\"Content-Type\" content=\"txt/html; charset=utf-8\" />";
@@ -63,6 +69,7 @@ $(document).ready(function(){
 		$(".showapp3").show();
 		$("#showapp4").show();
 		$("#loadrefund").hide();
+		document.getElementById("btn_appv").disabled = false;
 		<?php
 		if($app==1){ //กรณีบัญชีอนุมัติ
 		?>
@@ -106,6 +113,9 @@ $(document).ready(function(){
 		$(".showapp3").hide();
 		$("#showapp4").hide();
 		$("#loadrefund").hide();
+		
+		checkAdminConfirm(); // ตรวจสอบว่าสามารถกดปุ่มบันทึกได้หรือไม่
+		
 		<?php
 		if($app==1){
 		?>
@@ -472,7 +482,9 @@ if($app==2){
 <?php
 }
 ?>
-}	
+	if(!confirm('ยืนยันการทำรายการหรือไม่')){return false;}
+}
+
 function sentvalue(){
 	$("#loadspec").load("showcustomer.php?contractID="+$('#contractID').val());
 }
@@ -502,6 +514,18 @@ function valuechq(){
 function popU(U,N,T){
     newWindow = window.open(U, N, T);
 }
+
+function checkAdminConfirm() // ตรวจสอบว่าสามารถกดปุ่มบันทึกได้หรือไม่
+{
+	if(document.getElementById("checkContract").value == 'noContract' && document.getElementById("isAdminConfirm").value == 'no')
+	{
+		document.getElementById("btn_appv").disabled = true;
+	}
+	else
+	{
+		document.getElementById("btn_appv").disabled = false;
+	}
+}
 </script>
 </head>
 <body>
@@ -510,6 +534,8 @@ function popU(U,N,T){
 <tr style="font-weight:bold;" valign="top" bgcolor="#79BCFF" align="center">
     <td>รหัสรายการเงินโอน</td>
     <td>ประเภทการนำเข้า</td>
+	<td>REF1</td>
+    <td>REF2</td>
     <td>เลขที่บัญชี</td>
 	<td>สาขา</td>
     <td>วันที่และเวลาที่นำเงินเข้าธนาคาร</td>
@@ -530,11 +556,52 @@ $p=0;
 while($resvc=pg_fetch_array($query)){
 	$revTranID = $resvc['revTranID'];
 	$cnID = $resvc['cnID'];
+	$bankRevRef1 = $resvc['bankRevRef1'];
+	$bankRevRef2 = $resvc['bankRevRef2'];
 	$BID = $resvc['bankRevAccID'];
 	$bankRevBranch = trim($resvc['bankRevBranch']);
 	$bankRevStamp = trim($resvc['bankRevStamp']);
 	$bankRevAmt = trim($resvc['bankRevAmt']);
 	$doerStamp = $resvc['doerStamp'];
+	
+	//----- หาค่า REF1 และ REF2
+		$REF1 = $bankRevRef1;
+		$REF2 = $bankRevRef2;
+		
+		$REF1_checknull = checknull($REF1);
+		$REF2_checknull = checknull($REF2);
+		
+		$qryinv=pg_query("SELECT ta_array1d_get(thcap_decode_invoice_ref($REF1_checknull, $REF2_checknull),0) as \"contractID\",
+								ta_array1d_get(thcap_decode_invoice_ref($REF1_checknull, $REF2_checknull),1) as \"invoiceID\"");
+		list($REF1_decode, $REF2_decode) = pg_fetch_array($qryinv);
+		
+		if($REF1_decode != "")
+		{
+			// ตรวจสอบว่ามีเลขที่สัญญาในระบบหรือไม่
+			$qry_checkContract = pg_query("select \"contractID\" from \"thcap_contract\" where \"contractID\" = '$REF1_decode'");
+			$row_checkContract = pg_num_rows($qry_checkContract);
+			
+			if($row_checkContract > 0) // ถ้ามีสัญญาอยู่จริง
+			{
+				$REF1 .= "<br/>(<font color=\"blue\" style=\"cursor:pointer;\" onclick=\"javascript:popU('../thcap_installments/frm_Index.php?show=1&idno=$REF1_decode','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=700')\"><u>$REF1_decode</u></font>)";
+			}
+			else // ถ้าไม่มีเลขที่สัญญาดังกล่าวในระบบ
+			{
+				$REF1 .= "<br/>(<font color=\"red\" style=\"cursor:pointer;\" onclick=\"javascript:popU('../thcap_installments/frm_Index.php?show=1&idno=$REF1_decode','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=700')\"><u>$REF1_decode</u></font>)";
+				
+				if($app == "1") // ถ้าเป็นหน้า บัญชี อนุมัติ
+				{
+					$checkContract = "noContract";
+					$canAppv = "title=\"มีเลขที่สัญญาที่ไม่มีอยู่จริงในระบบ\" disabled";
+				}
+			}
+		}
+		
+		if($REF2_decode != "")
+		{
+			$REF2 .= "<br/>(<font color=\"blue\" style=\"cursor:pointer;\" onclick=\"javascript:popU('Channel_detail_i.php?debtInvID=$REF2_decode','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=800,height=550')\"><u>$REF2_decode</u></font>)";
+		}
+	//----- จบการหาค่า REF1 และ REF2
 
 	//ตรวจสอบว่ามีในรายการอนุมัติไม่ผ่านหรือไม่ ถ้ามีให้ึขึ้นแถบสีแดงด้วย เพื่ีอให้รู้ว่าเป็นรายการที่ถูกแก้ไข
 	$qrynoapp=pg_query("SELECT * FROM finance.thcap_receive_transfer_noapptemp
@@ -567,6 +634,8 @@ while($resvc=pg_fetch_array($query)){
 ?>
         <td height="30"><?php echo $revTranID; ?></td>
         <td align="center"><?php echo $cnID; ?></td>
+		<td align="center"><?php echo $REF1; ?></td>
+        <td align="center"><?php echo $REF2; ?></td>
         <td align="center"><?php echo $bankRevAccID; ?></td>
         <td><?php echo $bankRevBranch; ?></td>
         <td><?php echo $bankRevStamp; ?></td>
@@ -581,7 +650,7 @@ while($resvc=pg_fetch_array($query)){
 }
 $sumbank = number_format($sumbankRevAmt,2);
 if($app==1){ //ให้แสดงกรณีบัญชีอนุมัติ เพราะมีหลายรายการจึงต้องแสดงผลรวม แต่ถ้าการเงินอนุมัติจะแสดงแค่รายการเดียว
-	echo "<tr><td colspan=\"6\" align=\"right\"><b>รวม </b></td><td align=\"right\"><b>$sumbank</b></td></tr>";					
+	echo "<tr><td colspan=\"8\" align=\"right\"><b>รวม </b></td><td align=\"right\"><b>$sumbank</b></td></tr>";
 }
 ?>
 </table>
@@ -605,7 +674,7 @@ if($app==1){ //ถ้าบัญชีอนุมัติ สถานะ 0 �
 		<?php if($app==2){ ?><input type="radio" name="result" id="result3" value="3" <?php if($revTranID=='bid_1'){ echo "disabled"; }?>> รายการที่เป็นเช็ค &nbsp;&nbsp;&nbsp;
 		<?php } ?>
 		<input type="radio" name="result" id="result2" value="<?php echo $statusapp;?>"> <?php if($app==1){ echo "ไม่อนุมัติ"; }else{ echo "เงินที่ไม่ใช่ชำระค่าสินค้าหรือบริการ (จ่ายเช็ค)"; }?>
-		<input type="radio" name="result" id="result5" value="<?php echo $statusapp;?>"> <?php if($app==1){ echo "ไม่อนุมัติ"; }else{ echo "เงินที่ไม่ใช่ชำระค่าสินค้าหรือบริการ (เงินโอน/เช็คนอกระบบ)"; }?>
+		<input type="radio" name="result" id="result5" value="<?php echo $statusapp;?>" <?php if($app==1){echo "hidden";}?> /> <?php if($app==1){ echo ""; }else{ echo "เงินที่ไม่ใช่ชำระค่าสินค้าหรือบริการ (เงินโอน/เช็คนอกระบบ)"; }?>
 		<?php if($isAnonymous == "1"){ echo"&nbsp;&nbsp;&nbsp;"; } ?>
 		<input type="radio" name="result" id="result4" value="8" <?php if($isAnonymous != "1"){ echo "hidden"; } ?>>
 		<?php if($isAnonymous == "1"){ echo "คืนเงินบุคคลภายนอก"; } ?>
@@ -799,7 +868,7 @@ if($app==2){ //กรณีการเงินอนุมัติให้�
 	</td>
 </tr>
 <tr>
-	<td colspan="2" align="center" bgcolor="#FFFFFF" height="50">
+	<td colspan="2" align="center" bgcolor="#FFFFFF">
 		<?php 
 			if($revTranID=='bid_1'){ 
 				echo 	"วันที่รับชำระเงินสด : <input type=\"text\" name=\"pcashdate\" id=\"pcashdate\" value=\"\" size=\"45\"><span style=\"color:red;\">*</span>
@@ -816,8 +885,25 @@ if($app==2){ //กรณีการเงินอนุมัติให้�
 		<input type="hidden" name="dateRevStamp" value="<?php echo $dateRevStamp;?>">
 		<input type="hidden" name="app" value="<?php echo $app;?>">
 		<input type="hidden" name="bankRevAmt" value="<?php echo $sumbankRevAmt;?>">
-		<input type="submit" value="บันทึก" onclick="return checkremark();">
-		<input type="button" value="ปิด" onclick="window.close();">
+		<input type="hidden" id="checkContract" value="<?php echo $checkContract; ?>" />
+		<input type="hidden" id="isAdminConfirm" name="isAdminConfirm" value="no" />
+		<input type="button" hidden id="checkAdminConfirm" name="checkAdminConfirm" onClick="checkAdminConfirm();" />
+		<input type="button" hidden id="showTextAdminConfirm" name="showTextAdminConfirm" onClick="$('#adminConfirmText').text('ยืนยันการทำรายการแล้ว');" />
+		
+		<input type="submit" id="btn_appv" name="btn_appv" value="บันทึก" style="cursor:pointer;" onclick="return checkremark();" <?php echo $canAppv; ?> />
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<input type="button" value="ปิด" style="cursor:pointer;" onclick="window.close();">
+		
+		<?php
+		if($checkContract == "noContract" && $isadmin == "1") // ถ้ามีเลขที่สัญญาที่ไม่มีอยู่จริงในระบบ และผู้ที่ใช้เมนูเป็นผู้บริหาร
+		{
+		?>
+			<br/><br/>
+			<input type="button" id="adminConfirm" name="adminConfirm" value="ยืนยันการทำรายการ" style="cursor:pointer;" onClick="javascript:popU('popup_admin_confirm.php','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=500,height=300')" />
+			<font color="#green"><span id="adminConfirmText" name="adminConfirmText"></span></font>
+		<?php
+		}
+		?>
 	</td>
 </tr>
 </table>

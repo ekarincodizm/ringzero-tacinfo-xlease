@@ -1,6 +1,8 @@
 <?php
-include("../../config/config.php");
-include("document_function.php");
+	include("../../config/config.php");
+	include("document_function.php");
+	
+	
 ?>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -86,7 +88,7 @@ include("document_function.php");
 	}
 </style>
 
-
+<link type="text/css" rel="stylesheet" href="css_for_doc.css"></link>
 <!---- หน้าต่าง Popup รูปภาพ ---->
 
  
@@ -134,6 +136,27 @@ function printpage(){
 		$Contract_Type = pg_escape_string($_POST['cr_0046_contract_type']);
 		$Contract_ID = pg_escape_string(trim($_POST['Contract_ID_Input']));
 		show_doc_msg("ใบสรุปการตรวจสอบเอกสารรับกลับสำหรับสินเชื่อเช่าซื้อ-ลีสซิ่ง	"," 22px");
+			
+		$Doc_Show = pg_escape_string($_GET['Doc_ID']);
+		if(strlen($Doc_Show) > 0){
+			?>	<div align="right">
+						<?php 
+							echo "เลขที่เอกสาร   ".$Doc_Show; 
+						?>
+				</div>
+			<?PHP
+			// ดึงค่าข้อมูลหมายเหตุ มาเตรียมแสดงสำหรับหมายเหตุในแต่ละช่อง
+			$Note_P1_Top = Get_Value_From_Text_Area($Doc_Show,'Note_P1-0','Note_P1-0');
+			$Note_P1_Down = Get_Value_From_Text_Area($Doc_Show,'Note_P1-1','Note_P1-1');
+			$Note_P2_Top = Get_Value_From_Text_Area($Doc_Show,'Note_P2-0','Note_P2-0');
+			$Note_P2_Checker = Get_Value_From_Text_Area($Doc_Show,'Checker_Note','Checker_Note');
+			$Txt_Area_Display_Control = "style=\"display:none;\"";
+			
+		}else
+		{
+			// No thing to do
+		}
+	
 	?>
     <div class="ui-tabs ui-widget ui-widget-content ui-corner-all" id="tabs" >
         <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" >
