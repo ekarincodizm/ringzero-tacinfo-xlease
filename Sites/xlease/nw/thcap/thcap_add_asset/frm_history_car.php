@@ -2,6 +2,25 @@
 include("../../../config/config.php");
 
 $astypeID = pg_escape_string($_GET["astypeID"]);
+$historyType = pg_escape_string($_GET["historyType"]);
+
+if($historyType == "add")
+{
+	$whereOther = "AND a.\"add_or_edit\" = '0'";
+	$historyText = "เพิ่มรายละเอียด";
+	$colspan = "11";
+}
+elseif($historyType == "edit")
+{
+	$whereOther = "AND a.\"add_or_edit\" > '0'";
+	$historyText = "แก้ไขรายละเอียด";
+	$colspan = "11";
+}
+else
+{
+	$colspan = "12";
+	$historyText = "รายละเอียด";
+}
 
 // ดึงข้อมูลประเภทสินทรัพย์มาแสดง
 $Sql_Get_Asset_Type = 	"
@@ -19,7 +38,7 @@ $astypeName = pg_fetch_result($Result,0);
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>ประวัติรายการอนุมัติ <?php echo $astypeName; ?> ทั้งหมด</title>
+	<title>ประวัติการอนุมัติ<?php echo "$historyText $astypeName "; ?>ทั้งหมด</title>
 	<link type="text/css" rel="stylesheet" href="../act.css"></link>
 	<link type="text/css" href="../../../jqueryui/css/ui-lightness/jquery-ui-1.8.2.custom.css" rel="stylesheet" />
 	<script type="text/javascript" src="../../../jqueryui/js/jquery-1.4.2.min.js"></script>
@@ -32,10 +51,10 @@ $astypeName = pg_fetch_result($Result,0);
 </head>
 <body>
 	<center>
-		<h1>ประวัติรายการอนุมัติ <?php echo $astypeName; ?> ทั้งหมด</h1>
+		<h1>ประวัติการอนุมัติ<?php echo "$historyText $astypeName "; ?>ทั้งหมด</h1>
 		<table width="100%" cellspacing="1" cellpadding="1" style="margin-top:1px" align="center">
 			<tr bgcolor="#FFFFFF">
-				<td colspan="11" align="right">
+				<td colspan="<?php echo $colspan; ?>" align="right">
 					<input type="button" value="ปิด" style="cursor:pointer; width:70px;"  onClick="window.close();" />
 				</td>
 			</tr>
@@ -48,6 +67,7 @@ $astypeName = pg_fetch_result($Result,0);
 				<th>วันเวลาที่ทำรายการ </th>
 				<th>ผู้อนุมัติ </th>
 				<th>วันเวลาที่อนุมัติ</th>
+				<?php if($historyType == ""){echo "<th>การกระทำ</th>";} ?>
 				<th>ดู</th>
 				<th>สถานะ</th>
 				<th>เหตุผล</th>
@@ -65,7 +85,8 @@ $astypeName = pg_fetch_result($Result,0);
 								a.\"doerDate\",
 								g.\"fullname\" AS \"appName\",
 								a.\"appDate\",
-								a.\"statusapp\"
+								a.\"statusapp\",
+								a.\"add_or_edit\"
 							FROM
 								\"thcap_asset_biz_detail_central\" a
 							LEFT JOIN
@@ -81,9 +102,9 @@ $astypeName = pg_fetch_result($Result,0);
 							LEFT JOIN
 								\"Vfuser\" g ON a.\"appID\" = g.\"id_user\"
 							WHERE
-								a.\"add_or_edit\" = '0' AND
 								a.\"statusapp\" IN('1', '2') AND
 								a.\"assetDetailID\" IN(select \"assetDetailID\" from \"thcap_asset_biz_detail\" where \"astypeID\" = '$astypeID')
+								$whereOther
 							ORDER BY
 								\"appDate\" DESC
 						";		
@@ -105,6 +126,19 @@ $astypeName = pg_fetch_result($Result,0);
 							$note = "<img style=\"cursor:pointer;\" onclick=\"popU('frm_note_reprint.php?ascenID=$ascenID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=550,height=250')\" src=\"../images/detail.gif\" width=\"20px;\" height=\"20px;\">";
 						}
 						
+						if($historyType == "")
+						{
+							if($result["add_or_edit"] == '0'){
+								$statustxt = "<td align=\"center\"><font color=\"red\">เพิ่มข้อมูล</font></td>";
+							}else{
+								$statustxt = "<td align=\"center\"><font color=\"red\">แก้ไขครั้งที่ ".$result["add_or_edit"]."</font></td>";
+							}
+						}
+						else
+						{
+							$statustxt = "";
+						}
+						
 						$i++;
 						if($i%2==0){
 							echo "<tr bgcolor=#EEE5DE onmouseover=\"javascript:this.bgColor = '#FFFF99';\" onmouseout=\"javascript:this.bgColor = '#EEE5DE';\" align=center>";
@@ -119,7 +153,8 @@ $astypeName = pg_fetch_result($Result,0);
 								<td align=\"center\">".$result["doerName"]."</td>	
 								<td align=\"center\">".$result["doerDate"]."</td>
 								<td align=\"center\">".$result["appName"]."</td>	
-								<td align=\"center\">".$result["appDate"]."</td>	
+								<td align=\"center\">".$result["appDate"]."</td>
+								$statustxt
 								<td align=\"center\"><img style=\"cursor:pointer;\" onclick=\"popU('view_asset_for_sales_car.php?ascenID=$ascenID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=900,height=600')\" src=\"../images/detail.gif\" width=\"20px;\" height=\"20px;\"></td>	
 								<td align=\"center\">".$txtstatus."</td>
 								<td align=\"center\">$note</td>
@@ -129,9 +164,9 @@ $astypeName = pg_fetch_result($Result,0);
 						unset($note);
 						unset($txtstatus);
 					}
-					echo "<tr bgcolor=\"#CDC5BF\"><td colspan=\"11\">รวม ".number_format($rows,0)." รายการ</td></tr>";
+					echo "<tr bgcolor=\"#CDC5BF\"><td colspan=\"$colspan\">รวม ".number_format($rows,0)." รายการ</td></tr>";
 				}else{
-					echo "<tr><td colspan=\"11\" align=\"center\">*** ไม่มีข้อมูล ***</td></tr>";
+					echo "<tr><td colspan=\"$colspan\" align=\"center\">*** ไม่มีข้อมูล ***</td></tr>";
 				}
 			?>
 		</table>

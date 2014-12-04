@@ -333,6 +333,10 @@ $NetPremium = pg_fetch_result($qr,20); // เบี้ยสุทธิ
 		<form id="insureforce" name="insureforce" method="post" action="process_unforce_edit.php" onsubmit="return checkdata();">
 			<table>
 				<tr align="left">
+					<td><b>รหัสประกัน</b></td>
+					<td class="text_gray"><?php echo $UnforceID; ?></td>
+				</tr>
+				<tr align="left">
 					<td><b>ประเภทรถ</b></td>
 					<td class="text_gray"><?php echo $astypeName; ?></td>
 				</tr>

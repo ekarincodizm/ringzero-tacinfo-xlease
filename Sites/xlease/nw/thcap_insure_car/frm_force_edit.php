@@ -102,7 +102,7 @@ $Discount = pg_fetch_result($qr,13); // ส่วนลด
 			newWindow = window.open(U, N, T);
 		}
 		
-		function doCallAjax()
+		function doCallAjax(evenType = 'new')
 		{
 			HttPRequest = false;
 			if (window.XMLHttpRequest)
@@ -159,14 +159,14 @@ $Discount = pg_fetch_result($qr,13); // ส่วนลด
 						document.getElementById('t1').style.display = 'none';
 						document.getElementById('t2').style.display = '';
 						document.getElementById('t3').style.display = 'none';
-						document.getElementById('capa').value="0";
+						if(evenType == 'new'){document.getElementById('capa').value="0";}
 					}
 					else if(codetype=="1.200" || codetype=="1.201" || codetype=="1.202" || codetype=="1.203")
 					{
 						document.getElementById('t1').style.display = 'none';
 						document.getElementById('t2').style.display = 'none';
 						document.getElementById('t3').style.display = '';
-						document.getElementById('capa').value="0";
+						if(evenType == 'new'){document.getElementById('capa').value="0";}
 					}
 					else
 					{
@@ -202,6 +202,14 @@ $Discount = pg_fetch_result($qr,13); // ส่วนลด
 			if (document.insureforce.code.value == "") {
 				theMessage = theMessage + "\n - กรุณาเลือกประเภท";       
 			}
+			if (document.insureforce.code.value == "1.200" || document.insureforce.code.value == "1.201" || document.insureforce.code.value == "1.202" || document.insureforce.code.value == "1.203") {
+				if (document.insureforce.capa.value == "") {
+					theMessage = theMessage + "\n - กรุณาระบุจำนวนที่นั่ง";
+				}
+				else if (document.insureforce.capa.value <= "0") {
+					theMessage = theMessage + "\n - จำนวนที่นั่ง ต้องมากว่า 0";
+				}
+			}
 
 			// If no errors, submit the form
 			if (theMessage == noErrors){
@@ -221,6 +229,10 @@ $Discount = pg_fetch_result($qr,13); // ส่วนลด
 		
 		<form id="insureforce" name="insureforce" method="post" action="process_force_edit.php" onsubmit="return validate(this)">
 			<table>
+				<tr align="left">
+					<td><b>รหัสประกัน</b></td>
+					<td class="text_gray"><?php echo $ForceID; ?></td>
+				</tr>
 				<tr align="left">
 					<td><b>ประเภทรถ</b></td>
 					<td class="text_gray"><?php echo $astypeName; ?></td>
@@ -339,7 +351,7 @@ $Discount = pg_fetch_result($qr,13); // ส่วนลด
 </body>
 
 <script>
-	doCallAjax();
+	doCallAjax('old');
 	fncChangeMoney();
 </script>
 

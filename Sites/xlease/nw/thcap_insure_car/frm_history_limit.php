@@ -1,10 +1,28 @@
+<?php
+// เงื่อนไขเพิ่มเติม
+if($historyType == "add")
+{
+	$whereOther = "AND a.\"editTime\" = '0'";
+	$colspan = "13";
+}
+elseif($historyType == "edit")
+{
+	$whereOther = "AND a.\"editTime\" > '0'";
+	$colspan = "13";
+}
+else
+{
+	$colspan = "14";
+}
+?>
+
 <table width="100%" border="0" cellSpacing="1" cellPadding="3" align="center" bgcolor="#F0F0F0">
 	<tr bgcolor="#FFFFFF">
-		<td colspan="14" align="left" style="font-weight:bold;">ประวัติการอนุมัติ 30 รายการล่าสุด <input type="button" value="แสดงประวัติทั้งหมด" onClick="javascript:popU('frm_history.php','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1400,height=650')" style="cursor:pointer;"></td>
+		<td colspan="<?php echo $colspan; ?>" align="left" style="font-weight:bold;">ประวัติการอนุมัติ 30 รายการล่าสุด <input type="button" value="แสดงประวัติทั้งหมด" onClick="javascript:popU('frm_history.php?historyType=<?php echo $historyType; ?>','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1400,height=650')" style="cursor:pointer;"></td>
 	</tr>
 	<tr style="font-weight:bold;" valign="middle" bgcolor="#D6D6D6" align="center">
 		<th>รายการ</th>
-		<th>ประเภทการทำรายการ</th>
+		<?php if($historyType == ""){echo "<th>ประเภทการทำรายการ</th>";} ?>
 		<th>เลขที่สัญญา</th>
 		<th>ประเภทประกัน</th>
 		<th>ประเภทรถ</th>
@@ -54,6 +72,7 @@
 								\"Vfuser\" i ON a.\"appvID\" = i.\"id_user\"
 							WHERE
 								\"appvStatus\" IN('0','1')
+								$whereOther
 							
 							UNION
 
@@ -91,6 +110,7 @@
 								\"Vfuser\" i ON a.\"appvID\" = i.\"id_user\"
 							WHERE
 								\"appvStatus\" IN('0','1')
+								$whereOther
 
 							ORDER BY
 								\"appvStamp\" DESC
@@ -165,7 +185,7 @@
 		}
 		
 		echo "<td align=\"center\">$i</td>";
-		echo "<td align=\"center\">$transactionType</td>";
+		if($historyType == ""){echo "<td align=\"center\">$transactionType</td>";}
 		echo "<td align=\"center\"><font color=\"blue\" style=\"cursor:pointer;\" onclick=\"javascript:popU('../thcap_installments/frm_Index.php?show=1&idno=$contractID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=700')\"><u>$contractID</u></font></td>";
 		echo "<td align=\"center\">$insureName</td>";
 		echo "<td align=\"center\">$astypeName</td>";
@@ -184,10 +204,10 @@
 	
 	if($i == 0)
 	{
-		echo "<tr><td colspan=\"14\" align=\"center\">--ไม่พบข้อมูล--</td></tr>";
+		echo "<tr><td colspan=\"$colspan\" align=\"center\">--ไม่พบข้อมูล--</td></tr>";
 	}
 	?>
 	<tr bgcolor="#D6D6D6">
-		<td colspan="14" align="left" >รวม : <?php echo number_format($i,0); ?>  รายการ</td>
+		<td colspan="<?php echo $colspan; ?>" align="left" >รวม : <?php echo number_format($i,0); ?>  รายการ</td>
 	</tr>
 </table>

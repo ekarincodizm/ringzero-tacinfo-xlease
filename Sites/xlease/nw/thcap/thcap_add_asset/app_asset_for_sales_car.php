@@ -98,8 +98,7 @@ function popU(U,N,T) {
 											$assetDetailID = $result["assetDetailID"];											
 											$temp_10_ID = $result["temp_10_ID"];
 											$fullnameuserdoer = $result["fullname"];
-											$ascenID = $result["assetDetailID"];
-											$ascenID_Real = $result["ascenID"];
+											$ascenID = $result["ascenID"];
 											
 											IF($result["add_or_edit"] == '0'){
 												$statustxt = 'เพิ่มข้อมูล';
@@ -121,7 +120,7 @@ function popU(U,N,T) {
 													<td align=\"center\">".$result["fullname"]."</td>	
 													<td align=\"center\">".$result["doerDate"]."</td>	
 													<td align=\"center\"><font color=\"red\">".$statustxt."</font></td>		
-													<td align=\"center\"><img style=\"cursor:pointer;\" onclick=\"popU('add_asset_for_sales_car_Approve_In.php?ascenID=$ascenID&readonly=t&appv=t&ascenID_Real=$ascenID_Real','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=900,height=600')\" src=\"../images/detail.gif\" width=\"20px;\" height=\"20px;\"></td>	
+													<td align=\"center\"><img style=\"cursor:pointer;\" onclick=\"popU('add_asset_for_sales_car_Approve_In.php?ascenID=$ascenID&readonly=t&appv=t&assetDetailID=$assetDetailID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=900,height=600')\" src=\"../images/detail.gif\" width=\"20px;\" height=\"20px;\"></td>	
 												</tr>
 												";	
 											
@@ -139,7 +138,7 @@ function popU(U,N,T) {
 <div style="padding-top:80px;"></div>
 
 		<fieldset style="width:60%;">
-		<legend><b>ประวัติรายการอนุมัติ <?php echo $Txt_Asset_Type; ?></b></legend>
+		<legend><b>ประวัติรายการอนุมัติ <?php echo $Txt_Asset_Type; ?> 30 รายการล่าสุด  (<font style="cursor:pointer;" onClick="popU('frm_history_car.php?astypeID=<?php echo $astype; ?>','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1200,height=600')"><u>ทั้งหมด</u></font>)</b></legend>
 				<table width="100%" frame="box" bgcolor="#FFFAFA">
 					<tr>
 						<td>
@@ -162,35 +161,39 @@ function popU(U,N,T) {
 									// ดึงรายการสินทรัพย์ที่ผ่านขั้นตอนพิจารณา อนุมัติ
 									$i = 0;
 									$Sql = 	"
-												SELECT 
-														\"thcap_asset_biz_brand\".\"brand_name\",
-														\"thcap_asset_biz_model\".\"model_name\",
-														\"thcap_asset_biz_detail_car_temp\".\"frame_no\",
-														\"thcap_asset_biz_detail_car_temp\".\"engine_no\",
-														\"Vfuser\".\"fullname\",
-														\"thcap_asset_biz_detail_central\".\"doerDate\",
-														\"thcap_asset_biz_detail_central\".\"appID\",
-														\"thcap_asset_biz_detail_central\".\"appDate\",
-														\"thcap_asset_biz_detail_central\".\"add_or_edit\",
-														\"thcap_asset_biz_detail_central\".\"statusapp\",
-														\"thcap_asset_biz_detail_central\".\"noteapp\",
-														\"thcap_asset_biz_detail\".\"assetDetailID\",
-														\"thcap_asset_biz_detail_central\".\"ascenID\" 
-												FROM 
-														\"thcap_asset_biz_detail\",
-														\"thcap_asset_biz_brand\",
-														\"thcap_asset_biz_model\",
-														\"thcap_asset_biz_detail_central\",
-														\"thcap_asset_biz_detail_car_temp\",
-														\"Vfuser\" 
-												WHERE  
-														(\"thcap_asset_biz_detail\".\"assetDetailID\" = \"thcap_asset_biz_detail_central\".\"assetDetailID\") AND 
-														(\"thcap_asset_biz_model\".\"modelID\" = \"thcap_asset_biz_detail\".\"model\") AND 
-														(\"thcap_asset_biz_detail_car_temp\".\"ascenID\" = \"thcap_asset_biz_detail_central\".\"ascenID\") AND 
-														(\"thcap_asset_biz_detail\".\"brand\" = \"thcap_asset_biz_brand\".\"brandID\") AND 
-														(\"thcap_asset_biz_detail_central\".\"doerID\" = \"Vfuser\".\"id_user\") and 
-														(\"thcap_asset_biz_detail_central\".\"statusapp\" > 0) and 
-														(\"thcap_asset_biz_detail_car_temp\".\"car_type\" = $astype )
+												SELECT
+													a.\"ascenID\",
+													d.\"brand_name\",
+													e.\"model_name\",
+													b.\"frame_no\",
+													b.\"engine_no\",
+													f.\"fullname\" AS \"doerName\",
+													a.\"doerDate\",
+													g.\"fullname\" AS \"appName\",
+													a.\"appDate\",
+													a.\"statusapp\",
+													a.\"add_or_edit\"
+												FROM
+													\"thcap_asset_biz_detail_central\" a
+												LEFT JOIN
+													\"thcap_asset_biz_detail_car_temp\" b ON a.\"ascenID\" = b.\"ascenID\"
+												LEFT JOIN
+													\"thcap_asset_biz_detail\" c ON a.\"assetDetailID\" = c.\"assetDetailID\"
+												LEFT JOIN
+													\"thcap_asset_biz_brand\" d ON c.\"brand\" = d.\"brandID\"
+												LEFT JOIN
+													\"thcap_asset_biz_model\" e ON c.\"model\" = e.\"modelID\"
+												LEFT JOIN
+													\"Vfuser\" f ON a.\"doerID\" = f.\"id_user\"
+												LEFT JOIN
+													\"Vfuser\" g ON a.\"appID\" = g.\"id_user\"
+												WHERE
+													a.\"statusapp\" IN('1', '2') AND
+													a.\"assetDetailID\" IN(select \"assetDetailID\" from \"thcap_asset_biz_detail\" where \"astypeID\" = '$astype')
+												ORDER BY
+													\"appDate\" DESC
+												LIMIT
+													30
 											";
 											
 									
@@ -203,19 +206,6 @@ function popU(U,N,T) {
 											$temp_10_ID = $result["temp_10_ID"];
 											$statusapp = $result["statusapp"];
 											$fullnameuserdoer = $result["fulldoer"];
-											// สืบค้นชื่อ ผู้อนุมัติ
-											$Sql_Get_Name = "
-																SELECT 
-																		fullname
-																FROM 
-																		\"Vfuser\"
-																WHERE 
-																		\"id_user\" = '".$result["appID"]."'
-															";
-															
-											$Result = pg_query($Sql_Get_Name);
-											$Data = pg_fetch_array($Result);
-											$fullnameuserapp = $Data["fullname"];
 											$ascenID = $result["ascenID"];
 											if($statusapp == '1'){
 												$txtstatus = 'อนุมัติ';
@@ -240,12 +230,12 @@ function popU(U,N,T) {
 													<td align=\"center\">".$result["model_name"]."</td>
 													<td align=\"center\">".$result["frame_no"]."</td>
 													<td align=\"center\">".$result["engine_no"]."</td>
-													<td align=\"center\">".$result["fullname"]."</td>	 
+													<td align=\"center\">".$result["doerName"]."</td>	 
 													<td align=\"center\">".$result["doerDate"]."</td>
-													<td align=\"center\">$fullnameuserapp</td>	
+													<td align=\"center\">".$result["appName"]."</td>	
 													<td align=\"center\">".$result["appDate"]."</td>
 													<td align=\"center\"><font color=\"red\">".$statustxt1."</font></td>
-													<td align=\"center\"><img style=\"cursor:pointer;\" onclick=\"popU('add_asset_for_sales_car_view.php?ascenID=$ascenID&readonly=t&assetdetailID=$assetDetailID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=900,height=600')\" src=\"../images/detail.gif\" width=\"20px;\" height=\"20px;\"></td>	
+													<td align=\"center\"><img style=\"cursor:pointer;\" onclick=\"popU('view_asset_for_sales_car.php?ascenID=$ascenID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=900,height=600')\" src=\"../images/detail.gif\" width=\"20px;\" height=\"20px;\"></td>	
 													<td align=\"center\">$txtstatus</td>
 													<td align=\"center\">$note</td>
 												

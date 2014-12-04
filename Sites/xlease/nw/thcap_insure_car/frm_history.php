@@ -1,10 +1,30 @@
 <?php
 include("../../config/config.php");
+
+$historyType = pg_escape_string($_GET["historyType"]);
+
+if($historyType == "add")
+{
+	$whereOther = "AND a.\"editTime\" = '0'";
+	$title = "ประวัติการอนุมัติเพิ่มประกันภัย";
+	$colspan = "13";
+}
+elseif($historyType == "edit")
+{
+	$whereOther = "AND a.\"editTime\" > '0'";
+	$title = "ประวัติการอนุมัติแก้ไขประกันภัย";
+	$colspan = "13";
+}
+else
+{
+	$title = "ประวัติการอนุมัติเพิ่ม-แก้ไขประกันภัย";
+	$colspan = "14";
+}
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html>
 <head>
-	<title>ประวัติการอนุมัติเพิ่ม-แก้ไขประกันภัย</title>
+	<title><?php echo $title; ?></title>
     <meta http-equiv="Content-Type" content="txt/html; charset=utf-8" />
     <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
     
@@ -23,11 +43,11 @@ include("../../config/config.php");
 
 <body>
 	<center>
-		<h1>ประวัติการอนุมัติเพิ่ม-แก้ไขประกันภัย</h1>
+		<h1><?php echo $title; ?></h1>
 		<table width="95%" border="0" cellSpacing="1" cellPadding="3" align="center" bgcolor="#F0F0F0">
 			<tr style="font-weight:bold;" valign="middle" bgcolor="#D6D6D6" align="center">
 				<th>รายการ</th>
-				<th>ประเภทการทำรายการ</th>
+				<?php if($historyType == ""){echo "<th>ประเภทการทำรายการ</th>";} ?>
 				<th>เลขที่สัญญา</th>
 				<th>ประเภทประกัน</th>
 				<th>ประเภทรถ</th>
@@ -77,6 +97,7 @@ include("../../config/config.php");
 										\"Vfuser\" i ON a.\"appvID\" = i.\"id_user\"
 									WHERE
 										\"appvStatus\" IN('0','1')
+										$whereOther
 									
 									UNION
 
@@ -114,6 +135,7 @@ include("../../config/config.php");
 										\"Vfuser\" i ON a.\"appvID\" = i.\"id_user\"
 									WHERE
 										\"appvStatus\" IN('0','1')
+										$whereOther
 
 									ORDER BY
 										\"appvStamp\" DESC
@@ -190,7 +212,7 @@ include("../../config/config.php");
 				}
 				
 				echo "<td align=\"center\">$i</td>";
-				echo "<td align=\"center\">$transactionType</td>";
+				if($historyType == ""){echo "<td align=\"center\">$transactionType</td>";}
 				echo "<td align=\"center\"><font color=\"blue\" style=\"cursor:pointer;\" onclick=\"javascript:popU('../thcap_installments/frm_Index.php?show=1&idno=$contractID','','toolbar=no,menubar=no,resizable=no,scrollbars=yes,status=no,location=no,width=1000,height=700')\"><u>$contractID</u></font></td>";
 				echo "<td align=\"center\">$insureName</td>";
 				echo "<td align=\"center\">$astypeName</td>";
@@ -209,11 +231,11 @@ include("../../config/config.php");
 			
 			if($i == 0)
 			{
-				echo "<tr><td colspan=\"14\" align=\"center\">--ไม่พบข้อมูล--</td></tr>";
+				echo "<tr><td colspan=\"$colspan\" align=\"center\">--ไม่พบข้อมูล--</td></tr>";
 			}
 			?>
 			<tr bgcolor="#D6D6D6">
-				<td colspan="14" align="left" >รวม : <?php echo number_format($i,0); ?>  รายการ</td>
+				<td colspan="<?php echo $colspan; ?>" align="left" >รวม : <?php echo number_format($i,0); ?>  รายการ</td>
 			</tr>
 		</table>
 	</center>

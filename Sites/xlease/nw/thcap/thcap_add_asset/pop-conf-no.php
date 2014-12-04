@@ -1,7 +1,7 @@
-<?php echo "pop-conf-no.php"; print_r($_GET);
+<?php
 include("../../../config/config.php");
 $ascenID = pg_escape_string($_GET["ascenID"]);  
-$ascenID_Real = pg_escape_string($_GET["ascenID_Real"]);  
+$assetDetailID = pg_escape_string($_GET["assetDetailID"]);  
 				
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
@@ -19,10 +19,10 @@ $ascenID_Real = pg_escape_string($_GET["ascenID_Real"]);
 		<div><textarea rows="5" cols="70" name="note" id="note"></textarea></div>
 		<div>
 			<input type="hidden" name="ascenID" id="ascenID" value="<?php echo $ascenID;?>">
-			<input type="hidden" name="ascenID_Real" id="ascenID_Real" value="<?php echo $ascenID_Real;?>">
+			<input type="hidden" name="assetDetailID" id="assetDetailID" value="<?php echo $assetDetailID;?>">
 			<input type="hidden" name="frompage" id="frompage" value="appvdetail">
-			<input type="submit" name="btn_save" id="btn_save" value="บันทึก" onclick="return confirmsave()" style="width:100px;" />
-			<input type="button" id="cancelvalue" onclick="$('#dialog').remove()" value="ยกเลิก" style="width:100px;">		
+			<input type="submit" name="btn_save" id="btn_save" value="บันทึก" onclick="return confirmsave()" style="width:100px; cursor:pointer;" />
+			<input type="button" id="cancelvalue" onclick="$('#dialog').remove()" value="ยกเลิก" style="width:100px; cursor:pointer;">		
 		</div> 
 	</form>
 </body>

@@ -30,6 +30,7 @@ include("../../config/config.php");
 		
 		function searchContract()
 		{
+			document.getElementById("showHistory").style.display = 'none';
 			$('#showContract').html('<img src="../../images/progress.gif" border="0" width="32" height="32" alt="กำลังโหลด...">');
 			$("#showContract").load("frm_contractDetail.php?contractID="+$("#contractID").val());
 		}
@@ -51,6 +52,19 @@ include("../../config/config.php");
 		<tr>
 			<td>
 				<div id="showContract"></div>
+			</td>
+		</tr>
+		<tr>
+			<td align="center">
+				<br/>
+				<?php $historyType = "add"; ?>
+				<div id="showHistory">
+					<?php
+						include("frm_history_wait.php");
+						echo "<br/>";
+						include("frm_history_limit.php");
+					?>
+				</div>
 			</td>
 		</tr>
 	</table>

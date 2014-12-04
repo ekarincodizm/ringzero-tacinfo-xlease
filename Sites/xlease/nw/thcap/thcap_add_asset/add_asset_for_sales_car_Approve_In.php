@@ -7,11 +7,11 @@ $id_user=$_SESSION["av_iduser"];
 $qrylevel=pg_query("select ta_get_user_emplevel('$id_user')"); 
 list($emplevel)=pg_fetch_array($qrylevel); 
 
-$assetDetailID = pg_escape_string($_GET["ascenID"]); 
+$ascenID = pg_escape_string($_GET["ascenID"]);
+$assetDetailID = pg_escape_string($_GET["assetDetailID"]);
 $readonly = pg_escape_string($_GET["readonly"]); 
 $appv = pg_escape_string($_GET["appv"]);
 $method = pg_escape_string($_GET["method"]);
-$ascenID_Real = pg_escape_string($_GET["ascenID_Real"]);  
 if ($method=='edit'){ 
  //* Old Par Code Not Use */
 }else{
@@ -26,7 +26,8 @@ if ($method=='edit'){
 		$Str_Qry = 	" SELECT 
   								thcap_asset_biz_brand.brand_name,
   								thcap_asset_biz_model.model_name,	
-  								thcap_asset_biz_detail.\"secondaryID\",	
+  								thcap_asset_biz_detail.\"secondaryID\",
+								thcap_asset_biz_detail.\"productCode\",
   								thcap_asset_biz_detail_car_temp.frame_no,
   								thcap_asset_biz_astype.\"astypeName\",
   								thcap_asset_biz_detail_car_temp.\"car_mileage\",
@@ -52,9 +53,7 @@ if ($method=='edit'){
   								thcap_asset_biz_detail_central.\"ascenID\" = thcap_asset_biz_detail_car_temp.\"ascenID\" AND
   								thcap_asset_biz_detail_central.\"assetDetailID\" = thcap_asset_biz_detail.\"assetDetailID\" AND
   								thcap_asset_biz_detail_central.statusapp = '0' AND
-  								thcap_asset_biz_detail.\"assetDetailID\" = ".$assetDetailID."
-		
-						
+  								thcap_asset_biz_detail_central.\"ascenID\" = '$ascenID'
 					";
 					
 		$qry_detail = pg_query($Str_Qry);
@@ -73,6 +72,8 @@ if ($method=='edit'){
 		$car_province = $resultdetail["register_province"]; // echo 'ln71 '.$car_province.'<BR>';
 		$frameno = $resultdetail["frame_no"]; 
 		$engineno = $resultdetail["engine_no"]; 
+		$secondaryID = $resultdetail["secondaryID"]; // เลขเครื่องเดิม
+		$productCode = $resultdetail["productCode"]; // เลขถังเดิม
 	}
 	$qry_motorcycle = pg_query("
 								SELECT *
@@ -112,7 +113,7 @@ $(document).ready(function(){
 			
 		$('body').append('<div id="dialog"></div>');
 	
-		$('#dialog').load('pop-conf-no.php?ascenID=<?php echo $ascenID; ?>&ascenID_Real=<?php echo $ascenID_Real; ?>');
+		$('#dialog').load('pop-conf-no.php?ascenID=<?php echo $ascenID; ?>&assetDetailID=<?php echo $assetDetailID; ?>');
 		$('#dialog').dialog({
 			title: 'บันทึกเหตุผลการที่ไม่อนุมัติ',
 			resizable: false,
@@ -256,23 +257,8 @@ function chklist(){
 								</tr>				
 								<tr>
 									<td></td>
-									<td ><b>เลขเครื่อง :</b>
-									<?php 
-									IF($emplevel <= 1 and $method=='edit'){ //กรณีมาจากเมนู "(THCAP) ใส่รายละเอียดสัญญา BH"
-										echo "<input type=\"text\" name=\"newproductcode\" value=\"".$result["productCode"]."\" $look><font color=\"red\" >*</font>";
-									}else{
-										echo $engineno; // print_r($result);
-									}	
-									if($emplevel <= 1 ){
-										$disable_status = "";
-									}else
-									{
-										$disable_status = "disabled";		
-									}
-									?> 
-									<INPUT TYPE = HIDDEN Name = Frame_No  Value = "<?php echo $result["productCode"]; ?>">
-									</td>
-									<td colspan="2"><b>เลขตัวถัง : </b><?php echo $frameno; ?> </td>
+									<td ><b>เลขเครื่อง : </b><?php echo $secondaryID; ?></td>
+									<td colspan="2"><b>เลขตัวถัง : </b><?php echo $productCode; ?></td>
 								</tr>
 							</table>	
 							<table width="100%" >	
@@ -302,10 +288,10 @@ function chklist(){
 									</select><font color="red" >*</font></td>
 								</tr>
 								<tr>
-									<td align="right" width="10%"><b>เลขตัวถัง : </b></td>
-									<td><input type="text" size="50" name="bodyno" id = "bodyno" value="<?php echo $frameno; ?>" <?php echo $look; ?>><font color="red" >*</font></td>
 									<td align="right"><b>เลขเครื่อง :</b></td>
-									<td colspan = "4"><input type="text" size="50" name="engineno" id = "engineno" value = "<?php echo $engineno; ?>" <?php echo $look; ?> ><font color="red" >*</font></td>
+									<td><input type="text" size="50" name="engineno" id = "engineno" value = "<?php echo $engineno; ?>" <?php echo $look; ?> ><font color="red" >*</font></td>
+									<td align="right" width="10%"><b>เลขตัวถัง : </b></td>
+									<td colspan="4"><input type="text" size="50" name="bodyno" id = "bodyno" value="<?php echo $frameno; ?>" <?php echo $look; ?>><font color="red" >*</font></td>
 								</tr>
 								<tr>
 									<td width="15%" align="right" ><b>ขนาด ซี.ซี. : </b></td>
@@ -365,7 +351,7 @@ function chklist(){
 		</form>
 		<form name="my" method="post" action="process_approve-yes.php">
 			<input type="hidden" name="ascenID" id="ascenID" value="<?php echo $ascenID;?>">
-			<input type="hidden" name="ascenID_Real" id="ascenID_Real" value="<?php echo $ascenID_Real;?>">
+			<input type="hidden" name="assetDetailID" id="assetDetailID" value="<?php echo $assetDetailID;?>">
 			<input type="hidden" name="frompage" id="frompage" value="appvdetail">
 			<input name="appv" type="submit" value="อนุมัติ" hidden /></td>
 		</form>	
